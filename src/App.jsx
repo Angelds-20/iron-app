@@ -11,6 +11,7 @@ import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
 import { evaluateAchievements } from './lib/overloadEngine'
 import { BADGES_CATALOG, DEFAULT_ROUTINES } from './lib/constants'
+import { syncWorkoutToCloud } from './lib/syncService'
 import { Trophy } from 'lucide-react'
 
 export default function App() {
@@ -129,6 +130,11 @@ export default function App() {
 
     const newHistory = [workoutData, ...workoutsHistory]
     setWorkoutsHistory(newHistory)
+
+    // Sincronizar en segundo plano con Supabase Cloud
+    syncWorkoutToCloud(workoutData, { weight: bodyweight }).catch((err) =>
+      console.warn('Sync cloud warning:', err)
+    )
 
     if (workoutData.maxWeight > (personalRecords.benchPress || 0)) {
       setPersonalRecords((prev) => ({
