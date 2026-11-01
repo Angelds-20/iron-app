@@ -20,7 +20,10 @@ import {
   Target,
   BarChart3,
   Sliders,
-  X
+  X,
+  Activity,
+  Watch,
+  HeartPulse
 } from 'lucide-react'
 
 const ICON_MAP = {
@@ -44,7 +47,10 @@ const ICON_MAP = {
   Target,
   BarChart3,
   Sliders,
-  X
+  X,
+  Activity,
+  Watch,
+  HeartPulse
 }
 
 export function LucideIcon({ name, className = 'w-5 h-5', ...props }) {

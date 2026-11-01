@@ -10,7 +10,9 @@ import {
   Sparkles,
   Info,
   ChevronDown,
-  RotateCcw
+  RotateCcw,
+  Watch,
+  HeartPulse
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
@@ -36,6 +38,10 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
   // Timer de descanso entre series
   const [restSeconds, setRestSeconds] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
+
+  // Métricas de Honor Choice Watch 2i post-sesión
+  const [watchBpm, setWatchBpm] = useState(135)
+  const [watchCalories, setWatchCalories] = useState(240)
 
   React.useEffect(() => {
     let interval = null
@@ -97,7 +103,6 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
   }
 
   const handleFinish = () => {
-    // Calcular estadísticas del entreno
     let totalVolume = 0
     let maxWeight = 0
     let completedSetsCount = 0
@@ -120,7 +125,6 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
       }
     })
 
-    // Efecto de celebración con confetti
     confetti({
       particleCount: 80,
       spread: 70,
@@ -135,6 +139,10 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
       totalVolume,
       maxWeight,
       completedSetsCount,
+      watchMetrics: {
+        avgBpm: Number(watchBpm),
+        caloriesBurned: Number(watchCalories)
+      },
       exercises: formattedExercises
     })
   }
@@ -177,7 +185,7 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
         </div>
       </div>
 
-      {/* Timer de descanso flotante o banner superior si está activo */}
+      {/* Timer de descanso flotante si está activo */}
       {restSeconds > 0 && (
         <div className="mb-4 bg-carbon-900 text-white rounded-2xl p-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-2">
@@ -200,16 +208,14 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
 
       {/* Resumen de la rutina actual */}
       <div className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/60 mb-5 relative overflow-hidden">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="inline-block px-2.5 py-1 rounded-full bg-sand-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wider mb-2">
-              Sesión Activa
-            </div>
-            <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight">
-              {currentRoutine.title}
-            </h2>
-            <p className="text-xs text-neutral-500 mt-1">{currentRoutine.description}</p>
+        <div>
+          <div className="inline-block px-2.5 py-1 rounded-full bg-sand-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wider mb-2">
+            Sesión Activa
           </div>
+          <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight">
+            {currentRoutine.title}
+          </h2>
+          <p className="text-xs text-neutral-500 mt-1">{currentRoutine.description}</p>
         </div>
       </div>
 
@@ -217,7 +223,6 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
       <div className="space-y-4">
         {currentRoutine.exercises.map((exercise, exIndex) => {
           const sets = exerciseData[exercise.id] || []
-          const overloadAdvice = calculateOverload(previousHistory[exercise.id])
 
           return (
             <div
@@ -244,7 +249,7 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
                 <TrendingUp className="w-4 h-4 text-coral-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <div className="font-bold text-carbon-900 text-[11px]">
-                    Objetivo de Sobrecarga:
+                    Clave de Sobrecarga:
                   </div>
                   <div className="text-neutral-500 text-[11px] mt-0.5">
                     {exercise.notes}
@@ -357,6 +362,40 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
             </div>
           )
         })}
+      </div>
+
+      {/* Métricas de Honor Choice Watch 2i */}
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/60 mt-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Watch className="w-4 h-4 text-coral-500" />
+          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+            Honor Choice Watch 2i (Datos de Sesión)
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[10px] font-semibold text-neutral-500 mb-1">
+              Pulso Promedio (BPM)
+            </label>
+            <input
+              type="number"
+              value={watchBpm}
+              onChange={(e) => setWatchBpm(e.target.value)}
+              className="w-full text-center py-2 bg-sand-100 rounded-xl font-bold text-carbon-900 text-xs border border-sand-200 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] font-semibold text-neutral-500 mb-1">
+              Calorías Reloj (kcal)
+            </label>
+            <input
+              type="number"
+              value={watchCalories}
+              onChange={(e) => setWatchCalories(e.target.value)}
+              className="w-full text-center py-2 bg-sand-100 rounded-xl font-bold text-carbon-900 text-xs border border-sand-200 outline-none"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Botón final flotante para registrar entreno */}

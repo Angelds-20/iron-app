@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react'
 import { Header } from './components/Header'
 import { WeekStrip } from './components/WeekStrip'
 import { BodyweightCard } from './components/BodyweightCard'
-import { NutritionCard } from './components/NutritionCard'
+import { SessionMetricsCard } from './components/SessionMetricsCard'
 import { ActionCards } from './components/ActionCards'
 import { Navbar } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
 import { AchievementsView } from './components/AchievementsView'
-import { MealsLogger } from './components/MealsLogger'
 import { SettingsView } from './components/SettingsView'
+import { WatchModal } from './components/WatchModal'
 import { evaluateAchievements } from './lib/overloadEngine'
 import { BADGES_CATALOG } from './lib/constants'
-import { Sparkles, X, Trophy } from 'lucide-react'
+import { Trophy } from 'lucide-react'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
+  const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
 
   // Estado del usuario y peso
   const [bodyweight, setBodyweight] = useState(() => {
@@ -50,16 +51,16 @@ export default function App() {
     return saved ? JSON.parse(saved) : { benchPress: 45, squat: 50, deadlift: 60 }
   })
 
-  // Nutrición del día
-  const [dailyMeals, setDailyMeals] = useState(() => {
-    const saved = localStorage.getItem('daily_meals')
-    return saved ? JSON.parse(saved) : []
+  // Métricas de Honor Choice Watch 2i
+  const [watchData, setWatchData] = useState(() => {
+    const saved = localStorage.getItem('honor_watch_data')
+    return saved ? JSON.parse(saved) : { avgBpm: 132, maxBpm: 165, caloriesBurned: 260 }
   })
 
   // Modal de nueva insignia desbloqueada
   const [newBadgeModal, setNewBadgeModal] = useState(null)
 
-  // Guardar en localStorage ante cambios
+  // Persistencia Local
   useEffect(() => {
     localStorage.setItem('user_weight', bodyweight.toString())
   }, [bodyweight])
@@ -85,19 +86,12 @@ export default function App() {
   }, [personalRecords])
 
   useEffect(() => {
-    localStorage.setItem('daily_meals', JSON.stringify(dailyMeals))
-  }, [dailyMeals])
+    localStorage.setItem('honor_watch_data', JSON.stringify(watchData))
+  }, [watchData])
 
-  // Totales de nutrición calculados
-  const nutritionTotals = dailyMeals.reduce(
-    (acc, m) => ({
-      calories: acc.calories + (m.calories || 0),
-      protein: acc.protein + (m.protein || 0),
-      carbs: acc.carbs + (m.carbs || 0),
-      fat: acc.fat + (m.fat || 0)
-    }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 }
-  )
+  // Volumen de la última sesión
+  const lastWorkout = workoutsHistory[0]
+  const currentSessionVolume = lastWorkout?.totalVolume || 0
 
   // Manejar finalización de un entrenamiento
   const handleCompleteWorkout = (workoutData) => {
@@ -108,11 +102,16 @@ export default function App() {
       setCompletedDates((prev) => [...prev, todayStr])
     }
 
-    // 2. Guardar en historial
+    // 2. Guardar métricas del Honor Watch
+    if (workoutData.watchMetrics) {
+      setWatchData(workoutData.watchMetrics)
+    }
+
+    // 3. Guardar en historial
     const newHistory = [workoutData, ...workoutsHistory]
     setWorkoutsHistory(newHistory)
 
-    // 3. Evaluar récords personales (PR)
+    // 4. Evaluar récords personales (PR)
     if (workoutData.maxWeight > (personalRecords.benchPress || 0)) {
       setPersonalRecords((prev) => ({
         ...prev,
@@ -120,31 +119,25 @@ export default function App() {
       }))
     }
 
-    // 4. Evaluar insignias y otorgar XP
+    // 5. Evaluar insignias y otorgar XP
     const newBadges = evaluateAchievements(unlockedBadges, workoutData, newHistory)
     if (newBadges.length > 0) {
       setUnlockedBadges((prev) => [...prev, ...newBadges])
-      const xpGained = newBadges.reduce((acc, b) => acc + (b.xpReward || 50), 0) + 100 // 100 base por entreno
+      const xpGained = newBadges.reduce((acc, b) => acc + (b.xpReward || 50), 0) + 120
       setTotalXp((prev) => prev + xpGained)
       setNewBadgeModal(newBadges[0])
     } else {
-      setTotalXp((prev) => prev + 100) // 100 base por completar
+      setTotalXp((prev) => prev + 120)
     }
 
     // Volver a Home
     setActiveTab('home')
   }
 
-  // Manejar guardado de comida
-  const handleAddMeal = (meal) => {
-    setDailyMeals((prev) => [meal, ...prev])
-    setActiveTab('home')
-  }
-
   return (
     <div className="min-h-screen bg-sand-100 flex justify-center selection:bg-coral-500 selection:text-white">
-      {/* Contenedor tipo pantalla móvil / aplicación centrada */}
-      <div className="w-full max-w-md px-5 pt-4 pb-20 relative min-h-screen">
+      {/* Contenedor optimizado para iPhone con Safe Area Insets */}
+      <div className="w-full max-w-md px-5 pt-3 pb-28 relative min-h-screen">
         
         {/* Vistas según la pestaña activa */}
         {activeTab === 'home' && (
@@ -167,22 +160,20 @@ export default function App() {
               onUpdateWeight={setBodyweight}
             />
 
-            {/* Tarjeta de Nutrición (Calorías circular + Macros) */}
-            <NutritionCard
-              caloriesCurrent={nutritionTotals.calories}
-              caloriesTarget={2800}
-              proteinCurrent={nutritionTotals.protein}
-              proteinTarget={180}
-              carbsCurrent={nutritionTotals.carbs}
-              carbsTarget={300}
-              fatCurrent={nutritionTotals.fat}
-              fatTarget={70}
+            {/* Métricas de Fuerza & Honor Choice Watch 2i (Volumen circular + BPM) */}
+            <SessionMetricsCard
+              totalVolume={currentSessionVolume}
+              targetVolume={2500}
+              avgBpm={watchData.avgBpm}
+              maxBpm={watchData.maxBpm}
+              activeCalories={watchData.caloriesBurned}
             />
 
-            {/* Tarjetas de Acción: Workouts (Start) & Meals (Log) */}
+            {/* Tarjetas de Acción de Entrenamiento y Reloj */}
             <ActionCards
               onStartWorkout={() => setActiveTab('workout')}
-              onLogMeals={() => setActiveTab('meals')}
+              onOpenWatchModal={() => setIsWatchModalOpen(true)}
+              lastWatchData={watchData}
             />
           </div>
         )}
@@ -207,12 +198,22 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'meals' && (
-          <MealsLogger
-            currentMeals={dailyMeals}
-            onAddMeal={handleAddMeal}
-            onCancel={() => setActiveTab('home')}
-          />
+        {activeTab === 'watch' && (
+          <div>
+            <Header title="Honor Watch" streak={Math.max(1, completedDates.length)} />
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
+              <h3 className="text-lg font-black text-carbon-900 mb-1">Honor Choice Watch 2i</h3>
+              <p className="text-xs text-neutral-400 mb-4">
+                Monitorea pulso, picos cardíacos en series pesadas y gasto calórico.
+              </p>
+              <button
+                onClick={() => setIsWatchModalOpen(true)}
+                className="w-full py-3 bg-carbon-900 hover:bg-black text-white text-xs font-bold rounded-full transition-all"
+              >
+                Actualizar Métricas del Reloj
+              </button>
+            </div>
+          </div>
         )}
 
         {activeTab === 'settings' && (
@@ -224,6 +225,25 @@ export default function App() {
             />
           </div>
         )}
+
+        {/* Modal de métricas del Honor Choice Watch 2i */}
+        <WatchModal
+          isOpen={isWatchModalOpen}
+          onClose={() => setIsWatchModalOpen(false)}
+          onSaveWatchData={(data) => {
+            setWatchData(data)
+            // Añadir logro de watch si es la primera vez
+            if (!unlockedBadges.some(b => b.code === 'WATCH_SYNC')) {
+              const watchBadge = BADGES_CATALOG.find(b => b.code === 'WATCH_SYNC')
+              if (watchBadge) {
+                setUnlockedBadges(prev => [...prev, watchBadge])
+                setTotalXp(prev => prev + 100)
+                setNewBadgeModal(watchBadge)
+              }
+            }
+          }}
+          currentData={watchData}
+        />
 
         {/* Modal de Insignia Desbloqueada */}
         {newBadgeModal && (

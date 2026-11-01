@@ -1,12 +1,12 @@
 import React from 'react'
-import { Home, Dumbbell, Trophy, Utensils, Settings } from 'lucide-react'
+import { Home, Dumbbell, Trophy, Watch, Settings } from 'lucide-react'
 
 export function Navbar({ activeTab = 'home', onSelectTab }) {
   const tabs = [
     { id: 'home', icon: Home, label: 'Inicio' },
     { id: 'workout', icon: Dumbbell, label: 'Entrenar' },
     { id: 'achievements', icon: Trophy, label: 'Premios' },
-    { id: 'meals', icon: Utensils, label: 'Comidas' },
+    { id: 'watch', icon: Watch, label: 'Honor Watch' },
     { id: 'settings', icon: Settings, label: 'Ajustes' }
   ]
 
