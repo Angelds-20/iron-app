@@ -2,54 +2,47 @@ import React, { useState } from 'react'
 import {
   Check,
   Plus,
+  Minus,
   Trash2,
   TrendingUp,
   Clock,
   Dumbbell,
   ArrowLeft,
   Sparkles,
-  Info,
-  ChevronDown,
-  RotateCcw,
-  Watch,
-  HeartPulse,
-  Sliders
+  Watch
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
-import { calculateOverload } from '../lib/overloadEngine'
-import { RoutineBuilderModal } from './RoutineBuilderModal'
 
 export function WorkoutLogger({
   routines = DEFAULT_ROUTINES,
-  onAddNewRoutine,
+  initialRoutineIndex = 0,
   onCompleteWorkout,
   onCancel,
   previousHistory = {}
 }) {
-  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(0)
-  const [isBuilderOpen, setIsBuilderOpen] = useState(false)
+  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(initialRoutineIndex)
   const currentRoutine = routines[selectedRoutineIndex] || routines[0] || DEFAULT_ROUTINES[0]
 
-  // Estado de las series por ejercicio
+  // Estado de series pre-rellenadas para empezar sin fricción
   const [exerciseData, setExerciseData] = useState(() => {
     const initial = {}
     currentRoutine.exercises.forEach((ex) => {
       initial[ex.id] = [
-        { setNumber: 1, weight: ex.defaultWeight, reps: 10, rir: 2, completed: false },
-        { setNumber: 2, weight: ex.defaultWeight, reps: 10, rir: 2, completed: false },
-        { setNumber: 3, weight: ex.defaultWeight, reps: 10, rir: 2, completed: false }
+        { setNumber: 1, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
+        { setNumber: 2, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
+        { setNumber: 3, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false }
       ]
     })
     return initial
   })
 
-  // Timer de descanso entre series
+  // Timer de descanso flotante
   const [restSeconds, setRestSeconds] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
 
-  // Métricas de Honor Choice Watch 2i post-sesión
-  const [watchBpm, setWatchBpm] = useState(135)
+  // Métricas de Honor Choice Watch 2i
+  const [watchBpm, setWatchBpm] = useState(132)
   const [watchCalories, setWatchCalories] = useState(240)
 
   React.useEffect(() => {
@@ -69,6 +62,20 @@ export function WorkoutLogger({
     setTimerActive(true)
   }
 
+  const handleSwitchRoutine = (idx) => {
+    setSelectedRoutineIndex(idx)
+    const newRoutine = routines[idx]
+    const newExData = {}
+    newRoutine.exercises.forEach((ex) => {
+      newExData[ex.id] = [
+        { setNumber: 1, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
+        { setNumber: 2, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
+        { setNumber: 3, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false }
+      ]
+    })
+    setExerciseData(newExData)
+  }
+
   const handleUpdateSet = (exerciseId, setIdx, field, value) => {
     setExerciseData((prev) => {
       const currentSets = [...(prev[exerciseId] || [])]
@@ -78,6 +85,19 @@ export function WorkoutLogger({
       }
       return { ...prev, [exerciseId]: currentSets }
     })
+  }
+
+  // Ajustes rápidos (+/- 2.5 kg o +/- 1 rep) sin teclado
+  const handleQuickAdjustWeight = (exerciseId, setIdx, delta) => {
+    const current = Number(exerciseData[exerciseId][setIdx].weight) || 0
+    const nextVal = Math.max(0, current + delta)
+    handleUpdateSet(exerciseId, setIdx, 'weight', nextVal)
+  }
+
+  const handleQuickAdjustReps = (exerciseId, setIdx, delta) => {
+    const current = Number(exerciseData[exerciseId][setIdx].reps) || 0
+    const nextVal = Math.max(1, current + delta)
+    handleUpdateSet(exerciseId, setIdx, 'reps', nextVal)
   }
 
   const handleToggleComplete = (exerciseId, setIdx) => {
@@ -100,14 +120,6 @@ export function WorkoutLogger({
         completed: false
       }
       return { ...prev, [exerciseId]: [...currentSets, newSet] }
-    })
-  }
-
-  const handleRemoveSet = (exerciseId, setIdx) => {
-    setExerciseData((prev) => {
-      const currentSets = prev[exerciseId].filter((_, idx) => idx !== setIdx)
-      const renumbered = currentSets.map((s, idx) => ({ ...s, setNumber: idx + 1 }))
-      return { ...prev, [exerciseId]: renumbered }
     })
   }
 
@@ -157,83 +169,69 @@ export function WorkoutLogger({
   }
 
   return (
-    <div className="pb-32">
-      {/* Barra superior con volver, selector de rutina y botón de crear rutina */}
-      <div className="flex items-center justify-between mb-5 gap-2">
+    <div className="pb-36">
+      {/* Botón Volver + Selector de Rutinas tipo pastilla táctil */}
+      <div className="flex items-center gap-2 mb-4">
         <button
           onClick={onCancel}
-          className="p-2.5 rounded-full bg-white border border-sand-200 text-carbon-800 hover:bg-sand-100 transition-colors shadow-sm"
+          className="p-2.5 rounded-full bg-white border border-sand-200 text-carbon-800 hover:bg-sand-100 transition-colors shadow-xs flex-shrink-0"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-2">
-          <select
-            value={selectedRoutineIndex}
-            onChange={(e) => {
-              const idx = Number(e.target.value)
-              setSelectedRoutineIndex(idx)
-              const newExData = {}
-              routines[idx].exercises.forEach((ex) => {
-                newExData[ex.id] = [
-                  { setNumber: 1, weight: ex.defaultWeight || 40, reps: 10, rir: 2, completed: false },
-                  { setNumber: 2, weight: ex.defaultWeight || 40, reps: 10, rir: 2, completed: false },
-                  { setNumber: 3, weight: ex.defaultWeight || 40, reps: 10, rir: 2, completed: false }
-                ]
-              })
-              setExerciseData(newExData)
-            }}
-            className="bg-white border border-sand-200 text-xs font-bold text-carbon-900 rounded-full px-3 py-2 outline-none shadow-sm cursor-pointer max-w-[170px] truncate"
-          >
-            {routines.map((rot, i) => (
-              <option key={rot.id} value={i}>
-                {rot.title}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={() => setIsBuilderOpen(true)}
-            className="p-2 rounded-full bg-carbon-900 text-white hover:bg-black transition-colors shadow-sm"
-            title="Crear nueva rutina personalizada"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
+        <div className="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-full border border-sand-200/80 w-full shadow-xs">
+          {routines.slice(0, 2).map((rot, idx) => (
+            <button
+              key={rot.id}
+              onClick={() => handleSwitchRoutine(idx)}
+              className={`py-2 text-xs font-bold rounded-full transition-all ${
+                selectedRoutineIndex === idx
+                  ? 'bg-carbon-900 text-white shadow-xs'
+                  : 'text-neutral-500 hover:text-carbon-900'
+              }`}
+            >
+              {rot.category === 'torso' ? 'Torso (Banca)' : 'Pierna (Sentadilla)'}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Timer de descanso flotante si está activo */}
+      {/* Timer de descanso flotante inteligente */}
       {restSeconds > 0 && (
-        <div className="mb-4 bg-carbon-900 text-white rounded-2xl p-3 flex items-center justify-between shadow-md">
+        <div className="sticky top-2 z-30 mb-4 bg-carbon-900 text-white rounded-2xl p-3 flex items-center justify-between shadow-lg shadow-carbon-900/15 border border-carbon-800">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-coral-500 animate-spin" />
-            <span className="text-xs font-semibold">Descanso entre series:</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-lg font-black text-coral-500 font-mono">
+            <span className="text-xs font-bold">Descanso:</span>
+            <span className="text-lg font-black text-coral-500 font-mono tracking-tight">
               {Math.floor(restSeconds / 60)}:{(restSeconds % 60).toString().padStart(2, '0')}
             </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setRestSeconds((s) => s + 30)}
+              className="text-[11px] font-bold px-2 py-1 rounded-lg bg-carbon-800 hover:bg-carbon-700 text-neutral-300"
+            >
+              +30s
+            </button>
             <button
               onClick={() => setRestSeconds(0)}
-              className="text-[11px] underline text-neutral-400 hover:text-white"
+              className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-sand-100 text-carbon-900"
             >
-              Saltar
+              Listo
             </button>
           </div>
         </div>
       )}
 
-      {/* Resumen de la rutina actual */}
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/60 mb-5 relative overflow-hidden">
-        <div>
-          <div className="inline-block px-2.5 py-1 rounded-full bg-sand-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wider mb-2">
-            Sesión Activa
-          </div>
-          <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight">
-            {currentRoutine.title}
-          </h2>
-          <p className="text-xs text-neutral-500 mt-1">{currentRoutine.description}</p>
-        </div>
+      {/* Encabezado simple */}
+      <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60 mb-4">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-coral-500">
+          SESIÓN ACTIVA
+        </span>
+        <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight mt-0.5">
+          {currentRoutine.title}
+        </h2>
+        <p className="text-xs text-neutral-400 mt-1">{currentRoutine.description}</p>
       </div>
 
       {/* Lista de Ejercicios */}
@@ -244,180 +242,124 @@ export function WorkoutLogger({
           return (
             <div
               key={exercise.id}
-              className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/60"
+              className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60"
             >
               {/* Encabezado del ejercicio */}
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-sand-100 text-carbon-800 text-[11px] font-bold flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full bg-sand-100 text-carbon-900 text-xs font-bold flex items-center justify-center">
                       {exIndex + 1}
                     </span>
-                    <h3 className="text-base font-bold text-carbon-900">{exercise.name}</h3>
+                    <h3 className="text-base font-extrabold text-carbon-900">{exercise.name}</h3>
                   </div>
-                  <div className="text-[11px] font-semibold text-neutral-400 mt-0.5 ml-7">
-                    {exercise.equipment || 'Equipamiento libre'} • {exercise.targetSets || 4} series × {exercise.targetReps || '8 - 10'} reps
-                  </div>
-                </div>
-              </div>
-
-              {/* Guía de Sobrecarga Progresiva */}
-              <div className="ml-7 my-3 p-3 bg-sand-50 rounded-2xl border border-sand-200/50 flex items-start gap-2.5 text-xs">
-                <TrendingUp className="w-4 h-4 text-coral-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-bold text-carbon-900 text-[11px]">
-                    Clave de Sobrecarga:
-                  </div>
-                  <div className="text-neutral-500 text-[11px] mt-0.5">
-                    {exercise.notes || 'Aumenta 1 repetición o sube peso manteniendo RIR 2.'}
+                  <div className="text-[11px] font-semibold text-neutral-400 mt-0.5 ml-8">
+                    {exercise.equipment}
                   </div>
                 </div>
               </div>
 
-              {/* Encabezados de tabla de series */}
-              <div className="grid grid-cols-12 gap-2 text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2 px-2 text-center">
-                <span className="col-span-2 text-left">Serie</span>
-                <span className="col-span-4">Kilos (kg)</span>
-                <span className="col-span-3">Reps</span>
-                <span className="col-span-2">RIR</span>
-                <span className="col-span-1">OK</span>
+              {/* Guía rápida de tempo / RIR */}
+              <div className="ml-8 mb-3 text-[11px] text-neutral-500 flex items-center gap-1.5 font-medium">
+                <TrendingUp className="w-3.5 h-3.5 text-coral-500 flex-shrink-0" />
+                <span>{exercise.notes}</span>
               </div>
 
-              {/* Filas de series */}
-              <div className="space-y-2">
+              {/* Series interactivas */}
+              <div className="space-y-2.5">
                 {sets.map((set, setIdx) => (
                   <div
                     key={setIdx}
-                    className={`grid grid-cols-12 gap-2 items-center p-2 rounded-2xl transition-colors ${
+                    className={`flex items-center justify-between p-3 rounded-2xl transition-all ${
                       set.completed
-                        ? 'bg-sand-100/70 border border-sand-200/70'
-                        : 'bg-sand-50/50 hover:bg-sand-50'
+                        ? 'bg-emerald-50/70 border border-emerald-200/80 text-emerald-900'
+                        : 'bg-sand-50/80 border border-sand-200/60'
                     }`}
                   >
-                    <span className="col-span-2 text-xs font-bold text-neutral-400 pl-1">
-                      #{set.setNumber}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-extrabold text-neutral-400 w-6">
+                        #{set.setNumber}
+                      </span>
 
-                    {/* Input Kilos */}
-                    <div className="col-span-4">
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={set.weight}
-                        onChange={(e) =>
-                          handleUpdateSet(exercise.id, setIdx, 'weight', e.target.value)
-                        }
-                        className="w-full text-center py-1.5 bg-white font-bold text-carbon-900 text-sm rounded-xl border border-sand-200 outline-none focus:border-coral-500 transition-colors"
-                      />
+                      {/* Ajuste Rápido de Kilos */}
+                      <div className="flex items-center bg-white rounded-xl border border-sand-200 shadow-2xs px-1 py-0.5">
+                        <button
+                          type="button"
+                          onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, -2.5)}
+                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-12 text-center text-xs font-black text-carbon-900 font-mono">
+                          {set.weight} kg
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, 2.5)}
+                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      {/* Ajuste Rápido de Repeticiones */}
+                      <div className="flex items-center bg-white rounded-xl border border-sand-200 shadow-2xs px-1 py-0.5">
+                        <button
+                          type="button"
+                          onClick={() => handleQuickAdjustReps(exercise.id, setIdx, -1)}
+                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-8 text-center text-xs font-black text-carbon-900 font-mono">
+                          {set.reps}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickAdjustReps(exercise.id, setIdx, 1)}
+                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Input Reps */}
-                    <div className="col-span-3">
-                      <input
-                        type="number"
-                        value={set.reps}
-                        onChange={(e) =>
-                          handleUpdateSet(exercise.id, setIdx, 'reps', e.target.value)
-                        }
-                        className="w-full text-center py-1.5 bg-white font-bold text-carbon-900 text-sm rounded-xl border border-sand-200 outline-none focus:border-coral-500 transition-colors"
-                      />
-                    </div>
-
-                    {/* Selector RIR */}
-                    <div className="col-span-2">
-                      <select
-                        value={set.rir}
-                        onChange={(e) =>
-                          handleUpdateSet(exercise.id, setIdx, 'rir', Number(e.target.value))
-                        }
-                        className="w-full text-center py-1.5 bg-white font-semibold text-neutral-600 text-xs rounded-xl border border-sand-200 outline-none cursor-pointer"
-                        title="Repeticiones en reserva antes del fallo"
-                      >
-                        <option value={0}>0 (Fallo)</option>
-                        <option value={1}>1 rep</option>
-                        <option value={2}>2 reps</option>
-                        <option value={3}>3+ reps</option>
-                      </select>
-                    </div>
-
-                    {/* Botón check de completado */}
-                    <div className="col-span-1 flex justify-center">
-                      <button
-                        onClick={() => handleToggleComplete(exercise.id, setIdx)}
-                        className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all ${
-                          set.completed
-                            ? 'bg-coral-500 text-white shadow-sm'
-                            : 'bg-sand-200 text-neutral-400 hover:bg-sand-300 hover:text-carbon-900'
-                        }`}
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    {/* Botón táctil grande de Check */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleComplete(exercise.id, setIdx)}
+                      className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+                        set.completed
+                          ? 'bg-coral-500 text-white shadow-md shadow-coral-500/20'
+                          : 'bg-white border border-sand-200 text-neutral-300 hover:text-carbon-900'
+                      }`}
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
 
-              {/* Botón añadir serie */}
-              <div className="mt-3 flex justify-between items-center px-1">
+              {/* Botón añadir serie rápido */}
+              <div className="mt-3 ml-8 flex justify-between items-center">
                 <button
+                  type="button"
                   onClick={() => handleAddSet(exercise.id)}
-                  className="flex items-center gap-1 text-[11px] font-bold text-neutral-500 hover:text-carbon-900 transition-colors"
+                  className="flex items-center gap-1 text-[11px] font-bold text-coral-500 hover:text-coral-600"
                 >
-                  <Plus className="w-3.5 h-3.5 text-coral-500" />
+                  <Plus className="w-3.5 h-3.5" />
                   <span>Añadir Serie</span>
                 </button>
-
-                {sets.length > 1 && (
-                  <button
-                    onClick={() => handleRemoveSet(exercise.id, sets.length - 1)}
-                    className="text-[11px] text-neutral-400 hover:text-rose-500 transition-colors"
-                  >
-                    Quitar última
-                  </button>
-                )}
               </div>
             </div>
           )
         })}
       </div>
 
-      {/* Métricas de Honor Choice Watch 2i */}
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/60 mt-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Watch className="w-4 h-4 text-coral-500" />
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-            Honor Choice Watch 2i (Datos de Sesión)
-          </span>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-[10px] font-semibold text-neutral-500 mb-1">
-              Pulso Promedio (BPM)
-            </label>
-            <input
-              type="number"
-              value={watchBpm}
-              onChange={(e) => setWatchBpm(e.target.value)}
-              className="w-full text-center py-2 bg-sand-100 rounded-xl font-bold text-carbon-900 text-xs border border-sand-200 outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-semibold text-neutral-500 mb-1">
-              Calorías Reloj (kcal)
-            </label>
-            <input
-              type="number"
-              value={watchCalories}
-              onChange={(e) => setWatchCalories(e.target.value)}
-              className="w-full text-center py-2 bg-sand-100 rounded-xl font-bold text-carbon-900 text-xs border border-sand-200 outline-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Botón final flotante para registrar entreno */}
+      {/* Botón flotante para terminar entreno */}
       <div className="mt-6">
         <button
+          type="button"
           onClick={handleFinish}
           className="w-full py-4 bg-carbon-900 hover:bg-black active:scale-[0.99] text-white font-extrabold text-sm rounded-full shadow-lg shadow-carbon-900/20 transition-all flex items-center justify-center gap-2"
         >
@@ -425,18 +367,6 @@ export function WorkoutLogger({
           <span>Completar Entrenamiento de Hoy</span>
         </button>
       </div>
-
-      {/* Modal para crear rutina personalizada */}
-      <RoutineBuilderModal
-        isOpen={isBuilderOpen}
-        onClose={() => setIsBuilderOpen(false)}
-        onSaveRoutine={(newRot) => {
-          if (onAddNewRoutine) {
-            onAddNewRoutine(newRot)
-          }
-          setSelectedRoutineIndex(routines.length)
-        }}
-      />
     </div>
   )
 }

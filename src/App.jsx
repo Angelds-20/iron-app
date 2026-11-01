@@ -16,6 +16,7 @@ import { Trophy } from 'lucide-react'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
+  const [activeRoutineIndex, setActiveRoutineIndex] = useState(0)
   const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
 
   // Rutinas activas (predefinidas + creadas por el usuario)
@@ -193,7 +194,10 @@ export default function App() {
 
             {/* Tarjetas de Acción de Entrenamiento y Reloj */}
             <ActionCards
-              onStartWorkout={() => setActiveTab('workout')}
+              onStartWorkout={(idx = 0) => {
+                setActiveRoutineIndex(idx)
+                setActiveTab('workout')
+              }}
               onOpenWatchModal={() => setIsWatchModalOpen(true)}
               lastWatchData={watchData}
             />
@@ -203,6 +207,7 @@ export default function App() {
         {activeTab === 'workout' && (
           <WorkoutLogger
             routines={allRoutines}
+            initialRoutineIndex={activeRoutineIndex}
             onAddNewRoutine={handleAddNewRoutine}
             onCompleteWorkout={handleCompleteWorkout}
             onCancel={() => setActiveTab('home')}
