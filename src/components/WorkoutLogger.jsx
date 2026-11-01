@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Check,
   Plus,
@@ -9,7 +9,8 @@ import {
   Dumbbell,
   ArrowLeft,
   Sparkles,
-  Watch
+  Watch,
+  RotateCcw
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
@@ -17,15 +18,28 @@ import { DEFAULT_ROUTINES } from '../lib/constants'
 export function WorkoutLogger({
   routines = DEFAULT_ROUTINES,
   initialRoutineIndex = 0,
+  activeSession = null,
+  onUpdateActiveSession,
+  onClearActiveSession,
   onCompleteWorkout,
   onCancel,
   previousHistory = {}
 }) {
-  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(initialRoutineIndex)
+  // 1. Restaurar o inicializar índice de rutina
+  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(() => {
+    if (activeSession?.routineIndex !== undefined) {
+      return activeSession.routineIndex
+    }
+    return initialRoutineIndex
+  })
+
   const currentRoutine = routines[selectedRoutineIndex] || routines[0] || DEFAULT_ROUTINES[0]
 
-  // Estado de series pre-rellenadas para empezar sin fricción
+  // 2. Restaurar o inicializar series (PERMANENTE en localStorage)
   const [exerciseData, setExerciseData] = useState(() => {
+    if (activeSession?.exerciseData && activeSession.routineIndex === selectedRoutineIndex) {
+      return activeSession.exerciseData
+    }
     const initial = {}
     currentRoutine.exercises.forEach((ex) => {
       initial[ex.id] = [
@@ -37,15 +51,33 @@ export function WorkoutLogger({
     return initial
   })
 
-  // Timer de descanso flotante
+  // 3. Tiempo de inicio de entrenamiento persistente
+  const [workoutStartedAt] = useState(() => {
+    return activeSession?.startedAt || Date.now()
+  })
+
+  const [elapsedSeconds, setElapsedSeconds] = useState(() => {
+    return Math.floor((Date.now() - (activeSession?.startedAt || Date.now())) / 1000)
+  })
+
+  // 4. Timer de descanso entre series
   const [restSeconds, setRestSeconds] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
 
-  // Métricas de Honor Choice Watch 2i
-  const [watchBpm, setWatchBpm] = useState(132)
-  const [watchCalories, setWatchCalories] = useState(240)
+  // 5. Métricas de Honor Choice Watch 2i
+  const [watchBpm, setWatchBpm] = useState(activeSession?.watchBpm || 132)
+  const [watchCalories, setWatchCalories] = useState(activeSession?.watchCalories || 240)
 
-  React.useEffect(() => {
+  // Contador de tiempo transcurrido continuo
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - workoutStartedAt) / 1000))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [workoutStartedAt])
+
+  // Timer de descanso
+  useEffect(() => {
     let interval = null
     if (timerActive && restSeconds > 0) {
       interval = setInterval(() => {
@@ -56,6 +88,21 @@ export function WorkoutLogger({
     }
     return () => clearInterval(interval)
   }, [timerActive, restSeconds])
+
+  // SINCRONIZACIÓN PERMANENTE INMEDIATA: cada cambio se guarda en localStorage
+  useEffect(() => {
+    if (onUpdateActiveSession) {
+      onUpdateActiveSession({
+        isActive: true,
+        routineIndex: selectedRoutineIndex,
+        routineId: currentRoutine.id,
+        startedAt: workoutStartedAt,
+        exerciseData,
+        watchBpm,
+        watchCalories
+      })
+    }
+  }, [exerciseData, selectedRoutineIndex, watchBpm, watchCalories, workoutStartedAt])
 
   const startRestTimer = (seconds = 90) => {
     setRestSeconds(seconds)
@@ -87,7 +134,6 @@ export function WorkoutLogger({
     })
   }
 
-  // Ajustes rápidos (+/- 2.5 kg o +/- 1 rep) sin teclado
   const handleQuickAdjustWeight = (exerciseId, setIdx, delta) => {
     const current = Number(exerciseData[exerciseId][setIdx].weight) || 0
     const nextVal = Math.max(0, current + delta)
@@ -123,6 +169,15 @@ export function WorkoutLogger({
     })
   }
 
+  const handleDiscardSession = () => {
+    if (window.confirm('¿Seguro que quieres descartar esta sesión? Se reseteará el progreso actual.')) {
+      if (onClearActiveSession) {
+        onClearActiveSession()
+      }
+      onCancel()
+    }
+  }
+
   const handleFinish = () => {
     let totalVolume = 0
     let maxWeight = 0
@@ -152,10 +207,16 @@ export function WorkoutLogger({
       origin: { y: 0.6 }
     })
 
+    // Limpiar sesión activa en progreso
+    if (onClearActiveSession) {
+      onClearActiveSession()
+    }
+
     onCompleteWorkout({
       routineId: currentRoutine.id,
       title: currentRoutine.title,
       category: currentRoutine.category,
+      durationMinutes: Math.max(1, Math.round(elapsedSeconds / 60)),
       completedAt: new Date().toISOString(),
       totalVolume,
       maxWeight,
@@ -168,13 +229,26 @@ export function WorkoutLogger({
     })
   }
 
+  // Formato mm:ss o hh:mm:ss
+  const formatTime = (secs) => {
+    const mins = Math.floor(secs / 60)
+    const s = secs % 60
+    if (mins >= 60) {
+      const h = Math.floor(mins / 60)
+      const m = mins % 60
+      return `${h}h ${m}m ${s < 10 ? '0' : ''}${s}s`
+    }
+    return `${mins}:${s < 10 ? '0' : ''}${s}`
+  }
+
   return (
     <div className="pb-36">
-      {/* Botón Volver + Selector de Rutinas tipo pastilla táctil */}
+      {/* Barra superior con volver, cronómetro real y selector de rutinas */}
       <div className="flex items-center gap-2 mb-4">
         <button
           onClick={onCancel}
           className="p-2.5 rounded-full bg-white border border-sand-200 text-carbon-800 hover:bg-sand-100 transition-colors shadow-xs flex-shrink-0"
+          title="Guardar y volver al inicio"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -223,15 +297,24 @@ export function WorkoutLogger({
         </div>
       )}
 
-      {/* Encabezado simple */}
+      {/* Encabezado con tiempo de entrenamiento real en vivo */}
       <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60 mb-4">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-coral-500">
-          SESIÓN ACTIVA
-        </span>
-        <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight mt-0.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+              EN CURSO • TIEMPO ACTIVO
+            </span>
+          </div>
+          <div className="text-xs font-black font-mono text-carbon-900 bg-sand-100 px-2.5 py-1 rounded-full">
+            {formatTime(elapsedSeconds)}
+          </div>
+        </div>
+
+        <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight mt-1.5">
           {currentRoutine.title}
         </h2>
-        <p className="text-xs text-neutral-400 mt-1">{currentRoutine.description}</p>
+        <p className="text-xs text-neutral-400 mt-0.5">{currentRoutine.description}</p>
       </div>
 
       {/* Lista de Ejercicios */}
@@ -356,8 +439,8 @@ export function WorkoutLogger({
         })}
       </div>
 
-      {/* Botón flotante para terminar entreno */}
-      <div className="mt-6">
+      {/* Botones de acción inferior */}
+      <div className="mt-6 space-y-2.5">
         <button
           type="button"
           onClick={handleFinish}
@@ -365,6 +448,15 @@ export function WorkoutLogger({
         >
           <Sparkles className="w-4 h-4 text-coral-500" />
           <span>Completar Entrenamiento de Hoy</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDiscardSession}
+          className="w-full py-2.5 text-neutral-400 hover:text-rose-500 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          <span>Descartar progreso de esta sesión</span>
         </button>
       </div>
     </div>

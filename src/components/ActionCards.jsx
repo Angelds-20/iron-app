@@ -1,13 +1,49 @@
 import React from 'react'
-import { Dumbbell, ArrowRight, Flame, Watch } from 'lucide-react'
-import { APP_IMAGES } from '../lib/constants'
+import { Dumbbell, ArrowRight, Flame, Watch, Play, Clock, Sparkles } from 'lucide-react'
 
-export function ActionCards({ onStartWorkout, onOpenWatchModal, lastWatchData }) {
+export function ActionCards({ onStartWorkout, onOpenWatchModal, lastWatchData, activeSession }) {
+  // Contar series completadas si hay sesión activa
+  const completedSetsCount = activeSession?.exerciseData
+    ? Object.values(activeSession.exerciseData).flatMap((sets) => sets).filter((s) => s.completed).length
+    : 0
+
   return (
     <div className="space-y-3 mb-6">
-      <div className="flex items-center justify-between px-1">
+      {/* Banner de Sesión en Curso si hay entrenamiento activo */}
+      {activeSession?.isActive && (
+        <div
+          onClick={() => onStartWorkout(activeSession.routineIndex || 0)}
+          className="bg-carbon-900 text-white rounded-3xl p-5 shadow-lg shadow-carbon-900/15 cursor-pointer active:scale-[0.98] transition-all border border-carbon-800 relative overflow-hidden group"
+        >
+          <div className="flex items-center justify-between relative z-10">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-coral-500 animate-pulse" />
+                <span className="text-[10px] font-extrabold tracking-widest uppercase text-coral-500">
+                  SESIÓN EN PROGRESO
+                </span>
+              </div>
+              <h3 className="text-lg font-black text-white">
+                {activeSession.routineIndex === 1
+                  ? 'Pierna — Sentadilla & Peso Muerto'
+                  : 'Torso — Banca & Inclinado'}
+              </h3>
+              <p className="text-xs text-neutral-300 mt-0.5">
+                {completedSetsCount} series registradas • Toca para continuar
+              </p>
+            </div>
+
+            <div className="px-4 py-2.5 rounded-full bg-coral-500 text-white text-xs font-black flex items-center gap-1.5 shadow-sm group-hover:bg-coral-600 transition-colors">
+              <span>Continuar</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between px-1 pt-1">
         <span className="text-[11px] font-bold tracking-widest text-neutral-400 uppercase">
-          COMENZAR AHORA
+          RUTINAS DE PATIO
         </span>
         <span className="text-[11px] font-semibold text-neutral-400">1-Tap para entrenar</span>
       </div>
@@ -15,7 +51,7 @@ export function ActionCards({ onStartWorkout, onOpenWatchModal, lastWatchData })
       {/* Tarjeta 1: Torso (Banca, Inclinado, Remo, Francés, Curl) */}
       <div
         onClick={() => onStartWorkout(0)}
-        className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
+        className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
       >
         <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center gap-3.5">
@@ -35,7 +71,7 @@ export function ActionCards({ onStartWorkout, onOpenWatchModal, lastWatchData })
             </div>
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-sm">
+          <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-xs">
             <ArrowRight className="w-4 h-4" />
           </div>
         </div>
@@ -44,7 +80,7 @@ export function ActionCards({ onStartWorkout, onOpenWatchModal, lastWatchData })
       {/* Tarjeta 2: Pierna (Sentadilla & Peso Muerto) */}
       <div
         onClick={() => onStartWorkout(1)}
-        className="bg-white rounded-3xl p-5 shadow-sm border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
+        className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
       >
         <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center gap-3.5">
@@ -64,14 +100,14 @@ export function ActionCards({ onStartWorkout, onOpenWatchModal, lastWatchData })
             </div>
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-sm">
+          <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-xs">
             <ArrowRight className="w-4 h-4" />
           </div>
         </div>
       </div>
 
       {/* Tarjeta Honor Choice Watch 2i compacta */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-sand-200/60 flex items-center justify-between">
+      <div className="bg-white rounded-2xl p-4 shadow-xs border border-sand-200/60 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Watch className="w-4 h-4 text-coral-500" />
           <div className="text-xs">

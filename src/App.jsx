@@ -19,6 +19,29 @@ export default function App() {
   const [activeRoutineIndex, setActiveRoutineIndex] = useState(0)
   const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
 
+  // Sesión en curso persistente (permanece aunque salgas de la app o vuelvas al home)
+  const [activeWorkoutSession, setActiveWorkoutSession] = useState(() => {
+    const saved = localStorage.getItem('active_workout_session')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch (e) {
+        return null
+      }
+    }
+    return null
+  })
+
+  const handleUpdateActiveSession = (sessionData) => {
+    setActiveWorkoutSession(sessionData)
+    localStorage.setItem('active_workout_session', JSON.stringify(sessionData))
+  }
+
+  const handleClearActiveSession = () => {
+    setActiveWorkoutSession(null)
+    localStorage.removeItem('active_workout_session')
+  }
+
   // Rutinas activas (predefinidas + creadas por el usuario)
   const [allRoutines, setAllRoutines] = useState(() => {
     const saved = localStorage.getItem('user_custom_routines')
@@ -200,6 +223,7 @@ export default function App() {
               }}
               onOpenWatchModal={() => setIsWatchModalOpen(true)}
               lastWatchData={watchData}
+              activeSession={activeWorkoutSession}
             />
           </div>
         )}
@@ -208,6 +232,9 @@ export default function App() {
           <WorkoutLogger
             routines={allRoutines}
             initialRoutineIndex={activeRoutineIndex}
+            activeSession={activeWorkoutSession}
+            onUpdateActiveSession={handleUpdateActiveSession}
+            onClearActiveSession={handleClearActiveSession}
             onAddNewRoutine={handleAddNewRoutine}
             onCompleteWorkout={handleCompleteWorkout}
             onCancel={() => setActiveTab('home')}
