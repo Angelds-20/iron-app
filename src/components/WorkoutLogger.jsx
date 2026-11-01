@@ -12,15 +12,24 @@ import {
   ChevronDown,
   RotateCcw,
   Watch,
-  HeartPulse
+  HeartPulse,
+  Sliders
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
 import { calculateOverload } from '../lib/overloadEngine'
+import { RoutineBuilderModal } from './RoutineBuilderModal'
 
-export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {} }) {
+export function WorkoutLogger({
+  routines = DEFAULT_ROUTINES,
+  onAddNewRoutine,
+  onCompleteWorkout,
+  onCancel,
+  previousHistory = {}
+}) {
   const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(0)
-  const currentRoutine = DEFAULT_ROUTINES[selectedRoutineIndex]
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false)
+  const currentRoutine = routines[selectedRoutineIndex] || routines[0] || DEFAULT_ROUTINES[0]
 
   // Estado de las series por ejercicio
   const [exerciseData, setExerciseData] = useState(() => {
@@ -62,7 +71,7 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
 
   const handleUpdateSet = (exerciseId, setIdx, field, value) => {
     setExerciseData((prev) => {
-      const currentSets = [...prev[exerciseId]]
+      const currentSets = [...(prev[exerciseId] || [])]
       currentSets[setIdx] = {
         ...currentSets[setIdx],
         [field]: value
@@ -75,7 +84,7 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
     const isNowCompleted = !exerciseData[exerciseId][setIdx].completed
     handleUpdateSet(exerciseId, setIdx, 'completed', isNowCompleted)
     if (isNowCompleted) {
-      startRestTimer(90) // Inicia 90 segundos de descanso automáticamente
+      startRestTimer(90)
     }
   }
 
@@ -149,8 +158,8 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
 
   return (
     <div className="pb-32">
-      {/* Barra superior con volver y selector de rutina */}
-      <div className="flex items-center justify-between mb-5">
+      {/* Barra superior con volver, selector de rutina y botón de crear rutina */}
+      <div className="flex items-center justify-between mb-5 gap-2">
         <button
           onClick={onCancel}
           className="p-2.5 rounded-full bg-white border border-sand-200 text-carbon-800 hover:bg-sand-100 transition-colors shadow-sm"
@@ -165,23 +174,31 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
               const idx = Number(e.target.value)
               setSelectedRoutineIndex(idx)
               const newExData = {}
-              DEFAULT_ROUTINES[idx].exercises.forEach((ex) => {
+              routines[idx].exercises.forEach((ex) => {
                 newExData[ex.id] = [
-                  { setNumber: 1, weight: ex.defaultWeight, reps: 10, rir: 2, completed: false },
-                  { setNumber: 2, weight: ex.defaultWeight, reps: 10, rir: 2, completed: false },
-                  { setNumber: 3, weight: ex.defaultWeight, reps: 10, rir: 2, completed: false }
+                  { setNumber: 1, weight: ex.defaultWeight || 40, reps: 10, rir: 2, completed: false },
+                  { setNumber: 2, weight: ex.defaultWeight || 40, reps: 10, rir: 2, completed: false },
+                  { setNumber: 3, weight: ex.defaultWeight || 40, reps: 10, rir: 2, completed: false }
                 ]
               })
               setExerciseData(newExData)
             }}
-            className="bg-white border border-sand-200 text-xs font-bold text-carbon-900 rounded-full px-3 py-2 outline-none shadow-sm cursor-pointer"
+            className="bg-white border border-sand-200 text-xs font-bold text-carbon-900 rounded-full px-3 py-2 outline-none shadow-sm cursor-pointer max-w-[170px] truncate"
           >
-            {DEFAULT_ROUTINES.map((rot, i) => (
+            {routines.map((rot, i) => (
               <option key={rot.id} value={i}>
                 {rot.title}
               </option>
             ))}
           </select>
+
+          <button
+            onClick={() => setIsBuilderOpen(true)}
+            className="p-2 rounded-full bg-carbon-900 text-white hover:bg-black transition-colors shadow-sm"
+            title="Crear nueva rutina personalizada"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -239,7 +256,7 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
                     <h3 className="text-base font-bold text-carbon-900">{exercise.name}</h3>
                   </div>
                   <div className="text-[11px] font-semibold text-neutral-400 mt-0.5 ml-7">
-                    {exercise.equipment} • {exercise.targetSets} series × {exercise.targetReps} reps
+                    {exercise.equipment || 'Equipamiento libre'} • {exercise.targetSets || 4} series × {exercise.targetReps || '8 - 10'} reps
                   </div>
                 </div>
               </div>
@@ -252,7 +269,7 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
                     Clave de Sobrecarga:
                   </div>
                   <div className="text-neutral-500 text-[11px] mt-0.5">
-                    {exercise.notes}
+                    {exercise.notes || 'Aumenta 1 repetición o sube peso manteniendo RIR 2.'}
                   </div>
                 </div>
               </div>
@@ -408,6 +425,18 @@ export function WorkoutLogger({ onCompleteWorkout, onCancel, previousHistory = {
           <span>Completar Entrenamiento de Hoy</span>
         </button>
       </div>
+
+      {/* Modal para crear rutina personalizada */}
+      <RoutineBuilderModal
+        isOpen={isBuilderOpen}
+        onClose={() => setIsBuilderOpen(false)}
+        onSaveRoutine={(newRot) => {
+          if (onAddNewRoutine) {
+            onAddNewRoutine(newRot)
+          }
+          setSelectedRoutineIndex(routines.length)
+        }}
+      />
     </div>
   )
 }

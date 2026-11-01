@@ -10,12 +10,26 @@ import { AchievementsView } from './components/AchievementsView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
 import { evaluateAchievements } from './lib/overloadEngine'
-import { BADGES_CATALOG } from './lib/constants'
+import { BADGES_CATALOG, DEFAULT_ROUTINES } from './lib/constants'
 import { Trophy } from 'lucide-react'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
+
+  // Rutinas activas (predefinidas + creadas por el usuario)
+  const [allRoutines, setAllRoutines] = useState(() => {
+    const saved = localStorage.getItem('user_custom_routines')
+    if (saved) {
+      try {
+        const custom = JSON.parse(saved)
+        return [...DEFAULT_ROUTINES, ...custom]
+      } catch (e) {
+        return DEFAULT_ROUTINES
+      }
+    }
+    return DEFAULT_ROUTINES
+  })
 
   // Estado del usuario y peso
   const [bodyweight, setBodyweight] = useState(() => {
@@ -89,6 +103,14 @@ export default function App() {
     localStorage.setItem('honor_watch_data', JSON.stringify(watchData))
   }, [watchData])
 
+  const handleAddNewRoutine = (newRoutine) => {
+    setAllRoutines((prev) => [...prev, newRoutine])
+    // Guardar solo las custom en localStorage
+    const savedCustom = localStorage.getItem('user_custom_routines')
+    const customList = savedCustom ? JSON.parse(savedCustom) : []
+    localStorage.setItem('user_custom_routines', JSON.stringify([...customList, newRoutine]))
+  }
+
   // Volumen de la última sesión
   const lastWorkout = workoutsHistory[0]
   const currentSessionVolume = lastWorkout?.totalVolume || 0
@@ -97,21 +119,17 @@ export default function App() {
   const handleCompleteWorkout = (workoutData) => {
     const todayStr = new Date().toISOString().split('T')[0]
     
-    // 1. Agregar fecha a completados si no estaba
     if (!completedDates.includes(todayStr)) {
       setCompletedDates((prev) => [...prev, todayStr])
     }
 
-    // 2. Guardar métricas del Honor Watch
     if (workoutData.watchMetrics) {
       setWatchData(workoutData.watchMetrics)
     }
 
-    // 3. Guardar en historial
     const newHistory = [workoutData, ...workoutsHistory]
     setWorkoutsHistory(newHistory)
 
-    // 4. Evaluar récords personales (PR)
     if (workoutData.maxWeight > (personalRecords.benchPress || 0)) {
       setPersonalRecords((prev) => ({
         ...prev,
@@ -119,7 +137,6 @@ export default function App() {
       }))
     }
 
-    // 5. Evaluar insignias y otorgar XP
     const newBadges = evaluateAchievements(unlockedBadges, workoutData, newHistory)
     if (newBadges.length > 0) {
       setUnlockedBadges((prev) => [...prev, ...newBadges])
@@ -130,13 +147,12 @@ export default function App() {
       setTotalXp((prev) => prev + 120)
     }
 
-    // Volver a Home
     setActiveTab('home')
   }
 
   return (
     <div className="min-h-screen bg-sand-100 flex justify-center selection:bg-coral-500 selection:text-white">
-      {/* Contenedor optimizado para iPhone con Safe Area Insets */}
+      {/* Contenedor optimizado para iPhone 13 (notch 47px, barra inferior 34px) */}
       <div className="w-full max-w-md px-5 pt-3 pb-28 relative min-h-screen">
         
         {/* Vistas según la pestaña activa */}
@@ -180,6 +196,8 @@ export default function App() {
 
         {activeTab === 'workout' && (
           <WorkoutLogger
+            routines={allRoutines}
+            onAddNewRoutine={handleAddNewRoutine}
             onCompleteWorkout={handleCompleteWorkout}
             onCancel={() => setActiveTab('home')}
             previousHistory={{}}
@@ -232,7 +250,6 @@ export default function App() {
           onClose={() => setIsWatchModalOpen(false)}
           onSaveWatchData={(data) => {
             setWatchData(data)
-            // Añadir logro de watch si es la primera vez
             if (!unlockedBadges.some(b => b.code === 'WATCH_SYNC')) {
               const watchBadge = BADGES_CATALOG.find(b => b.code === 'WATCH_SYNC')
               if (watchBadge) {

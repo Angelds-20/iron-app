@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Schema Supabase: Aura Fitness - Progressive Overload & Gamification
+-- Schema Supabase: IRON — Progressive Overload & Gamification SaaS
 -- ==============================================================================
 
 -- 1. Perfil del Usuario
@@ -9,58 +9,70 @@ create table if not exists public.profiles (
   full_name text,
   current_weight numeric(5,2) default 77.9,
   target_weight numeric(5,2) default 75.0,
-  daily_calorie_target integer default 2800,
   streak_count integer default 1,
   total_xp integer default 120,
   level integer default 1,
   created_at timestamptz default timezone('utc'::text, now()) not null
 );
 
--- 2. Entrenamientos completados
+-- 2. Plantillas de Rutinas Personalizadas (SaaS: Cada usuario crea sus rutinas y ejercicios)
+create table if not exists public.custom_routines (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  title text not null,
+  category text default 'general',
+  description text,
+  exercises jsonb not null default '[]'::jsonb,
+  created_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+-- 3. Entrenamientos completados
 create table if not exists public.workouts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.profiles(id) on delete cascade not null,
-  title text not null, -- 'Torso A', 'Pierna A', 'Torso B', 'Pierna B'
-  category text not null, -- 'torso', 'pierna', 'fullbody'
+  title text not null,
+  category text not null,
   notes text,
   duration_minutes integer default 45,
+  avg_bpm integer,
+  calories_burned integer,
   completed_at timestamptz default timezone('utc'::text, now()) not null
 );
 
--- 3. Ejercicios dentro del entrenamiento
+-- 4. Ejercicios dentro del entrenamiento
 create table if not exists public.exercises (
   id uuid primary key default gen_random_uuid(),
   workout_id uuid references public.workouts(id) on delete cascade not null,
   name text not null,
   order_index integer default 0,
-  suggested_overload text -- Sugerencia calculada de sobrecarga progresiva
+  suggested_overload text
 );
 
--- 4. Series (Sets)
+-- 5. Series (Sets)
 create table if not exists public.exercise_sets (
   id uuid primary key default gen_random_uuid(),
   exercise_id uuid references public.exercises(id) on delete cascade not null,
   set_number integer not null,
   weight_kg numeric(5,2) not null,
   reps integer not null,
-  rir integer default 2, -- Repeticiones en reserva (0 a 4)
+  rir integer default 2,
   is_pr boolean default false,
   created_at timestamptz default timezone('utc'::text, now()) not null
 );
 
--- 5. Medallas y Logros (Premios / Gamificación)
+-- 6. Medallas y Logros (Premios / Gamificación)
 create table if not exists public.achievements (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.profiles(id) on delete cascade not null,
-  code text not null, -- ej: 'FIRST_SESSION', 'BENCH_60KG', 'STREAK_7'
+  code text not null,
   title text not null,
   description text not null,
-  icon_name text not null, -- Lucide Icon (Trophy, Flame, Zap, Award, Target, Dumbbell)
+  icon_name text not null,
   unlocked_at timestamptz default timezone('utc'::text, now()) not null,
   unique(user_id, code)
 );
 
--- 6. Registro de Peso Corporal (Histórico diario)
+-- 7. Registro de Peso Corporal (Histórico)
 create table if not exists public.weight_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.profiles(id) on delete cascade not null,
@@ -69,8 +81,9 @@ create table if not exists public.weight_logs (
   unique(user_id, log_date)
 );
 
--- Políticas RLS (Row Level Security)
+-- Políticas RLS (Row Level Security) - Multi-tenant estricto
 alter table public.profiles enable row level security;
+alter table public.custom_routines enable row level security;
 alter table public.workouts enable row level security;
 alter table public.exercises enable row level security;
 alter table public.exercise_sets enable row level security;
@@ -80,6 +93,10 @@ alter table public.weight_logs enable row level security;
 -- Policies para perfiles
 create policy "Usuarios gestionan su propio perfil" 
   on public.profiles for all using (auth.uid() = id);
+
+-- Policies para rutinas personalizadas
+create policy "Usuarios gestionan sus rutinas" 
+  on public.custom_routines for all using (auth.uid() = user_id);
 
 -- Policies para workouts
 create policy "Usuarios gestionan sus workouts" 
