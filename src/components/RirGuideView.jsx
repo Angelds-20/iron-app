@@ -1,20 +1,17 @@
 import React, { useState } from 'react'
 import {
-  ShieldAlert,
   Zap,
   TrendingUp,
   HelpCircle,
   CheckCircle2,
   AlertTriangle,
-  ArrowRight,
-  Flame,
-  Activity,
-  Award,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Activity,
+  Award
 } from 'lucide-react'
 
-export function RirGuideView({ onSelectRirFilter = null }) {
+export function RirGuideView() {
   const [selectedRir, setSelectedRir] = useState(2)
   const [expandedFaq, setExpandedFaq] = useState(null)
 
@@ -23,273 +20,217 @@ export function RirGuideView({ onSelectRirFilter = null }) {
       level: 3,
       badge: 'RIR 3',
       name: 'Aproximación & Técnica',
-      color: 'bg-sky-50 text-sky-700 border-sky-200',
+      color: 'text-sky-700',
       tagColor: 'bg-sky-500 text-white',
-      accentColor: 'text-sky-600',
-      description: 'Quedan 3 repeticiones en reserva antes de fallar.',
-      barSpeed: 'Rápida y fluida',
-      targetSets: 'Series de calentamiento o trabajo técnico',
-      feel: 'Sientes la carga pero no hay desaceleración notable de la barra.',
-      angelAdvice: 'Ideal en las primeras series de calentamiento antes de cargar los 60 kg.'
+      description: 'Te quedaban 3 repeticiones más antes de llegar al fallo.',
+      barSpeed: 'Rápida y fluida sin desaceleración notable',
+      feel: 'Sientes la carga pero no hay fatiga neuromuscular profunda.',
+      angelAdvice: 'Úsalo en tus series de aproximación antes de cargar los 60 kg en banca o remo.'
     },
     {
       level: 2,
       badge: 'RIR 2',
-      name: 'Zona Dorada de Hipertrofia',
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      name: 'Zona Dorada de Hipertrofia & Fuerza',
+      color: 'text-emerald-700',
       tagColor: 'bg-emerald-600 text-white',
-      accentColor: 'text-emerald-700',
       isRecommended: true,
-      description: 'Quedan 2 repeticiones en reserva antes del fallo técnico.',
-      barSpeed: 'Ligera desaceleración en las 2 últimas reps',
-      targetSets: 'Series efectivas 1 y 2 de Banca, Inclinado y Remo',
-      feel: 'Esfuerzo alto y concentración total, pero mantienes la postura y técnica 100% impecables.',
-      angelAdvice: '¡Tu zona objetivo! Te da el 95% del estímulo muscular acumulado sin sobrecargar tus articulaciones ni el sistema nervioso central en el patio.'
+      description: 'Te quedaban exactamente 2 repeticiones antes del fallo técnico.',
+      barSpeed: 'La barra desacelera en las 2 últimas repeticiones pero no se traba',
+      feel: 'Esfuerzo alto con concentración total; técnica y postura 100% impecables.',
+      angelAdvice: '¡Tu zona objetivo en patio! Te da el 95% del estímulo de crecimiento con fatiga controlada para el sistema nervioso.'
     },
     {
       level: 1,
       badge: 'RIR 1',
       name: 'Esfuerzo Máximo Seguro',
-      color: 'bg-amber-50 text-amber-800 border-amber-200',
+      color: 'text-amber-700',
       tagColor: 'bg-amber-600 text-white',
-      accentColor: 'text-amber-700',
-      description: 'Solo podías completar 1 repetición más con buena técnica.',
-      barSpeed: 'Desaceleración marcada en la última rep',
-      targetSets: 'Última serie del ejercicio principal',
-      feel: 'La barra sube lenta y demanda máxima tensión en pecho, tríceps o espalda.',
-      angelAdvice: 'Aplica RIR 1 en la 3ª serie de tus ejercicios cuando quieras auditar si estás listo para dar el salto a más reps.'
+      description: 'Solo podías sacar 1 repetición más con buena técnica.',
+      barSpeed: 'Desaceleración marcada en la última repetición',
+      feel: 'Tensión muscular extrema; demanda empujar con todo.',
+      angelAdvice: 'Aplica RIR 1 en la 3ª serie cuando quieras auditar si estás listo para subir reps o peso.'
     },
     {
       level: 0,
       badge: 'RIR 0',
       name: 'Fallo Técnico Concéntrico',
-      color: 'bg-rose-50 text-rose-800 border-rose-200',
+      color: 'text-rose-700',
       tagColor: 'bg-rose-600 text-white',
       description: 'Imposible completar otra repetición con técnica estricta.',
-      barSpeed: 'La barra casi se detiene o se frena por completo',
-      targetSets: 'Solo en barra chica (brazos) o pruebas puntuales',
-      feel: 'Incapacidad física de empujar o tirar. Fatiga neuromuscular extrema.',
-      angelAdvice: 'Precaución en press de banca de 60 kg en patio sin spotter/ayudante: nunca busques RIR 0 absoluto en banca plana para evitar accidentes. Deja siempre RIR 1 o 2.'
+      barSpeed: 'La barra se frena o no sube más',
+      feel: 'Incapacidad física de mover la carga.',
+      angelAdvice: 'En press de banca de 60 kg en patio sin jaula de seguridad, evita llegar a RIR 0 absoluto para no quedar atrapado.'
     }
   ]
 
   const faqs = [
     {
       q: '¿Por qué en la app se le llama RIR / RIP?',
-      a: 'RIR significa "Reps In Reserve" (Repeticiones en Reserva). Es la métrica estándar de oro de la biomecánica moderna y la autoregulación deportiva (Mike Israetel, Eric Helms) para medir el esfuerzo real sin necesidad de llegar a lesionarte.'
+      a: 'RIR significa "Reps In Reserve" (Repeticiones en Reserva). Es la métrica estándar de oro de la biomecánica deportiva moderna (Eric Helms, Mike Israetel) para medir el esfuerzo real sin llegar a la lesión ni quemar el sistema nervioso.'
     },
     {
       q: '¿Cómo sé exactamente cuál es mi RIR al terminar una serie?',
-      a: 'Hazte esta pregunta al terminar la serie: "Si tuviera una recompensa de $1.000 por cada repetición extra con buena técnica, ¿cuántas más habría podido sacar?". Si la respuesta honesta es 2 reps, tu serie fue RIR 2.'
+      a: 'Pregúntate con honestidad al terminar la serie: "Si tuviera una recompensa de $1.000 por cada repetición extra con buena técnica, ¿cuántas más habría podido sacar?". Si la respuesta es 2 reps, tu serie fue RIR 2.'
     },
     {
       q: '¿Cuándo debo subir el peso o las repeticiones con mi barra de 60 kg?',
-      a: 'Si completas tus 3 series de 10 reps terminando la última serie con RIR 2 o superior, la sobrecarga progresiva se ha consolidado: ¡puedes aumentar a 11-12 reps o añadir 2.5 kg en la siguiente sesión!'
+      a: 'Si completas tus 3 series de 10 reps terminando la última serie con RIR 2 o 3, la sobrecarga progresiva se ha consolidado: ¡puedes aumentar a 11-12 reps o añadir 2.5 kg en la siguiente sesión!'
     }
   ]
 
+  const activeLevel = rirLevels.find((l) => l.level === selectedRir) || rirLevels[1]
+
   return (
     <div className="space-y-4 animate-fadeIn pb-6">
-      {/* Encabezado Principal */}
-      <div className="bg-carbon-900 text-white rounded-3xl p-5 shadow-sm border border-carbon-800 relative overflow-hidden">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-7 h-7 rounded-xl bg-coral-500/20 text-coral-500 flex items-center justify-center">
-            <Zap className="w-4 h-4" />
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-coral-500">
-            GUÍA DE ESFUERZO PERCIBIDO
-          </span>
-        </div>
-
-        <h2 className="text-xl font-black text-white leading-tight">
+      {/* Cabecera Limpia */}
+      <div className="px-1">
+        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+          AUTOREGULACIÓN & ESFUERZO PERCIBIDO
+        </span>
+        <h2 className="text-xl font-black text-carbon-900 leading-tight">
           Escala RIR / RIP
         </h2>
-        <p className="text-xs text-neutral-300 mt-1 leading-relaxed">
-          <strong className="text-white">Reps In Reserve:</strong> la métrica para medir cuánto te faltó para el fallo muscular y saber con precisión cuándo aumentar peso.
+        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+          <strong className="text-carbon-900 font-bold">Reps In Reserve:</strong> cuántas repeticiones más podías haber completado antes del fallo técnico real.
         </p>
-
-        <div className="grid grid-cols-2 gap-2 mt-4 pt-3.5 border-t border-carbon-800 text-[11px]">
-          <div className="p-2.5 rounded-2xl bg-carbon-800/80 border border-carbon-700/60">
-            <span className="text-[9px] font-bold text-neutral-400 uppercase block">Zona Óptima</span>
-            <span className="font-extrabold text-emerald-400 font-mono text-sm">RIR 2</span>
-            <span className="text-[9px] text-neutral-300 block mt-0.5">Máximo estímulo con fatiga baja</span>
-          </div>
-
-          <div className="p-2.5 rounded-2xl bg-carbon-800/80 border border-carbon-700/60">
-            <span className="text-[9px] font-bold text-neutral-400 uppercase block">Seguridad en Patio</span>
-            <span className="font-extrabold text-amber-400 font-mono text-sm">Evitar RIR 0</span>
-            <span className="text-[9px] text-neutral-300 block mt-0.5">En banca de 60 kg sin ayudante</span>
-          </div>
-        </div>
       </div>
 
-      {/* Selector de Nivel RIR */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
-            DESGLOSE DE CADA NIVEL
+      {/* TARJETA MAESTRA DE RIR (Sin matriosca de cajas) */}
+      <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/70 space-y-4">
+        {/* Selector de Nivel RIR */}
+        <div>
+          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-2">
+            Selecciona un nivel de esfuerzo
           </span>
-          <span className="text-[10px] font-bold text-neutral-500">
-            Toca para explorar
-          </span>
-        </div>
-
-        <div className="grid grid-cols-4 gap-1.5">
-          {rirLevels.map((lvl) => {
-            const isCurrent = selectedRir === lvl.level
-            return (
-              <button
-                key={lvl.level}
-                type="button"
-                onClick={() => setSelectedRir(lvl.level)}
-                className={`py-2 px-1 rounded-2xl text-center border transition-all cursor-pointer ${
-                  isCurrent
-                    ? `${lvl.tagColor} border-transparent shadow-sm font-black scale-102`
-                    : 'bg-white text-carbon-900 border-sand-200/80 hover:bg-sand-50 font-bold'
-                }`}
-              >
-                <div className="text-xs font-mono">{lvl.badge}</div>
-                <div className="text-[9px] opacity-80 line-clamp-1">{lvl.level === 0 ? 'Fallo' : `${lvl.level} reps`}</div>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Tarjeta Detallada del RIR Seleccionado */}
-        {(() => {
-          const active = rirLevels.find((l) => l.level === selectedRir) || rirLevels[1]
-          return (
-            <div className={`p-5 rounded-3xl border shadow-xs transition-all ${active.color}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${active.tagColor}`}>
-                      {active.badge}
-                    </span>
-                    {active.isRecommended && (
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-200/60 text-emerald-900 uppercase">
-                        Recomendado
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-base font-black mt-2 leading-tight">
-                    {active.name}
-                  </h3>
-                  <p className="text-xs mt-1 font-medium opacity-90">
-                    {active.description}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 mt-4 pt-3.5 border-t border-black/10 text-xs">
-                <div className="flex items-start gap-2">
-                  <Activity className="w-4 h-4 flex-shrink-0 mt-0.5 opacity-70" />
-                  <div>
-                    <span className="font-bold">Velocidad de la barra: </span>
-                    <span className="opacity-90">{active.barSpeed}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <Award className="w-4 h-4 flex-shrink-0 mt-0.5 opacity-70" />
-                  <div>
-                    <span className="font-bold">Sensación del cuerpo: </span>
-                    <span className="opacity-90">{active.feel}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 opacity-70" />
-                  <div>
-                    <span className="font-bold">Aplicación en tu entreno: </span>
-                    <span className="opacity-90">{active.angelAdvice}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )
-        })()}
-      </div>
-
-      {/* Regla Práctica de Sobrecarga para Angel */}
-      <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 space-y-3">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-coral-500" />
-          <h3 className="text-sm font-black text-carbon-900 uppercase tracking-wide">
-            Semáforo de Carga para 60 kg
-          </h3>
-        </div>
-
-        <div className="space-y-2 text-xs">
-          <div className="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-emerald-900">
-            <div className="font-black flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>Verde: Completaste 10 reps con RIR 2 o RIR 3</span>
-            </div>
-            <p className="text-[11px] text-emerald-800 mt-1">
-              Tienes margen sobrante. En tu siguiente entreno intenta subir a 11-12 reps o sumar 2.5 kg a la barra.
-            </p>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-900">
-            <div className="font-black flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              <span>Amarillo: Terminaste la última serie en RIR 1</span>
-            </div>
-            <p className="text-[11px] text-amber-800 mt-1">
-              Esfuerzo exacto. Mantén los 60 kg la próxima sesión y enfócate en bajar en 3 segundos controlados.
-            </p>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-sand-100/80 border border-sand-200 text-neutral-800">
-            <div className="font-black flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-neutral-400" />
-              <span>Gris: Te quedaste en 6 reps (ej. Inclinado serie 3)</span>
-            </div>
-            <p className="text-[11px] text-neutral-600 mt-1">
-              Fatiga normal por el peso previo. Tu objetivo la próxima semana es sacar 7 u 8 repeticiones con los mismos 60 kg.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Preguntas Frecuentes Desplegables */}
-      <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 space-y-3">
-        <div className="flex items-center gap-2 mb-1">
-          <HelpCircle className="w-4 h-4 text-coral-500" />
-          <h3 className="text-sm font-black text-carbon-900 uppercase tracking-wide">
-            Dudas Clave sobre RIR
-          </h3>
-        </div>
-
-        <div className="space-y-2">
-          {faqs.map((faq, index) => {
-            const isOpen = expandedFaq === index
-            return (
-              <div
-                key={index}
-                className="rounded-2xl border border-sand-200/80 bg-sand-50/60 overflow-hidden transition-colors"
-              >
+          <div className="grid grid-cols-4 gap-1.5">
+            {rirLevels.map((lvl) => {
+              const isCurrent = selectedRir === lvl.level
+              return (
                 <button
+                  key={lvl.level}
                   type="button"
-                  onClick={() => setExpandedFaq(isOpen ? null : index)}
-                  className="w-full p-3.5 text-left text-xs font-bold text-carbon-900 flex items-center justify-between gap-2 cursor-pointer"
+                  onClick={() => setSelectedRir(lvl.level)}
+                  className={`py-2 px-1 rounded-xl text-center transition-all cursor-pointer ${
+                    isCurrent
+                      ? 'bg-carbon-900 text-white font-black shadow-xs'
+                      : 'bg-sand-100 text-neutral-600 hover:text-carbon-900 font-bold'
+                  }`}
                 >
-                  <span>{faq.q}</span>
-                  {isOpen ? (
-                    <ChevronUp className="w-4 h-4 text-neutral-400 flex-shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-neutral-400 flex-shrink-0" />
-                  )}
+                  <div className="text-xs font-mono">{lvl.badge}</div>
+                  <div className="text-[9px] opacity-75">{lvl.level === 0 ? 'Fallo' : `${lvl.level} reps`}</div>
                 </button>
-                {isOpen && (
-                  <div className="px-3.5 pb-3.5 pt-0 text-xs text-neutral-600 leading-relaxed border-t border-sand-200/40">
-                    {faq.a}
-                  </div>
-                )}
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Detalle del RIR Activo (Integrado fluidamente) */}
+        <div className="pt-3 border-t border-sand-200/60 space-y-2.5">
+          <div className="flex items-center gap-2">
+            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${activeLevel.tagColor}`}>
+              {activeLevel.badge}
+            </span>
+            <h3 className="text-base font-black text-carbon-900 leading-tight">
+              {activeLevel.name}
+            </h3>
+          </div>
+
+          <p className="text-xs text-neutral-600 leading-relaxed font-medium">
+            {activeLevel.description}
+          </p>
+
+          <div className="space-y-2 text-xs pt-2">
+            <div className="flex items-start gap-2">
+              <Activity className="w-3.5 h-3.5 text-coral-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-extrabold text-carbon-900">Velocidad de barra: </strong>
+                <span className="text-neutral-600">{activeLevel.barSpeed}</span>
               </div>
-            )
-          })}
+            </div>
+
+            <div className="flex items-start gap-2">
+              <Award className="w-3.5 h-3.5 text-coral-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-extrabold text-carbon-900">Sensación corporal: </strong>
+                <span className="text-neutral-600">{activeLevel.feel}</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-extrabold text-carbon-900">Para tus entrenos en patio: </strong>
+                <span className="text-neutral-600">{activeLevel.angelAdvice}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Semáforo de Decisión para 60 kg */}
+        <div className="pt-3 border-t border-sand-200/60 space-y-2">
+          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase block">
+            SEMÁFORO DE SOBRECARGA (60 KG)
+          </span>
+
+          <div className="space-y-2 text-xs">
+            <div className="flex items-start gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0 mt-1" />
+              <div>
+                <strong className="font-extrabold text-carbon-900">Verde (RIR 2 o 3 en las 10 reps): </strong>
+                <span className="text-neutral-600">Tienes margen sobrante. En tu siguiente entreno intenta sacar 11-12 reps o sumar 2.5 kg a la barra.</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0 mt-1" />
+              <div>
+                <strong className="font-extrabold text-carbon-900">Amarillo (RIR 1 en la serie final): </strong>
+                <span className="text-neutral-600">Esfuerzo exacto. Mantén los 60 kg la próxima sesión y enfócate en bajar en 3 segundos controlados.</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-neutral-400 flex-shrink-0 mt-1" />
+              <div>
+                <strong className="font-extrabold text-carbon-900">Gris (Te quedaste en 6 reps): </strong>
+                <span className="text-neutral-600">Fatiga acumulada esperable. Tu objetivo la próxima semana es sacar 7 u 8 repeticiones con los mismos 60 kg.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQs Limpias (Sin matriosca) */}
+        <div className="pt-3 border-t border-sand-200/60 space-y-2">
+          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase block">
+            PREGUNTAS FRECUENTES
+          </span>
+
+          <div className="divide-y divide-sand-200/60">
+            {faqs.map((faq, index) => {
+              const isOpen = expandedFaq === index
+              return (
+                <div key={index} className="py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedFaq(isOpen ? null : index)}
+                    className="w-full text-left text-xs font-bold text-carbon-900 flex items-center justify-between gap-2 cursor-pointer hover:text-coral-600 transition-colors"
+                  >
+                    <span>{faq.q}</span>
+                    {isOpen ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="pt-2 text-xs text-neutral-600 leading-relaxed">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>

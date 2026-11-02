@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calendar, Flame, User, LogIn } from 'lucide-react'
+import { Calendar, Flame, User, Cloud, CheckCircle2 } from 'lucide-react'
 import { APP_VERSION } from '../lib/constants'
 
 export function Header({
@@ -7,56 +7,71 @@ export function Header({
   streak = 1,
   onOpenCalendar,
   userSession = null,
-  onOpenAuth
+  onOpenAuth,
+  onGoHome
 }) {
   return (
-    <header className="flex items-center justify-between pt-1.5 pb-3">
-      <div className="flex items-center gap-2 min-w-0">
-        <h1 className="text-xl sm:text-2xl font-black text-carbon-900 tracking-tight whitespace-nowrap">
-          {title}
-        </h1>
-        <span className="hidden sm:inline-block text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-sand-200/80 text-neutral-600 border border-sand-300/40 flex-shrink-0">
-          {APP_VERSION}
-        </span>
-      </div>
+    <header className="flex items-center justify-between pt-1 pb-3 mb-1">
+      {/* Lado izquierdo: Logo & Título cliqueable que lleva a Home */}
+      <button
+        type="button"
+        onClick={onGoHome}
+        className="flex items-center gap-2.5 text-left group cursor-pointer transition-transform active:scale-95"
+        title="Ir a Inicio (Home)"
+      >
+        <div className="w-8 h-8 rounded-xl bg-carbon-900 text-coral-500 flex items-center justify-center font-black text-xs tracking-tighter shadow-sm group-hover:bg-black transition-colors">
+          IR
+        </div>
+        <div>
+          <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400 block -mb-0.5">
+            IRON TRACKER
+          </span>
+          <h1 className="text-xl font-black text-carbon-900 tracking-tight leading-tight group-hover:text-coral-600 transition-colors">
+            {title}
+          </h1>
+        </div>
+      </button>
 
-      <div className="flex items-center gap-1.5">
-        {/* Botón de Autenticación Permanente */}
-        {userSession ? (
-          <button
-            type="button"
-            onClick={onOpenAuth}
-            className="w-8 h-8 rounded-full bg-sand-100 border border-sand-200 flex items-center justify-center text-carbon-900 relative shadow-2xs"
-            title={userSession.user?.email || 'Cuenta conectada'}
-          >
-            <User className="w-4 h-4 text-coral-500" />
-            <span className="w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-0.5 ring-2 ring-white" />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={onOpenAuth}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-sand-100 border border-sand-200/90 text-carbon-900 text-[11px] font-bold shadow-2xs transition-colors"
-          >
-            <LogIn className="w-3 h-3 text-coral-500" />
-            <span>Entrar</span>
-          </button>
-        )}
-
-        {/* Badge de racha */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-sand-200/80 shadow-2xs">
+      {/* Lado derecho: Racha + Perfil de Atleta (Angel) + Calendario */}
+      <div className="flex items-center gap-2">
+        {/* Badge de Racha */}
+        <div
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-sand-200/80 shadow-2xs"
+          title={`Racha actual: ${streak} días seguidos`}
+        >
           <Flame className="w-3.5 h-3.5 text-coral-500 fill-coral-500" />
-          <span className="text-xs font-black text-carbon-900">{streak}</span>
+          <span className="text-xs font-black text-carbon-900 font-mono">{streak}</span>
+          <span className="text-[10px] font-bold text-neutral-400">d</span>
         </div>
 
-        {/* Botón calendario */}
+        {/* Perfil del Atleta: Angel (Sin botón confuso 'Entrar') */}
         <button
-          onClick={onOpenCalendar}
-          className="w-8 h-8 rounded-full bg-white border border-sand-200/80 shadow-2xs flex items-center justify-center text-carbon-900 hover:bg-sand-100 transition-colors"
-          aria-label="Abrir calendario"
+          type="button"
+          onClick={onOpenAuth}
+          className="flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full bg-white border border-sand-200/80 hover:border-carbon-900 shadow-2xs transition-all cursor-pointer group"
+          title={userSession ? `Conectado como ${userSession.user?.email}` : 'Perfil de Angel (Toca para nube y ajustes)'}
         >
-          <Calendar className="w-3.5 h-3.5" />
+          <div className="w-6 h-6 rounded-full bg-carbon-900 text-white flex items-center justify-center text-[10px] font-black group-hover:bg-coral-500 transition-colors">
+            A
+          </div>
+          <span className="text-xs font-bold text-carbon-900">Angel</span>
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${userSession ? 'bg-emerald-500' : 'bg-emerald-400'}`}
+          />
         </button>
+
+        {/* Botón calendario / historial */}
+        {onOpenCalendar && (
+          <button
+            type="button"
+            onClick={onOpenCalendar}
+            className="w-8 h-8 rounded-full bg-white border border-sand-200/80 shadow-2xs flex items-center justify-center text-carbon-900 hover:bg-sand-100 transition-colors cursor-pointer"
+            aria-label="Abrir entrenamientos"
+            title="Ir a Entrenar"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
     </header>
   )

@@ -563,6 +563,7 @@ export default function App() {
               onOpenCalendar={() => setActiveTab('workout')}
               userSession={userSession}
               onOpenAuth={() => setIsAuthModalOpen(true)}
+              onGoHome={() => setActiveTab('home')}
             />
 
             <HomeHub
@@ -599,6 +600,7 @@ export default function App() {
               streak={Math.max(1, completedDates.length + restDates.length)}
               userSession={userSession}
               onOpenAuth={() => setIsAuthModalOpen(true)}
+              onGoHome={() => setActiveTab('home')}
             />
             <RoutinesView
               routines={allRoutines}
@@ -636,6 +638,7 @@ export default function App() {
               streak={Math.max(1, completedDates.length + restDates.length)}
               userSession={userSession}
               onOpenAuth={() => setIsAuthModalOpen(true)}
+              onGoHome={() => setActiveTab('home')}
             />
             <StatsView
               workoutsHistory={workoutsHistory}
@@ -658,6 +661,7 @@ export default function App() {
               streak={Math.max(1, completedDates.length + restDates.length)}
               userSession={userSession}
               onOpenAuth={() => setIsAuthModalOpen(true)}
+              onGoHome={() => setActiveTab('home')}
             />
             <WatchView
               currentData={watchData}
@@ -673,6 +677,7 @@ export default function App() {
               streak={Math.max(1, completedDates.length + restDates.length)}
               userSession={userSession}
               onOpenAuth={() => setIsAuthModalOpen(true)}
+              onGoHome={() => setActiveTab('home')}
             />
             <SettingsView
               userProfile={{ weight: bodyweight }}
