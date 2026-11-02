@@ -146,9 +146,8 @@ export default function App() {
     return saved && saved >= 90 ? saved : 120.0
   })
 
-  // Días completados (Garantiza ayer y hoy por la sesión de 60 kg)
+  // Días completados (Garantiza ayer como sesión de 60 kg completada)
   const [completedDates, setCompletedDates] = useState(() => {
-    const todayStr = new Date().toISOString().split('T')[0]
     const yesterdayStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     const saved = localStorage.getItem('completed_workout_dates')
     const list = saved ? JSON.parse(saved) : []
@@ -157,10 +156,12 @@ export default function App() {
     return combined
   })
 
-  // Días de descanso planificados
+  // Días de descanso planificados (Garantiza hoy como descanso activo tras la sesión de ayer)
   const [restDates, setRestDates] = useState(() => {
+    const todayStr = new Date().toISOString().split('T')[0]
     const saved = localStorage.getItem('iron_rest_dates_v2')
-    return saved ? JSON.parse(saved) : []
+    const list = saved ? JSON.parse(saved) : []
+    return list.includes(todayStr) ? list : [...list, todayStr]
   })
 
   // Entrenamientos completados (Historial con sesión de ayer: 6.420 kg, 15 series efectivas)
@@ -342,18 +343,26 @@ export default function App() {
     })
   }
 
-  // Marcar día de descanso (+50 XP y racha protegida)
+  // Alternar día de descanso / entreno (+50 XP y racha protegida)
   const handleLogRestDay = () => {
     const todayStr = new Date().toISOString().split('T')[0]
-    if (!restDates.includes(todayStr) && !completedDates.includes(todayStr)) {
-      setRestDates((prev) => [...prev, todayStr])
-      setTotalXp((prev) => prev + 50)
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.8 }
-      })
-    }
+    setRestDates((prev) => {
+      const isRest = prev.includes(todayStr)
+      let nextRest
+      if (isRest) {
+        nextRest = prev.filter((d) => d !== todayStr)
+      } else {
+        nextRest = [...prev, todayStr]
+        setTotalXp((xp) => xp + 50)
+        confetti({
+          particleCount: 45,
+          spread: 60,
+          origin: { y: 0.8 }
+        })
+      }
+      localStorage.setItem('iron_rest_dates_v2', JSON.stringify(nextRest))
+      return nextRest
+    })
   }
 
   // Construir mapa de historial contextual por ejercicio (última sesión ejecutada)

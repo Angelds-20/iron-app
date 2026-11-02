@@ -1,5 +1,5 @@
 import React from 'react'
-import { Moon, ShieldCheck, Flame } from 'lucide-react'
+import { Moon, Dumbbell } from 'lucide-react'
 
 export function WeekStrip({
   completedDates = [],
@@ -40,61 +40,82 @@ export function WeekStrip({
 
   const days = getWeekDates()
   const todayStr = new Date().toISOString().split('T')[0]
-  const isTodayLogged = completedDates.includes(todayStr) || restDates.includes(todayStr)
+  const isTodayRest = restDates.includes(todayStr)
+  const isTodayCompleted = completedDates.includes(todayStr)
 
   const workoutsThisWeek = days.filter((d) => d.isCompleted).length
   const restsThisWeek = days.filter((d) => d.isRest).length
 
   return (
-    <div className="w-full bg-white rounded-3xl p-4 shadow-xs border border-sand-200/60 mb-5">
+    <div className="w-full bg-white rounded-3xl p-4 shadow-xs border border-sand-200/70 mb-4">
       {/* Resumen de Días y Botón de Descanso */}
       <div className="flex items-center justify-between mb-3 px-1">
         <div>
-          <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">
-            ESTA SEMANA
+          <span className="text-[10px] font-black text-neutral-400 uppercase tracking-wider block">
+            SEGUIMIENTO SEMANAL
           </span>
-          <div className="text-xs font-bold text-carbon-900 mt-0.5">
-            {workoutsThisWeek} entrenos • {restsThisWeek} descansos
+          <div className="text-xs font-black text-carbon-900 mt-0.5 flex items-center gap-2">
+            <span className="flex items-center gap-1 text-carbon-900">
+              <Dumbbell className="w-3 h-3 text-coral-500" />
+              <span>{workoutsThisWeek} entreno</span>
+            </span>
+            <span className="text-neutral-300">•</span>
+            <span className="flex items-center gap-1 text-emerald-700">
+              <Moon className="w-3 h-3" />
+              <span>{restsThisWeek} descanso</span>
+            </span>
           </div>
         </div>
 
-        {!isTodayLogged && onLogRestDay && (
+        {/* Estado interactivo de hoy */}
+        {onLogRestDay && (
           <button
             type="button"
             onClick={onLogRestDay}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-[11px] font-bold transition-colors"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              isTodayRest
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300/80 shadow-2xs'
+                : 'bg-sand-100 hover:bg-sand-200 text-neutral-700 border border-sand-200'
+            }`}
+            title="Alternar día de descanso / entreno para hoy"
           >
-            <Moon className="w-3.5 h-3.5" />
-            <span>Hoy Descanso</span>
+            <Moon className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{isTodayRest ? 'Hoy: Descanso' : 'Marcar Descanso'}</span>
           </button>
         )}
       </div>
 
       {/* Grid de 7 Días */}
-      <div className="grid grid-cols-7 gap-2 text-center">
+      <div className="grid grid-cols-7 gap-1.5 text-center">
         {days.map((item, idx) => {
           let circleStyle = 'bg-sand-100 text-carbon-800'
-          let extraIcon = null
+          let icon = null
 
-          if (item.isToday) {
-            circleStyle = 'bg-coral-500 text-white font-black shadow-md shadow-coral-500/30'
-          } else if (item.isCompleted) {
-            circleStyle = 'bg-carbon-900 text-white font-bold'
+          if (item.isCompleted) {
+            circleStyle = item.isToday
+              ? 'bg-carbon-900 text-white font-black ring-2 ring-coral-500 ring-offset-2'
+              : 'bg-carbon-900 text-white font-bold'
+            icon = <Dumbbell className="w-2.5 h-2.5 text-coral-500" />
           } else if (item.isRest) {
-            circleStyle = 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-300/60'
-            extraIcon = <Moon className="w-2.5 h-2.5 inline-block -mt-1 ml-0.5" />
+            circleStyle = item.isToday
+              ? 'bg-emerald-600 text-white font-black ring-2 ring-emerald-400 ring-offset-2 shadow-xs'
+              : 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-300/60'
+            icon = <Moon className={`w-2.5 h-2.5 ${item.isToday ? 'text-white' : 'text-emerald-700'}`} />
+          } else if (item.isToday) {
+            circleStyle = 'bg-coral-500 text-white font-black shadow-md shadow-coral-500/30'
           }
 
           return (
-            <div key={idx} className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-extrabold tracking-wider text-neutral-400 uppercase">
+            <div key={idx} className="flex flex-col items-center gap-1">
+              <span className="text-[10px] font-black tracking-wider text-neutral-400 uppercase">
                 {item.label}
               </span>
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm transition-all duration-200 ${circleStyle}`}
+                className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-xs transition-all duration-200 ${circleStyle}`}
+                title={`${item.label} ${item.dayNumber}: ${item.isCompleted ? 'Entrenamiento' : item.isRest ? 'Descanso' : 'Sin registro'}`}
               >
-                <span>{item.dayNumber}</span>
-                {extraIcon}
+                <span className="leading-none">{item.dayNumber}</span>
+                {icon && <span className="mt-0.5">{icon}</span>}
               </div>
             </div>
           )
