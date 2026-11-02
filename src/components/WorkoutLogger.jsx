@@ -20,6 +20,12 @@ import { DEFAULT_ROUTINES } from '../lib/constants'
 import { initAudio, playTimerDoneSound } from '../lib/soundEngine'
 import { ExerciseSwapModal } from './ExerciseSwapModal'
 import {
+  calculateEstimated1RM,
+  compareWithPreviousSession,
+  formatPreviousSessionSummary,
+  calculateOverload
+} from '../lib/overloadEngine'
+import {
   getActiveSession,
   saveActiveSession,
   clearActiveSession,
@@ -260,6 +266,13 @@ export function WorkoutLogger({
     handleUpdateSet(exerciseId, setIdx, 'reps', nextVal)
   }
 
+  const handleCycleRir = (exerciseId, setIdx) => {
+    const currentRir = exerciseData[exerciseId]?.[setIdx]?.rir ?? 2
+    // Ciclar entre 2 -> 1 -> 0 (Fallo) -> 3 -> 2
+    const nextRir = currentRir === 2 ? 1 : currentRir === 1 ? 0 : currentRir === 0 ? 3 : 2
+    handleUpdateSet(exerciseId, setIdx, 'rir', nextRir)
+  }
+
   const handleToggleComplete = (exerciseId, setIdx) => {
     const isNowCompleted = !exerciseData[exerciseId][setIdx].completed
     handleUpdateSet(exerciseId, setIdx, 'completed', isNowCompleted)
@@ -491,20 +504,33 @@ export function WorkoutLogger({
       <div className="space-y-4">
         {dynamicExercises.map((exercise, exIndex) => {
           const sets = exerciseData[exercise.id] || []
+          const lastPerformance = previousHistory?.[exercise.id]
+          const comparison = compareWithPreviousSession(sets, lastPerformance)
+          const overloadRec = calculateOverload(lastPerformance)
+          const best1RM = sets.reduce((best, s) => {
+            const r1m = calculateEstimated1RM(s.weight, s.reps)
+            return r1m > best ? r1m : best
+          }, 0)
 
           return (
             <div
               key={exercise.id}
               className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60"
             >
-              {/* Encabezado del ejercicio con botón de Sustitución */}
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-sand-100 text-carbon-900 text-xs font-bold flex items-center justify-center">
+              {/* Encabezado del ejercicio con botón de Sustitución y Badge de Progresión */}
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="w-6 h-6 rounded-full bg-sand-100 text-carbon-900 text-xs font-bold flex items-center justify-center flex-shrink-0">
                       {exIndex + 1}
                     </span>
-                    <h3 className="text-base font-extrabold text-carbon-900">{exercise.name}</h3>
+                    <h3 className="text-base font-extrabold text-carbon-900 leading-snug">{exercise.name}</h3>
+                    {comparison?.isProgressing && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black tracking-wide uppercase shadow-2xs">
+                        <TrendingUp className="w-2.5 h-2.5" />
+                        <span>PROGRESANDO {comparison.weightDiff > 0 ? `+${comparison.weightDiff}kg` : ''}</span>
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] font-semibold text-neutral-400 mt-0.5 ml-8">
                     {exercise.equipment}
@@ -514,7 +540,7 @@ export function WorkoutLogger({
                 <button
                   type="button"
                   onClick={() => setSwapTargetExercise(exercise)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-neutral-600 text-[11px] font-bold border border-sand-200/80 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-neutral-600 text-[11px] font-bold border border-sand-200/80 transition-colors flex-shrink-0"
                   title="Cambiar ejercicio (ej: predicador por curl)"
                 >
                   <RefreshCw className="w-3 h-3 text-coral-500" />
@@ -522,8 +548,33 @@ export function WorkoutLogger({
                 </button>
               </div>
 
-              {/* Guía rápida de tempo / RIR */}
-              <div className="ml-8 mb-3 text-[11px] text-neutral-500 flex items-center gap-1.5 font-medium">
+              {/* Historial Contextual en Vivo & Sugerencia de Sobrecarga */}
+              {lastPerformance && (
+                <div className="mb-3 p-3 rounded-2xl bg-sand-100/70 border border-sand-200/80 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-carbon-900">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-coral-500 flex-shrink-0" />
+                      <span className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-wider">Último entreno:</span>
+                      <span className="font-mono text-[11px] text-carbon-900 font-black">
+                        {formatPreviousSessionSummary(lastPerformance)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {overloadRec && overloadRec.type !== 'baseline' && (
+                    <div className="flex items-start gap-1.5 pt-1.5 border-t border-sand-200/50 text-[11px] text-neutral-600 leading-snug">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-extrabold text-carbon-900">Sugerencia hoy: </span>
+                        <span>{overloadRec.message}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Guía rápida de tempo / notas */}
+              <div className="mb-3 text-[11px] text-neutral-500 flex items-center gap-1.5 font-medium">
                 <TrendingUp className="w-3.5 h-3.5 text-coral-500 flex-shrink-0" />
                 <span>{exercise.notes}</span>
               </div>
@@ -540,7 +591,7 @@ export function WorkoutLogger({
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-extrabold text-neutral-400 w-6">
+                      <span className="text-xs font-extrabold text-neutral-400 w-5">
                         #{set.setNumber}
                       </span>
 
@@ -549,19 +600,19 @@ export function WorkoutLogger({
                         <button
                           type="button"
                           onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, -2.5)}
-                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-2.5 h-2.5" />
                         </button>
-                        <span className="w-12 text-center text-xs font-black text-carbon-900 font-mono">
-                          {set.weight} kg
+                        <span className="w-11 text-center text-xs font-black text-carbon-900 font-mono">
+                          {set.weight}k
                         </span>
                         <button
                           type="button"
                           onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, 2.5)}
-                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-2.5 h-2.5" />
                         </button>
                       </div>
 
@@ -570,21 +621,39 @@ export function WorkoutLogger({
                         <button
                           type="button"
                           onClick={() => handleQuickAdjustReps(exercise.id, setIdx, -1)}
-                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-2.5 h-2.5" />
                         </button>
-                        <span className="w-8 text-center text-xs font-black text-carbon-900 font-mono">
+                        <span className="w-6 text-center text-xs font-black text-carbon-900 font-mono">
                           {set.reps}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleQuickAdjustReps(exercise.id, setIdx, 1)}
-                          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
+                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-2.5 h-2.5" />
                         </button>
                       </div>
+
+                      {/* Selector RIR interactivo */}
+                      <button
+                        type="button"
+                        onClick={() => handleCycleRir(exercise.id, setIdx)}
+                        className={`px-2 py-1 rounded-xl text-[10px] font-black tracking-tight border transition-all ${
+                          set.rir === 0
+                            ? 'bg-rose-100 text-rose-700 border-rose-300'
+                            : set.rir === 1
+                            ? 'bg-amber-100 text-amber-800 border-amber-300'
+                            : set.rir === 2
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                            : 'bg-sand-100 text-neutral-600 border-sand-300'
+                        }`}
+                        title="Repeticiones en reserva (toca para cambiar)"
+                      >
+                        {set.rir === 0 ? 'Fallo' : `RIR ${set.rir ?? 2}`}
+                      </button>
                     </div>
 
                     {/* Botón táctil grande de Check */}
@@ -603,8 +672,8 @@ export function WorkoutLogger({
                 ))}
               </div>
 
-              {/* Botón añadir serie rápido */}
-              <div className="mt-3 ml-8 flex justify-between items-center">
+              {/* Pie de tarjeta con Añadir Serie y 1RM Estimado */}
+              <div className="mt-3 flex justify-between items-center px-1">
                 <button
                   type="button"
                   onClick={() => handleAddSet(exercise.id)}
@@ -613,6 +682,13 @@ export function WorkoutLogger({
                   <Plus className="w-3.5 h-3.5" />
                   <span>Añadir Serie</span>
                 </button>
+
+                {best1RM > 0 && (
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-neutral-400">
+                    <span className="text-[10px] uppercase tracking-wider">1RM Estimado:</span>
+                    <span className="font-mono font-black text-coral-500">{best1RM} kg</span>
+                  </div>
+                )}
               </div>
             </div>
           )

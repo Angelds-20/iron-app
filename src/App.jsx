@@ -288,6 +288,37 @@ export default function App() {
     }
   }
 
+  // Construir mapa de historial contextual por ejercicio (última sesión ejecutada)
+  const previousExerciseHistory = React.useMemo(() => {
+    const map = {}
+    workoutsHistory.forEach((workout) => {
+      workout.exercises?.forEach((ex) => {
+        if (!map[ex.id] && ex.sets && ex.sets.length > 0) {
+          map[ex.id] = {
+            sets: ex.sets,
+            completedAt: workout.completedAt,
+            routineTitle: workout.title
+          }
+        }
+      })
+    })
+
+    // Garantizar que Press de Banca tenga su registro contextual base (60 kg)
+    if (!map['bench-press']) {
+      map['bench-press'] = {
+        sets: [
+          { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
+          { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
+          { setNumber: 3, weight: 60, reps: 9, rir: 1, completed: true },
+          { setNumber: 4, weight: 60, reps: 8, rir: 0, completed: true }
+        ],
+        completedAt: new Date().toISOString(),
+        routineTitle: 'Torso — Banca & Inclinado'
+      }
+    }
+    return map
+  }, [workoutsHistory])
+
   // Volumen de la última sesión
   const lastWorkout = workoutsHistory[0]
   const currentSessionVolume = lastWorkout?.totalVolume || 0
@@ -427,7 +458,7 @@ export default function App() {
             onAddNewRoutine={handleAddNewRoutine}
             onCompleteWorkout={handleCompleteWorkout}
             onCancel={() => setActiveTab('home')}
-            previousHistory={{}}
+            previousHistory={previousExerciseHistory}
           />
         )}
 

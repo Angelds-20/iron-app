@@ -1,6 +1,78 @@
 import { BADGES_CATALOG } from './constants'
 
 /**
+ * Calcula el 1RM estimado usando la fórmula de Epley: Peso * (1 + Reps / 30)
+ */
+export function calculateEstimated1RM(weight, reps) {
+  const w = Number(weight) || 0
+  const r = Number(reps) || 0
+  if (w <= 0 || r <= 0) return 0
+  if (r === 1) return w
+  return Math.round(w * (1 + r / 30) * 10) / 10
+}
+
+/**
+ * Compara en caliente el desempeño de la sesión actual contra la anterior
+ */
+export function compareWithPreviousSession(currentSets = [], lastPerformance = null) {
+  if (!lastPerformance || !lastPerformance.sets || lastPerformance.sets.length === 0) {
+    return null
+  }
+
+  const lastSets = lastPerformance.sets
+  const currentCompleted = currentSets.filter((s) => s.completed)
+
+  const lastMaxWeight = Math.max(...lastSets.map((s) => Number(s.weight) || 0))
+  const lastTotalVolume = lastSets.reduce(
+    (acc, s) => acc + (Number(s.weight) || 0) * (Number(s.reps) || 0),
+    0
+  )
+
+  const currMaxWeight = currentCompleted.length > 0
+    ? Math.max(...currentCompleted.map((s) => Number(s.weight) || 0))
+    : Math.max(...currentSets.map((s) => Number(s.weight) || 0))
+
+  const currTotalVolume = currentCompleted.reduce(
+    (acc, s) => acc + (Number(s.weight) || 0) * (Number(s.reps) || 0),
+    0
+  )
+
+  const weightDiff = currMaxWeight - lastMaxWeight
+  const volumeDiff = currTotalVolume - lastTotalVolume
+
+  // Progresando si subió el peso o si completó más volumen efectivo
+  const isProgressing = weightDiff > 0 || (weightDiff === 0 && volumeDiff > 0)
+
+  return {
+    isProgressing,
+    weightDiff,
+    volumeDiff,
+    lastMaxWeight,
+    currMaxWeight,
+    lastTotalVolume,
+    currTotalVolume
+  }
+}
+
+/**
+ * Genera un resumen compacto de la última sesión
+ * Ej: "50 kg • 3 × 10 reps (RIR 2)"
+ */
+export function formatPreviousSessionSummary(lastPerformance) {
+  if (!lastPerformance || !lastPerformance.sets || lastPerformance.sets.length === 0) {
+    return 'Sin registros previos (Sesión base)'
+  }
+
+  const sets = lastPerformance.sets
+  const maxWeight = Math.max(...sets.map((s) => Number(s.weight) || 0))
+  const setsCount = sets.length
+  const avgReps = Math.round(sets.reduce((acc, s) => acc + (Number(s.reps) || 0), 0) / setsCount)
+  const avgRir = sets.reduce((acc, s) => acc + (s.rir !== undefined ? Number(s.rir) : 2), 0) / setsCount
+
+  return `${maxWeight} kg • ${setsCount} × ${avgReps} reps (RIR ${avgRir.toFixed(0)})`
+}
+
+/**
  * Calcula la recomendación de sobrecarga progresiva para el siguiente entrenamiento
  */
 export function calculateOverload(lastPerformance) {
