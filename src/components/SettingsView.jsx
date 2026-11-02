@@ -100,7 +100,7 @@ export function SettingsView({
 
       {actionNotice && (
         <div className="p-4 rounded-2xl bg-white text-black font-black text-xs flex items-center gap-2 shadow-lg animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 stroke-[3]" />
+          <CheckCircle2 className="w-4 h-4 text-black stroke-[3]" />
           <span>{actionNotice}</span>
         </div>
       )}
@@ -275,7 +275,7 @@ export function SettingsView({
               Base de Datos
             </span>
           </div>
-          <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/40 px-3 py-1 rounded-full uppercase">
+          <span className="text-[10px] font-black text-white bg-[#1A1B20] border border-[#2C2D34] px-3 py-1 rounded-full uppercase">
             {isSupabaseConfigured || supabaseUrl ? 'Conectado' : 'Local'}
           </span>
         </div>

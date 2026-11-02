@@ -17,7 +17,7 @@ import { BodyMeasurementsModal } from './components/BodyMeasurementsModal'
 import { WatchView } from './components/WatchView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
-import { AuthModal } from './components/AuthModal'
+import { QuickActionModal } from './components/QuickActionModal'
 import { GlobalRestTimer } from './components/GlobalRestTimer'
 import { evaluateAchievements } from './lib/overloadEngine'
 import { BADGES_CATALOG, DEFAULT_ROUTINES, APP_VERSION } from './lib/constants'
@@ -817,13 +817,19 @@ export default function App() {
           </div>
         )}
 
-        {/* Modal de Autenticación Permanente */}
-        <AuthModal
+        {/* Menú de Acciones Rápidas de Angel (Modo Monousuario) */}
+        <QuickActionModal
           isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
-          onAuthSuccess={(session) => setUserSession(session)}
-          onSignOut={handleSignOut}
-          currentSession={userSession}
+          onStartWorkout={(idx) => handleStartWorkout(idx)}
+          onOpenNutrition={() => setActiveTab('nutrition')}
+          onOpenWeightModal={() => setIsAddMeasurementOpen(true)}
+          onCreateRoutine={() => {
+            setEditingRoutine(null)
+            setIsRoutineEditorOpen(true)
+          }}
+          onOpenSettings={() => setActiveTab('settings')}
+          athleteProfile={athleteProfile}
         />
 
         {/* Modal de Creación y Edición de Rutinas */}
