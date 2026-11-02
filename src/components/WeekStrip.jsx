@@ -46,22 +46,24 @@ export function WeekStrip({
   const restsCount = days.filter((d) => d.isRest).length
 
   return (
-    <div className="w-full bg-white rounded-3xl p-4 shadow-xs border border-sand-200/70 mb-4">
+    <div className="w-full bg-[#18181D] rounded-3xl p-5 sm:p-6 shadow-xl shadow-black/30 mb-4 animate-fade-in">
       {/* Resumen de Días y Botón de Descanso */}
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-4 px-1">
         <div>
-          <span className="text-[10px] font-black text-neutral-400 uppercase tracking-wider block">
+          <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">
             SEGUIMIENTO DIARIO
           </span>
-          <div className="text-xs font-black text-carbon-900 mt-0.5 flex items-center gap-2">
-            <span className="flex items-center gap-1 text-carbon-900">
-              <Dumbbell className="w-3 h-3 text-coral-500" />
-              <span>{workoutsCount || 1} entreno (ayer)</span>
+          <div className="text-xs font-black text-white mt-1 flex items-center gap-2">
+            <span className="flex items-center gap-1.5 text-white">
+              <Dumbbell className="w-3.5 h-3.5 text-coral-500" />
+              <span>{workoutsCount || 1} entreno</span>
+              <span className="text-[10px] text-zinc-500 font-normal">(ayer)</span>
             </span>
-            <span className="text-neutral-300">•</span>
-            <span className="flex items-center gap-1 text-emerald-700">
-              <Moon className="w-3 h-3" />
-              <span>{restsCount || 1} descanso (hoy)</span>
+            <span className="text-zinc-600">•</span>
+            <span className="flex items-center gap-1.5 text-emerald-400">
+              <Moon className="w-3.5 h-3.5" />
+              <span>{restsCount || 1} descanso</span>
+              <span className="text-[10px] text-zinc-500 font-normal">(hoy)</span>
             </span>
           </div>
         </div>
@@ -71,14 +73,14 @@ export function WeekStrip({
           <button
             type="button"
             onClick={onLogRestDay}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer active:scale-95 ${
               isTodayRest
-                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300/80 shadow-2xs'
-                : 'bg-sand-100 hover:bg-sand-200 text-neutral-700 border border-sand-200'
+                ? 'bg-emerald-500/15 text-emerald-400 shadow-sm shadow-emerald-500/10'
+                : 'bg-[#262631] text-zinc-300 hover:text-white'
             }`}
             title="Alternar día de descanso / entreno para hoy"
           >
-            <Moon className="w-3.5 h-3.5 text-emerald-600" />
+            <Moon className="w-3.5 h-3.5 text-emerald-400" />
             <span>{isTodayRest ? 'Hoy: Descanso' : 'Marcar Descanso'}</span>
           </button>
         )}
@@ -87,34 +89,34 @@ export function WeekStrip({
       {/* Grid de 7 Días */}
       <div className="grid grid-cols-7 gap-1.5 text-center">
         {days.map((item, idx) => {
-          let circleStyle = 'bg-sand-100 text-carbon-800'
+          let circleStyle = 'bg-[#22222A] text-zinc-400 hover:text-white'
           let icon = null
 
           if (item.isCompleted) {
             circleStyle = item.isToday
-              ? 'bg-carbon-900 text-white font-black ring-2 ring-coral-500 ring-offset-2'
-              : 'bg-carbon-900 text-white font-bold'
+              ? 'bg-white text-black font-black ring-4 ring-coral-500/30 shadow-lg scale-105'
+              : 'bg-white text-black font-black shadow-md scale-100'
             icon = <Dumbbell className="w-2.5 h-2.5 text-coral-500" />
           } else if (item.isRest) {
             circleStyle = item.isToday
-              ? 'bg-emerald-600 text-white font-black ring-2 ring-emerald-400 ring-offset-2 shadow-xs'
-              : 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-300/60'
-            icon = <Moon className={`w-2.5 h-2.5 ${item.isToday ? 'text-white' : 'text-emerald-700'}`} />
+              ? 'bg-emerald-500 text-black font-black ring-4 ring-emerald-500/20 shadow-lg shadow-emerald-500/20 scale-105'
+              : 'bg-emerald-500/20 text-emerald-400 font-bold'
+            icon = <Moon className={`w-2.5 h-2.5 ${item.isToday ? 'text-black' : 'text-emerald-400'}`} />
           } else if (item.isToday) {
-            circleStyle = 'bg-coral-500 text-white font-black shadow-md shadow-coral-500/30'
+            circleStyle = 'bg-coral-500 text-white font-black shadow-lg shadow-coral-500/30'
           }
 
           return (
-            <div key={idx} className="flex flex-col items-center gap-1">
+            <div key={idx} className="flex flex-col items-center gap-1.5">
               <span
                 className={`text-[10px] font-black tracking-wider uppercase ${
-                  item.isToday ? 'text-coral-500' : item.isYesterday ? 'text-carbon-900' : 'text-neutral-400'
+                  item.isToday ? 'text-coral-500' : item.isYesterday ? 'text-white' : 'text-zinc-500'
                 }`}
               >
                 {item.label}
               </span>
               <div
-                className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-xs transition-all duration-200 ${circleStyle}`}
+                className={`w-10 h-10 rounded-2xl flex flex-col items-center justify-center text-xs transition-all duration-200 ${circleStyle}`}
                 title={`${item.label} ${item.dayNumber}: ${
                   item.isCompleted ? 'Entrenamiento' : item.isRest ? 'Descanso' : 'Programado'
                 }`}

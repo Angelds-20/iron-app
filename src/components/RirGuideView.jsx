@@ -84,25 +84,25 @@ export function RirGuideView() {
     <div className="space-y-4 animate-fadeIn pb-6">
       {/* Cabecera Limpia */}
       <div className="px-1">
-        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
           AUTOREGULACIÓN & ESFUERZO PERCIBIDO
         </span>
-        <h2 className="text-xl font-black text-carbon-900 leading-tight">
+        <h2 className="text-xl font-black text-white leading-tight">
           Escala RIR / RIP
         </h2>
-        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
-          <strong className="text-carbon-900 font-bold">Reps In Reserve:</strong> cuántas repeticiones más podías haber completado antes del fallo técnico real.
+        <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+          <strong className="text-white font-bold">Reps In Reserve:</strong> cuántas repeticiones más podías haber completado antes del fallo técnico real.
         </p>
       </div>
 
-      {/* TARJETA MAESTRA DE RIR (Sin matriosca de cajas) */}
-      <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/70 space-y-4">
+      {/* TARJETA MAESTRA DE RIR EN ELEVACIÓN OSCURA */}
+      <div className="bg-[#18181D] rounded-3xl p-6 shadow-xl shadow-black/30 space-y-5">
         {/* Selector de Nivel RIR */}
         <div>
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-2">
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-2.5">
             Selecciona un nivel de esfuerzo
           </span>
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-4 gap-2">
             {rirLevels.map((lvl) => {
               const isCurrent = selectedRir === lvl.level
               return (
@@ -110,10 +110,10 @@ export function RirGuideView() {
                   key={lvl.level}
                   type="button"
                   onClick={() => setSelectedRir(lvl.level)}
-                  className={`py-2 px-1 rounded-xl text-center transition-all cursor-pointer ${
+                  className={`py-2.5 px-2 rounded-2xl text-center transition-all cursor-pointer touch-press ${
                     isCurrent
-                      ? 'bg-carbon-900 text-white font-black shadow-xs'
-                      : 'bg-sand-100 text-neutral-600 hover:text-carbon-900 font-bold'
+                      ? 'bg-coral-500 text-white font-black shadow-lg shadow-coral-500/25 scale-105'
+                      : 'bg-[#22222A] text-zinc-400 hover:text-white font-bold'
                   }`}
                 >
                   <div className="text-xs font-mono">{lvl.badge}</div>
@@ -124,106 +124,106 @@ export function RirGuideView() {
           </div>
         </div>
 
-        {/* Detalle del RIR Activo (Integrado fluidamente) */}
-        <div className="pt-3 border-t border-sand-200/60 space-y-2.5">
+        {/* Detalle del RIR Activo */}
+        <div className="p-4 rounded-2xl bg-[#22222A] space-y-3">
           <div className="flex items-center gap-2">
             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${activeLevel.tagColor}`}>
               {activeLevel.badge}
             </span>
-            <h3 className="text-base font-black text-carbon-900 leading-tight">
+            <h3 className="text-base font-black text-white leading-tight">
               {activeLevel.name}
             </h3>
           </div>
 
-          <p className="text-xs text-neutral-600 leading-relaxed font-medium">
+          <p className="text-xs text-zinc-300 leading-relaxed font-medium">
             {activeLevel.description}
           </p>
 
-          <div className="space-y-2 text-xs pt-2">
-            <div className="flex items-start gap-2">
+          <div className="space-y-2.5 text-xs pt-1">
+            <div className="flex items-start gap-2.5">
               <Activity className="w-3.5 h-3.5 text-coral-500 flex-shrink-0 mt-0.5" />
               <div>
-                <strong className="font-extrabold text-carbon-900">Velocidad de barra: </strong>
-                <span className="text-neutral-600">{activeLevel.barSpeed}</span>
+                <strong className="font-bold text-white">Velocidad de barra: </strong>
+                <span className="text-zinc-400">{activeLevel.barSpeed}</span>
               </div>
             </div>
 
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2.5">
               <Award className="w-3.5 h-3.5 text-coral-500 flex-shrink-0 mt-0.5" />
               <div>
-                <strong className="font-extrabold text-carbon-900">Sensación corporal: </strong>
-                <span className="text-neutral-600">{activeLevel.feel}</span>
+                <strong className="font-bold text-white">Sensación corporal: </strong>
+                <span className="text-zinc-400">{activeLevel.feel}</span>
               </div>
             </div>
 
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
-                <strong className="font-extrabold text-carbon-900">Para tus entrenos en patio: </strong>
-                <span className="text-neutral-600">{activeLevel.angelAdvice}</span>
+                <strong className="font-bold text-white">Para tus entrenos en patio: </strong>
+                <span className="text-zinc-300">{activeLevel.angelAdvice}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Semáforo de Decisión para 60 kg */}
-        <div className="pt-3 border-t border-sand-200/60 space-y-2">
-          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase block">
+        <div className="p-4 rounded-2xl bg-[#22222A] space-y-2.5">
+          <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase block">
             SEMÁFORO DE SOBRECARGA (60 KG)
           </span>
 
-          <div className="space-y-2 text-xs">
+          <div className="space-y-2.5 text-xs">
             <div className="flex items-start gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0 mt-1" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1 shadow-xs shadow-emerald-400/50" />
               <div>
-                <strong className="font-extrabold text-carbon-900">Verde (RIR 2 o 3 en las 10 reps): </strong>
-                <span className="text-neutral-600">Tienes margen sobrante. En tu siguiente entreno intenta sacar 11-12 reps o sumar 2.5 kg a la barra.</span>
+                <strong className="font-bold text-white">Verde (RIR 2 o 3 en las 10 reps): </strong>
+                <span className="text-zinc-400">Tienes margen sobrante. En tu siguiente entreno intenta sacar 11-12 reps o sumar 2.5 kg a la barra.</span>
               </div>
             </div>
 
             <div className="flex items-start gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0 mt-1" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0 mt-1 shadow-xs shadow-amber-400/50" />
               <div>
-                <strong className="font-extrabold text-carbon-900">Amarillo (RIR 1 en la serie final): </strong>
-                <span className="text-neutral-600">Esfuerzo exacto. Mantén los 60 kg la próxima sesión y enfócate en bajar en 3 segundos controlados.</span>
+                <strong className="font-bold text-white">Amarillo (RIR 1 en la serie final): </strong>
+                <span className="text-zinc-400">Esfuerzo exacto. Mantén los 60 kg la próxima sesión y enfócate en bajar en 3 segundos controlados.</span>
               </div>
             </div>
 
             <div className="flex items-start gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-neutral-400 flex-shrink-0 mt-1" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-600 flex-shrink-0 mt-1" />
               <div>
-                <strong className="font-extrabold text-carbon-900">Gris (Te quedaste en 6 reps): </strong>
-                <span className="text-neutral-600">Fatiga acumulada esperable. Tu objetivo la próxima semana es sacar 7 u 8 repeticiones con los mismos 60 kg.</span>
+                <strong className="font-bold text-white">Gris (Te quedaste en 6 reps): </strong>
+                <span className="text-zinc-400">Fatiga acumulada esperable. Tu objetivo la próxima semana es sacar 7 u 8 repeticiones con los mismos 60 kg.</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* FAQs Limpias (Sin matriosca) */}
-        <div className="pt-3 border-t border-sand-200/60 space-y-2">
-          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase block">
+        {/* FAQs */}
+        <div className="space-y-2 pt-1">
+          <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase block">
             PREGUNTAS FRECUENTES
           </span>
 
-          <div className="divide-y divide-sand-200/60">
+          <div className="space-y-2">
             {faqs.map((faq, index) => {
               const isOpen = expandedFaq === index
               return (
-                <div key={index} className="py-2.5">
+                <div key={index} className="p-3.5 rounded-2xl bg-[#22222A]">
                   <button
                     type="button"
                     onClick={() => setExpandedFaq(isOpen ? null : index)}
-                    className="w-full text-left text-xs font-bold text-carbon-900 flex items-center justify-between gap-2 cursor-pointer hover:text-coral-600 transition-colors"
+                    className="w-full text-left text-xs font-bold text-white flex items-center justify-between gap-2 cursor-pointer hover:text-coral-500 transition-colors"
                   >
                     <span>{faq.q}</span>
                     {isOpen ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                      <ChevronUp className="w-4 h-4 text-zinc-400 flex-shrink-0" />
                     ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
+                      <ChevronDown className="w-4 h-4 text-zinc-400 flex-shrink-0" />
                     )}
                   </button>
                   {isOpen && (
-                    <div className="pt-2 text-xs text-neutral-600 leading-relaxed">
+                    <div className="pt-2 text-xs text-zinc-400 leading-relaxed border-t border-white/5 mt-2">
                       {faq.a}
                     </div>
                   )}

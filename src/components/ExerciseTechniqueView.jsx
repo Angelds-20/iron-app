@@ -345,25 +345,25 @@ export function ExerciseTechniqueView({ onStartExerciseRoutine = null }) {
       {/* Cabecera Limpia */}
       <div className="flex items-center justify-between px-1">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
             BIOMECÁNICA & EJECUCIÓN
           </span>
-          <h2 className="text-xl font-black text-carbon-900 leading-tight">
+          <h2 className="text-xl font-black text-white leading-tight">
             Consejos de Ejercicio
           </h2>
         </div>
 
         {/* Filtros de Categoría con scroll suave */}
-        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[200px] sm:max-w-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-[200px] sm:max-w-none">
           {['all', 'pecho', 'espalda', 'pierna', 'brazos', 'hombros'].map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setActiveCategory(cat)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap touch-press ${
                 activeCategory === cat
-                  ? 'bg-carbon-900 text-white shadow-2xs'
-                  : 'text-neutral-500 hover:text-carbon-900 bg-white border border-sand-200/80'
+                  ? 'bg-[#272731] text-white shadow-md'
+                  : 'text-zinc-400 hover:text-white bg-[#18181D]'
               }`}
             >
               {cat === 'all' ? 'Todos' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -372,88 +372,88 @@ export function ExerciseTechniqueView({ onStartExerciseRoutine = null }) {
         </div>
       </div>
 
-      {/* Tarjetas Editoriales de Ejercicios (Sin cajas anidadas) */}
+      {/* Tarjetas Editoriales de Ejercicios en Elevación Oscura */}
       <div className="space-y-4">
         {filteredExercises.map((ex) => (
           <div
             key={ex.id}
-            className="bg-white rounded-3xl overflow-hidden shadow-xs border border-sand-200/70"
+            className="bg-[#18181D] rounded-3xl overflow-hidden shadow-xl shadow-black/30"
           >
             {/* Foto con Banner y Título Directo */}
-            <div className="relative h-44 w-full bg-carbon-900">
+            <div className="relative h-44 w-full bg-[#121216]">
               <img
                 src={ex.image}
                 alt={ex.title}
-                className="w-full h-full object-cover opacity-85"
+                className="w-full h-full object-cover opacity-75"
                 loading="lazy"
                 onError={(e) => {
                   e.target.style.display = 'none'
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#18181D] via-[#18181D]/40 to-transparent" />
 
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-full bg-carbon-900/80 backdrop-blur-md text-[10px] font-black text-coral-500 uppercase tracking-wider border border-white/10">
+                <span className="px-3 py-1 rounded-full bg-[#18181D]/80 backdrop-blur-md text-[10px] font-black text-coral-500 uppercase tracking-wider">
                   {ex.equipment}
                 </span>
-                <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold text-white uppercase">
+                <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-bold text-white uppercase">
                   {ex.category}
                 </span>
               </div>
 
-              <div className="absolute bottom-3 left-4 right-4">
-                <h3 className="text-lg font-black text-white leading-tight">
+              <div className="absolute bottom-3 left-5 right-5">
+                <h3 className="text-xl font-black text-white leading-tight">
                   {ex.title}
                 </h3>
-                <span className="text-[11px] text-neutral-300 font-medium block mt-0.5">
+                <span className="text-xs text-zinc-400 font-medium block mt-0.5">
                   {ex.muscles}
                 </span>
               </div>
             </div>
 
-            {/* Contenido Biomecánico Fluido (Sin Matriosca) */}
-            <div className="p-5 space-y-3.5">
+            {/* Contenido Biomecánico Fluido */}
+            <div className="p-6 space-y-4">
               {/* Tempo & Ajuste Personal para Angel */}
-              <div className="text-xs space-y-1">
-                <div className="flex items-center gap-1.5 text-neutral-400 font-bold uppercase tracking-wider text-[10px]">
-                  <Clock className="w-3 h-3 text-coral-500" />
+              <div className="text-xs space-y-1.5">
+                <div className="flex items-center gap-2 text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
+                  <Clock className="w-3.5 h-3.5 text-coral-500" />
                   <span>Tempo Recomendado:</span>
-                  <span className="text-carbon-900 font-mono font-black">{ex.tempo}</span>
+                  <span className="text-white font-mono font-black">{ex.tempo}</span>
                 </div>
                 {ex.athleteNote && (
-                  <p className="border-l-2 border-coral-500 pl-3 py-0.5 text-[11px] text-neutral-600 leading-relaxed italic">
-                    <strong className="text-carbon-900 not-italic font-bold">Para ti (194 cm / 120 kg): </strong>
+                  <p className="border-l-2 border-coral-500 pl-3 py-1 text-xs text-zinc-300 leading-relaxed italic bg-[#22222A]/50 rounded-r-xl">
+                    <strong className="text-white not-italic font-bold">Para ti (194 cm / 120 kg): </strong>
                     {ex.athleteNote}
                   </p>
                 )}
               </div>
 
-              {/* Claves de Ejecución (Lista limpia con división tipográfica) */}
-              <div className="pt-2 border-t border-sand-200/50">
-                <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase block mb-2">
+              {/* Claves de Ejecución */}
+              <div className="space-y-2.5">
+                <span className="text-[10px] font-black tracking-widest text-zinc-500 uppercase block">
                   PUNTOS CLAVE DE TÉCNICA
                 </span>
                 <div className="space-y-2 text-xs">
                   {ex.cues.map((cue, cIdx) => (
-                    <div key={cIdx} className="flex items-start gap-2">
-                      <span className="w-4 h-4 rounded-full bg-sand-100 text-carbon-900 text-[10px] font-black flex items-center justify-center flex-shrink-0 mt-0.5 font-mono">
+                    <div key={cIdx} className="flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-[#272731] text-coral-500 text-[10px] font-black flex items-center justify-center flex-shrink-0 mt-0.5 font-mono">
                         {cIdx + 1}
                       </span>
                       <div className="leading-snug">
-                        <strong className="font-extrabold text-carbon-900">{cue.title}: </strong>
-                        <span className="text-neutral-600">{cue.desc}</span>
+                        <strong className="font-bold text-white">{cue.title}: </strong>
+                        <span className="text-zinc-400">{cue.desc}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Error a Evitar (Línea sutil de advertencia) */}
-              <div className="pt-2 border-t border-sand-200/50 flex items-start gap-2 text-[11px] text-rose-900">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0 mt-0.5" />
+              {/* Error a Evitar */}
+              <div className="p-3 rounded-2xl bg-rose-950/20 flex items-start gap-2.5 text-xs text-rose-300">
+                <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong className="font-black text-rose-950">Error a evitar: </strong>
-                  <span className="text-rose-800">{ex.mistake}</span>
+                  <strong className="font-black text-rose-200">Error a evitar: </strong>
+                  <span>{ex.mistake}</span>
                 </p>
               </div>
             </div>

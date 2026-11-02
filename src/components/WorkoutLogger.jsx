@@ -164,13 +164,11 @@ export function WorkoutLogger({
     return saved?.watchCalories || 240
   })
 
-  // Manejador para cuando vuelves de TikTok o bloqueas el iPhone (visibilitychange)
+  // Manejador para cuando vuelves de background o bloqueas el iPhone
   useEffect(() => {
     const handleVisibilityChange = () => {
-      // Recalcular tiempo de entrenamiento real
       setElapsedSeconds(Math.floor((Date.now() - workoutStartedAt) / 1000))
 
-      // Recalcular tiempo de descanso
       if (restEndsAt) {
         const remaining = Math.max(0, Math.ceil((restEndsAt - Date.now()) / 1000))
         setRestSeconds(remaining)
@@ -282,7 +280,7 @@ export function WorkoutLogger({
       }
       const updated = { ...prev, [exerciseId]: currentSets }
 
-      // Persistir peso inmediatamente para que nunca más se resetee
+      // Persistir peso inmediatamente
       if (field === 'weight' && Number(value) > 0) {
         saveLastUsedWeight(exerciseId, Number(value))
       }
@@ -408,7 +406,6 @@ export function WorkoutLogger({
           totalVolume += w * r
           if (w > maxWeight) maxWeight = w
           completedSetsCount += 1
-          // Guardar el peso alcanzado
           saveLastUsedWeight(ex.id, w)
         }
       })
@@ -425,7 +422,6 @@ export function WorkoutLogger({
       origin: { y: 0.6 }
     })
 
-    // Limpiar sesión activa en progreso
     clearActiveSession()
     if (onClearActiveSession) {
       onClearActiveSession()
@@ -461,26 +457,26 @@ export function WorkoutLogger({
   }
 
   return (
-    <div className="pb-36">
+    <div className="pb-36 animate-fadeIn">
       {/* Barra superior con volver, cronómetro real y selector de rutinas */}
       <div className="flex items-center gap-2 mb-4">
         <button
           onClick={onCancel}
-          className="p-2.5 rounded-full bg-white border border-sand-200 text-carbon-800 hover:bg-sand-100 transition-colors shadow-xs flex-shrink-0"
+          className="w-11 h-11 rounded-2xl bg-[#18181D] hover:bg-[#22222A] text-zinc-300 hover:text-white flex items-center justify-center shadow-lg shadow-black/20 touch-press flex-shrink-0 cursor-pointer"
           title="Guardar y volver al inicio"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 bg-white p-1 rounded-full border border-sand-200/80 shadow-xs">
+        <div className="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 bg-[#18181D] p-1.5 rounded-2xl shadow-lg shadow-black/20">
           {routines.map((rot, idx) => (
             <button
               key={rot.id || idx}
               onClick={() => handleSwitchRoutine(idx)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap flex-shrink-0 cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-black rounded-xl transition-all whitespace-nowrap flex-shrink-0 cursor-pointer touch-press ${
                 selectedRoutineIndex === idx
-                  ? 'bg-carbon-900 text-white shadow-xs'
-                  : 'text-neutral-500 hover:text-carbon-900'
+                  ? 'bg-[#272731] text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
               {rot.title.split('—')[0].trim()}
@@ -491,16 +487,16 @@ export function WorkoutLogger({
 
       {/* Timer de descanso flotante dinámico con espacio para el notch */}
       {restSeconds > 0 && (
-        <div className="fixed top-12 sm:top-14 left-4 right-4 z-50 max-w-md mx-auto bg-carbon-900/95 backdrop-blur-md text-white rounded-2xl p-3.5 flex items-center justify-between shadow-2xl border border-carbon-800 animate-slideDown">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-carbon-800 flex items-center justify-center text-coral-500">
-              <Clock className="w-4 h-4 animate-spin" />
+        <div className="fixed top-12 sm:top-14 left-4 right-4 z-50 max-w-md mx-auto bg-[#18181D]/95 backdrop-blur-md text-white rounded-3xl p-4 flex items-center justify-between shadow-2xl shadow-black/70 animate-slideDown">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#272731] flex items-center justify-center text-coral-500">
+              <Clock className="w-5 h-5 animate-spin" />
             </div>
             <div>
-              <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                 DESCANSO EN VIVO
               </div>
-              <div className="text-xl font-black text-coral-500 font-mono tracking-tight leading-none">
+              <div className="text-2xl font-black text-coral-500 font-mono tracking-tight leading-none">
                 {Math.floor(restSeconds / 60)}:{(restSeconds % 60).toString().padStart(2, '0')}
               </div>
             </div>
@@ -509,14 +505,14 @@ export function WorkoutLogger({
             <button
               type="button"
               onClick={() => addRestTime(30)}
-              className="text-xs font-bold px-3 py-1.5 rounded-full bg-carbon-800 hover:bg-carbon-700 text-neutral-200 transition-colors"
+              className="text-xs font-black px-3.5 py-2 rounded-xl bg-[#272731] hover:bg-[#343442] text-zinc-200 transition-colors touch-press cursor-pointer"
             >
               +30s
             </button>
             <button
               type="button"
               onClick={cancelRestTimer}
-              className="text-xs font-black px-3.5 py-1.5 rounded-full bg-sand-100 hover:bg-white text-carbon-900 transition-colors shadow-xs"
+              className="text-xs font-black px-4 py-2 rounded-xl bg-white text-black hover:bg-zinc-200 transition-colors shadow-md touch-press cursor-pointer"
             >
               Listo
             </button>
@@ -525,33 +521,33 @@ export function WorkoutLogger({
       )}
 
       {/* Encabezado con tiempo de entrenamiento real en vivo */}
-      <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60 mb-4">
+      <div className="bg-[#18181D] rounded-3xl p-6 shadow-xl shadow-black/30 mb-4 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
               EN CURSO • TIEMPO ACTIVO
             </span>
           </div>
           <div className="flex items-center gap-2">
             <a
               href="meulify://"
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-carbon-900 text-[11px] font-bold border border-sand-200/80 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#272731] hover:bg-[#343442] text-zinc-200 text-xs font-bold transition-colors touch-press"
               title="Abrir reproductor Meulify en iPhone"
             >
-              <Music className="w-3 h-3 text-coral-500" />
+              <Music className="w-3.5 h-3.5 text-coral-500" />
               <span>Meulify</span>
             </a>
-            <div className="text-xs font-black font-mono text-carbon-900 bg-sand-100 px-2.5 py-1 rounded-full">
+            <div className="text-xs font-black font-mono text-white bg-[#272731] px-3 py-1.5 rounded-full">
               {formatTime(elapsedSeconds)}
             </div>
           </div>
         </div>
 
-        <h2 className="text-xl font-extrabold text-carbon-900 tracking-tight mt-1.5">
+        <h2 className="text-2xl font-black text-white tracking-tight leading-tight">
           {currentRoutine.title}
         </h2>
-        <p className="text-xs text-neutral-400 mt-0.5">{currentRoutine.description}</p>
+        <p className="text-xs text-zinc-400 leading-relaxed">{currentRoutine.description}</p>
       </div>
 
       {/* Lista de Ejercicios */}
@@ -569,24 +565,24 @@ export function WorkoutLogger({
           return (
             <div
               key={exercise.id}
-              className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60"
+              className="bg-[#18181D] rounded-3xl p-5 sm:p-6 shadow-xl shadow-black/30 space-y-4"
             >
               {/* Encabezado del ejercicio con botón de Sustitución y Badge de Progresión */}
-              <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="w-6 h-6 rounded-full bg-sand-100 text-carbon-900 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                    <span className="w-7 h-7 rounded-full bg-[#272731] text-white text-xs font-black flex items-center justify-center flex-shrink-0">
                       {exIndex + 1}
                     </span>
-                    <h3 className="text-base font-extrabold text-carbon-900 leading-snug">{exercise.name}</h3>
+                    <h3 className="text-lg font-black text-white leading-snug">{exercise.name}</h3>
                     {comparison?.isProgressing && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black tracking-wide uppercase shadow-2xs">
-                        <TrendingUp className="w-2.5 h-2.5" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black tracking-wide uppercase">
+                        <TrendingUp className="w-3 h-3 text-emerald-400" />
                         <span>PROGRESANDO {comparison.weightDiff > 0 ? `+${comparison.weightDiff}kg` : ''}</span>
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] font-semibold text-neutral-400 mt-0.5 ml-8">
+                  <div className="text-xs font-medium text-zinc-400 mt-1 ml-9">
                     {exercise.equipment}
                   </div>
                 </div>
@@ -594,32 +590,32 @@ export function WorkoutLogger({
                 <button
                   type="button"
                   onClick={() => setSwapTargetExercise(exercise)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-neutral-600 text-[11px] font-bold border border-sand-200/80 transition-colors flex-shrink-0"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#272731] hover:bg-[#343442] text-zinc-200 text-xs font-bold transition-colors flex-shrink-0 touch-press cursor-pointer"
                   title="Cambiar ejercicio (ej: predicador por curl)"
                 >
-                  <RefreshCw className="w-3 h-3 text-coral-500" />
+                  <RefreshCw className="w-3.5 h-3.5 text-coral-500" />
                   <span>Cambiar</span>
                 </button>
               </div>
 
               {/* Historial Contextual en Vivo & Sugerencia de Sobrecarga */}
               {lastPerformance && (
-                <div className="mb-3 p-3 rounded-2xl bg-sand-100/70 border border-sand-200/80 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-bold text-carbon-900">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-coral-500 flex-shrink-0" />
-                      <span className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-wider">Último entreno:</span>
-                      <span className="font-mono text-[11px] text-carbon-900 font-black">
+                <div className="p-4 rounded-2xl bg-[#22222A] space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-white">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-coral-500 flex-shrink-0" />
+                      <span className="text-[10px] text-zinc-400 font-extrabold uppercase tracking-wider">Último entreno:</span>
+                      <span className="font-mono text-xs text-white font-black">
                         {formatPreviousSessionSummary(lastPerformance)}
                       </span>
                     </div>
                   </div>
 
                   {overloadRec && overloadRec.type !== 'baseline' && (
-                    <div className="flex items-start gap-1.5 pt-1.5 border-t border-sand-200/50 text-[11px] text-neutral-600 leading-snug">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex items-start gap-2 pt-2 text-xs text-zinc-300 leading-snug">
+                      <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-extrabold text-carbon-900">Sugerencia hoy: </span>
+                        <span className="font-black text-white">Sugerencia hoy: </span>
                         <span>{overloadRec.message}</span>
                       </div>
                     </div>
@@ -628,118 +624,132 @@ export function WorkoutLogger({
               )}
 
               {/* Guía rápida de tempo / notas */}
-              <div className="mb-3 text-[11px] text-neutral-500 flex items-center gap-1.5 font-medium">
+              <div className="text-xs text-zinc-400 flex items-center gap-2 font-medium px-1">
                 <TrendingUp className="w-3.5 h-3.5 text-coral-500 flex-shrink-0" />
                 <span>{exercise.notes}</span>
               </div>
 
-              {/* Series interactivas */}
-              <div className="space-y-2.5">
+              {/* Series interactivas A PRUEBA DE GIMNASIO (Botones masivos de 44x44px, cero cajas de input) */}
+              <div className="space-y-3">
                 {sets.map((set, setIdx) => (
                   <div
                     key={setIdx}
-                    className={`flex items-center justify-between p-3 rounded-2xl transition-all ${
+                    className={`rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-between gap-1.5 sm:gap-2 ${
                       set.completed
-                        ? 'bg-emerald-50/70 border border-emerald-200/80 text-emerald-900'
-                        : 'bg-sand-50/80 border border-sand-200/60'
+                        ? 'bg-emerald-950/30 ring-1 ring-emerald-500/40 text-white'
+                        : 'bg-[#22222A]'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-extrabold text-neutral-400 w-5">
-                        #{set.setNumber}
-                      </span>
+                    {/* Número de Serie */}
+                    <span className="text-xs font-black text-zinc-500 w-5 text-center flex-shrink-0">
+                      #{set.setNumber}
+                    </span>
 
-                      {/* Ajuste Rápido de Kilos */}
-                      <div className="flex items-center bg-white rounded-xl border border-sand-200 shadow-2xs px-1 py-0.5">
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, -2.5)}
-                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
-                        >
-                          <Minus className="w-2.5 h-2.5" />
-                        </button>
-                        <span className="w-11 text-center text-xs font-black text-carbon-900 font-mono">
-                          {set.weight}k
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, 2.5)}
-                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
-                        >
-                          <Plus className="w-2.5 h-2.5" />
-                        </button>
-                      </div>
-
-                      {/* Ajuste Rápido de Repeticiones */}
-                      <div className="flex items-center bg-white rounded-xl border border-sand-200 shadow-2xs px-1 py-0.5">
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdjustReps(exercise.id, setIdx, -1)}
-                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
-                        >
-                          <Minus className="w-2.5 h-2.5" />
-                        </button>
-                        <span className="w-6 text-center text-xs font-black text-carbon-900 font-mono">
-                          {set.reps}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdjustReps(exercise.id, setIdx, 1)}
-                          className="w-5 h-5 flex items-center justify-center text-neutral-400 hover:text-carbon-900"
-                        >
-                          <Plus className="w-2.5 h-2.5" />
-                        </button>
-                      </div>
-
-                      {/* Selector RIR interactivo */}
+                    {/* Stepper de Peso (Kilos) - Botones masivos 44x44px a prueba de sudor */}
+                    <div className="flex items-center gap-1 sm:gap-1.5">
                       <button
                         type="button"
-                        onClick={() => handleCycleRir(exercise.id, setIdx)}
-                        className={`px-2 py-1 rounded-xl text-[10px] font-black tracking-tight border transition-all ${
-                          set.rir === 0
-                            ? 'bg-rose-100 text-rose-700 border-rose-300'
-                            : set.rir === 1
-                            ? 'bg-amber-100 text-amber-800 border-amber-300'
-                            : set.rir === 2
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                            : 'bg-sand-100 text-neutral-600 border-sand-300'
-                        }`}
-                        title="Repeticiones en reserva (toca para cambiar)"
+                        onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, -2.5)}
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        title="Restar 2.5 kg"
                       >
-                        {set.rir === 0 ? 'Fallo' : `RIR ${set.rir ?? 2}`}
+                        <Minus className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+
+                      <div className="flex flex-col items-center justify-center min-w-[46px] sm:min-w-[54px]">
+                        <span className="text-xl sm:text-2xl font-black font-mono text-white leading-none">
+                          {set.weight}
+                        </span>
+                        <span className="text-[10px] font-normal text-zinc-500 uppercase mt-0.5">kg</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, 2.5)}
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        title="Sumar 2.5 kg"
+                      >
+                        <Plus className="w-4 h-4 stroke-[2.5]" />
                       </button>
                     </div>
 
-                    {/* Botón táctil grande de Check */}
+                    {/* Stepper de Repeticiones - Botones masivos 44x44px */}
+                    <div className="flex items-center gap-1 sm:gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickAdjustReps(exercise.id, setIdx, -1)}
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        title="Restar 1 rep"
+                      >
+                        <Minus className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+
+                      <div className="flex flex-col items-center justify-center min-w-[34px] sm:min-w-[40px]">
+                        <span className="text-xl sm:text-2xl font-black font-mono text-white leading-none">
+                          {set.reps}
+                        </span>
+                        <span className="text-[10px] font-normal text-zinc-500 uppercase mt-0.5">reps</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleQuickAdjustReps(exercise.id, setIdx, 1)}
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        title="Sumar 1 rep"
+                      >
+                        <Plus className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+                    </div>
+
+                    {/* Selector RIR interactivo táctil */}
+                    <button
+                      type="button"
+                      onClick={() => handleCycleRir(exercise.id, setIdx)}
+                      className={`h-10 sm:h-11 px-2 sm:px-3 rounded-xl text-xs font-black transition-all cursor-pointer touch-press flex items-center justify-center ${
+                        set.rir === 0
+                          ? 'bg-rose-500/20 text-rose-400'
+                          : set.rir === 1
+                          ? 'bg-amber-500/20 text-amber-400'
+                          : set.rir === 2
+                          ? 'bg-emerald-500/20 text-emerald-400'
+                          : 'bg-[#2E2E3A] text-zinc-300'
+                      }`}
+                      title="Repeticiones en reserva (toca para cambiar)"
+                    >
+                      {set.rir === 0 ? 'Fallo' : `RIR ${set.rir ?? 2}`}
+                    </button>
+
+                    {/* Botón táctil grande de Check (48x48px hit target) */}
                     <button
                       type="button"
                       onClick={() => handleToggleComplete(exercise.id, setIdx)}
-                      className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer touch-press flex-shrink-0 ${
                         set.completed
-                          ? 'bg-coral-500 text-white shadow-md shadow-coral-500/20'
-                          : 'bg-white border border-sand-200 text-neutral-300 hover:text-carbon-900'
+                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105'
+                          : 'bg-[#2E2E3A] hover:bg-[#383848] text-zinc-500 hover:text-white'
                       }`}
+                      title={set.completed ? 'Serie completada' : 'Marcar serie como completada'}
                     >
-                      <Check className="w-4 h-4" />
+                      <Check className="w-5 h-5 stroke-[2.5]" />
                     </button>
                   </div>
                 ))}
               </div>
 
               {/* Pie de tarjeta con Añadir Serie y 1RM Estimado */}
-              <div className="mt-3 flex justify-between items-center px-1">
+              <div className="flex justify-between items-center px-1 pt-1">
                 <button
                   type="button"
                   onClick={() => handleAddSet(exercise.id)}
-                  className="flex items-center gap-1 text-[11px] font-bold text-coral-500 hover:text-coral-600"
+                  className="flex items-center gap-1.5 text-xs font-black text-coral-500 hover:text-coral-400 cursor-pointer touch-press"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
                   <span>Añadir Serie</span>
                 </button>
 
                 {best1RM > 0 && (
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-neutral-400">
-                    <span className="text-[10px] uppercase tracking-wider">1RM Estimado:</span>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400">
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-500">1RM Estimado:</span>
                     <span className="font-mono font-black text-coral-500">{best1RM} kg</span>
                   </div>
                 )}
@@ -750,32 +760,32 @@ export function WorkoutLogger({
       </div>
 
       {/* Botón para añadir ejercicio extra improvisado a la sesión */}
-      <div className="mt-3">
+      <div className="mt-4">
         <button
           type="button"
           onClick={handleAddNewExerciseToSession}
-          className="w-full py-3.5 rounded-3xl bg-white hover:bg-sand-50 border border-dashed border-sand-300 text-neutral-600 hover:text-carbon-900 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs"
+          className="w-full py-4 rounded-3xl bg-[#18181D] hover:bg-[#22222A] text-zinc-300 hover:text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/20 touch-press cursor-pointer"
         >
-          <Plus className="w-4 h-4 text-coral-500" />
+          <Plus className="w-4 h-4 text-coral-500 stroke-[2.5]" />
           <span>Añadir Otro Ejercicio a esta Sesión</span>
         </button>
       </div>
 
       {/* Botones de acción inferior */}
-      <div className="mt-6 space-y-2.5">
+      <div className="mt-6 space-y-3">
         <button
           type="button"
           onClick={handleFinish}
-          className="w-full py-4 bg-carbon-900 hover:bg-black active:scale-[0.99] text-white font-extrabold text-sm rounded-full shadow-lg shadow-carbon-900/20 transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 bg-coral-500 hover:bg-coral-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-coral-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer touch-press"
         >
-          <Sparkles className="w-4 h-4 text-coral-500" />
+          <Sparkles className="w-4 h-4 text-white" />
           <span>Completar Entrenamiento de Hoy</span>
         </button>
 
         <button
           type="button"
           onClick={handleDiscardSession}
-          className="w-full py-2.5 text-neutral-400 hover:text-rose-500 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+          className="w-full py-3 text-zinc-500 hover:text-rose-400 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer touch-press"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Descartar progreso de esta sesión</span>
