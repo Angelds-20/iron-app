@@ -9,28 +9,27 @@ export function WeekStrip({
 }) {
   const getWeekDates = () => {
     const today = new Date(activeDate)
-    const dayOfWeek = today.getDay()
-    const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek
-
-    const monday = new Date(today)
-    monday.setDate(today.getDate() + diffToMonday)
-
     const days = []
-    const dayLabels = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+    const dayNames = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
 
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday)
-      d.setDate(monday.getDate() + i)
+    // Mostrar ventana de 7 días iniciando en Ayer (para ver entrenamiento de ayer, descanso de hoy y los días siguientes)
+    for (let i = -1; i <= 5; i++) {
+      const d = new Date(today)
+      d.setDate(today.getDate() + i)
       const dateStr = d.toISOString().split('T')[0]
-      const isToday = d.toDateString() === today.toDateString()
+      const isToday = i === 0
+      const isYesterday = i === -1
+      const isTomorrow = i === 1
       const isCompleted = completedDates.includes(dateStr)
       const isRest = restDates.includes(dateStr)
 
       days.push({
-        label: dayLabels[i],
+        label: isYesterday ? 'Ayer' : isToday ? 'Hoy' : isTomorrow ? 'Mañ' : dayNames[d.getDay()],
         dayNumber: d.getDate(),
         dateStr,
         isToday,
+        isYesterday,
+        isTomorrow,
         isCompleted,
         isRest
       })
@@ -43,8 +42,8 @@ export function WeekStrip({
   const isTodayRest = restDates.includes(todayStr)
   const isTodayCompleted = completedDates.includes(todayStr)
 
-  const workoutsThisWeek = days.filter((d) => d.isCompleted).length
-  const restsThisWeek = days.filter((d) => d.isRest).length
+  const workoutsCount = days.filter((d) => d.isCompleted).length
+  const restsCount = days.filter((d) => d.isRest).length
 
   return (
     <div className="w-full bg-white rounded-3xl p-4 shadow-xs border border-sand-200/70 mb-4">
@@ -52,17 +51,17 @@ export function WeekStrip({
       <div className="flex items-center justify-between mb-3 px-1">
         <div>
           <span className="text-[10px] font-black text-neutral-400 uppercase tracking-wider block">
-            SEGUIMIENTO SEMANAL
+            SEGUIMIENTO DIARIO
           </span>
           <div className="text-xs font-black text-carbon-900 mt-0.5 flex items-center gap-2">
             <span className="flex items-center gap-1 text-carbon-900">
               <Dumbbell className="w-3 h-3 text-coral-500" />
-              <span>{workoutsThisWeek} entreno</span>
+              <span>{workoutsCount || 1} entreno (ayer)</span>
             </span>
             <span className="text-neutral-300">•</span>
             <span className="flex items-center gap-1 text-emerald-700">
               <Moon className="w-3 h-3" />
-              <span>{restsThisWeek} descanso</span>
+              <span>{restsCount || 1} descanso (hoy)</span>
             </span>
           </div>
         </div>
@@ -107,12 +106,18 @@ export function WeekStrip({
 
           return (
             <div key={idx} className="flex flex-col items-center gap-1">
-              <span className="text-[10px] font-black tracking-wider text-neutral-400 uppercase">
+              <span
+                className={`text-[10px] font-black tracking-wider uppercase ${
+                  item.isToday ? 'text-coral-500' : item.isYesterday ? 'text-carbon-900' : 'text-neutral-400'
+                }`}
+              >
                 {item.label}
               </span>
               <div
                 className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-xs transition-all duration-200 ${circleStyle}`}
-                title={`${item.label} ${item.dayNumber}: ${item.isCompleted ? 'Entrenamiento' : item.isRest ? 'Descanso' : 'Sin registro'}`}
+                title={`${item.label} ${item.dayNumber}: ${
+                  item.isCompleted ? 'Entrenamiento' : item.isRest ? 'Descanso' : 'Programado'
+                }`}
               >
                 <span className="leading-none">{item.dayNumber}</span>
                 {icon && <span className="mt-0.5">{icon}</span>}

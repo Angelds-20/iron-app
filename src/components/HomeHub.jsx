@@ -115,8 +115,8 @@ export function HomeHub({
       {/* 1. VISTA: Hoy & Cargas */}
       {activeSegment === 'hub' && (
         <div className="space-y-4">
-          {/* Banner de Sesión en Curso si hay entrenamiento activo */}
-          {activeSession?.isActive && (
+          {/* Banner de Sesión en Curso si hay entrenamiento activo con series completadas */}
+          {activeSession?.isActive && completedSetsCount > 0 && (
             <div className="bg-carbon-900 text-white rounded-3xl p-4 shadow-md border border-carbon-800 flex items-center justify-between">
               <div
                 onClick={() => onStartWorkout(activeSession.routineIndex || 0)}
@@ -129,12 +129,13 @@ export function HomeHub({
                   </span>
                 </div>
                 <h3 className="text-base font-black text-white leading-tight">
-                  {activeSession.routineIndex === 1
-                    ? 'Pierna — Sentadilla & Peso Muerto'
-                    : 'Torso — Banca & Inclinado'}
+                  {routines[activeSession.routineIndex]?.title ||
+                    (activeSession.routineIndex === 1
+                      ? 'Pierna — Sentadilla & Peso Muerto'
+                      : 'Torso — Banca & Inclinado')}
                 </h3>
                 <p className="text-[11px] text-neutral-300 mt-0.5">
-                  {completedSetsCount} series registradas • Toca para continuar
+                  {completedSetsCount} series completadas • Toca para continuar
                 </p>
               </div>
 
@@ -266,30 +267,43 @@ export function HomeHub({
                 </div>
               </div>
 
-              {/* Próximo Entreno & Opción de Entrenar Hoy */}
-              <div className="pt-3 border-t border-sand-200/60 flex items-center justify-between text-xs gap-3">
-                <div className="min-w-0">
-                  <span className="text-[10px] font-bold text-neutral-400 uppercase block">
-                    Próxima Sesión (Mañana)
+              {/* Próximo Entreno Planificado (Requiere confirmación previa de Angel) */}
+              <div className="pt-3 border-t border-sand-200/60 space-y-2">
+                <div className="flex items-center justify-between text-xs px-0.5">
+                  <span className="text-[10px] font-black text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sand-400" />
+                    <span>PLANIFICADO PARA MAÑANA • REQUIERE TU CONFIRMACIÓN</span>
                   </span>
-                  <span className="font-extrabold text-carbon-900 text-xs block truncate">
-                    Pierna — Sentadilla & Peso Muerto
-                  </span>
-                  <span className="text-[10px] text-neutral-400 block truncate">
-                    4 ejercicios • Sentadilla 60kg, PM 60kg, Zancadas 14kg, Gemelos 60kg
+                  <span className="text-[10px] font-bold text-neutral-400 bg-sand-100 px-2 py-0.5 rounded-full border border-sand-200/60">
+                    Sin iniciar
                   </span>
                 </div>
 
-                {/* Botón para cambiar a entrenar hoy si Angel lo decide */}
-                <button
-                  type="button"
-                  onClick={() => onStartWorkout(1)}
-                  className="px-3 py-2 rounded-xl bg-sand-100 hover:bg-sand-200 text-carbon-900 font-bold text-[11px] flex items-center gap-1 border border-sand-200/80 transition-all cursor-pointer flex-shrink-0"
-                  title="Iniciar rutina de pierna hoy"
-                >
-                  <span>¿Entrenar hoy?</span>
-                  <ArrowRight className="w-3 h-3 text-coral-500" />
-                </button>
+                <div className="bg-sand-50/70 rounded-2xl p-3 border border-sand-200/60 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-carbon-900 text-xs block truncate">
+                      Pierna — Sentadilla & Peso Muerto
+                    </span>
+                    <span className="text-[10px] text-neutral-500 block truncate mt-0.5">
+                      4 ejercicios • Sentadilla 60kg, PM 60kg, Zancadas 14kg, Gemelos 60kg
+                    </span>
+                  </div>
+
+                  {/* Botón con confirmación explícita */}
+                  <button
+                    type="button"
+                    onClick={() => onStartWorkout(1)}
+                    className="px-3 py-1.5 rounded-xl bg-carbon-900 hover:bg-black text-white font-bold text-[11px] flex items-center gap-1 shadow-2xs transition-all cursor-pointer flex-shrink-0"
+                    title="Confirmar e iniciar rutina de pierna"
+                  >
+                    <span>Confirmar / Iniciar</span>
+                    <ArrowRight className="w-3 h-3 text-coral-500" />
+                  </button>
+                </div>
+
+                <p className="text-[10px] text-neutral-400 italic px-0.5 leading-snug">
+                  Tu descanso de hoy está registrado automáticamente. Esta rutina no se iniciará ni registrará hasta que tú la confirmes.
+                </p>
               </div>
             </div>
           ) : (

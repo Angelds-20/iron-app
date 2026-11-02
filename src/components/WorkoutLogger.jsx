@@ -217,19 +217,24 @@ export function WorkoutLogger({
     return () => clearInterval(interval)
   }, [restEndsAt])
 
-  // SINCRONIZACIÓN PERMANENTE INMEDIATA: cada cambio se guarda en localStorage
+  // SINCRONIZACIÓN PERMANENTE: solo se activa como sesión en curso si el atleta completó al menos 1 serie
   useEffect(() => {
     if (onUpdateActiveSession) {
-      onUpdateActiveSession({
-        isActive: true,
-        routineIndex: selectedRoutineIndex,
-        routineId: currentRoutine.id,
-        startedAt: workoutStartedAt,
-        restEndsAt,
-        exerciseData,
-        watchBpm,
-        watchCalories
-      })
+      const hasCompletedAnySet = Object.values(exerciseData).some((sets) =>
+        sets.some((s) => s.completed)
+      )
+      if (hasCompletedAnySet) {
+        onUpdateActiveSession({
+          isActive: true,
+          routineIndex: selectedRoutineIndex,
+          routineId: currentRoutine.id,
+          startedAt: workoutStartedAt,
+          restEndsAt,
+          exerciseData,
+          watchBpm,
+          watchCalories
+        })
+      }
     }
   }, [exerciseData, selectedRoutineIndex, watchBpm, watchCalories, workoutStartedAt, restEndsAt])
 
@@ -282,16 +287,22 @@ export function WorkoutLogger({
         saveLastUsedWeight(exerciseId, Number(value))
       }
 
-      saveActiveSession({
-        isActive: true,
-        routineIndex: selectedRoutineIndex,
-        routineId: currentRoutine.id,
-        startedAt: workoutStartedAt,
-        restEndsAt,
-        exerciseData: updated,
-        watchBpm,
-        watchCalories
-      })
+      // Solo guardar en almacenamiento como sesión activa si hay al menos una serie completada
+      const hasCompletedAny = Object.values(updated).some((sets) =>
+        sets.some((s) => s.completed)
+      )
+      if (hasCompletedAny) {
+        saveActiveSession({
+          isActive: true,
+          routineIndex: selectedRoutineIndex,
+          routineId: currentRoutine.id,
+          startedAt: workoutStartedAt,
+          restEndsAt,
+          exerciseData: updated,
+          watchBpm,
+          watchCalories
+        })
+      }
 
       return updated
     })

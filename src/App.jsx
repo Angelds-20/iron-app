@@ -100,10 +100,15 @@ export default function App() {
     }
   }, [])
 
-  // Sesión en curso persistente (auto-descarta si tiene más de 3 horas para evitar sesiones fantasma)
+  // Sesión en curso persistente (auto-descarta si no tiene series completadas o tiene más de 3 horas para evitar sesiones fantasma)
   const [activeWorkoutSession, setActiveWorkoutSession] = useState(() => {
     const saved = getActiveSession()
-    if (saved?.startedAt && Date.now() - saved.startedAt > 3 * 60 * 60 * 1000) {
+    if (!saved) return null
+    // Si no tiene series completadas por el atleta, descartar para que no aparezca banner fantasma
+    const hasCompletedSets = saved.exerciseData
+      ? Object.values(saved.exerciseData).some((sets) => sets.some((s) => s.completed))
+      : false
+    if (!hasCompletedSets || (saved.startedAt && Date.now() - saved.startedAt > 3 * 60 * 60 * 1000)) {
       clearActiveSession()
       try {
         localStorage.removeItem('active_workout_session')
@@ -146,22 +151,32 @@ export default function App() {
     return saved && saved >= 90 ? saved : 120.0
   })
 
-  // Días completados (Garantiza ayer como sesión de 60 kg completada)
+  // Días completados (Registra SOLO ayer como sesión completada de 60 kg)
   const [completedDates, setCompletedDates] = useState(() => {
+    const todayStr = new Date().toISOString().split('T')[0]
     const yesterdayStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     const saved = localStorage.getItem('completed_workout_dates')
-    const list = saved ? JSON.parse(saved) : []
-    const combined = [...list]
-    if (!combined.includes(yesterdayStr)) combined.push(yesterdayStr)
-    return combined
+    let list = saved ? JSON.parse(saved) : []
+    // Asegurar que hoy NUNCA esté marcado como entrenado automáticamente
+    list = list.filter((d) => d !== todayStr)
+    if (!list.includes(yesterdayStr)) {
+      list.push(yesterdayStr)
+    }
+    localStorage.setItem('completed_workout_dates', JSON.stringify(list))
+    return list
   })
 
-  // Días de descanso planificados (Garantiza hoy como descanso activo tras la sesión de ayer)
+  // Días de descanso planificados (Garantiza HOY automáticamente como descanso activo tras la sesión de ayer)
   const [restDates, setRestDates] = useState(() => {
     const todayStr = new Date().toISOString().split('T')[0]
     const saved = localStorage.getItem('iron_rest_dates_v2')
     const list = saved ? JSON.parse(saved) : []
-    return list.includes(todayStr) ? list : [...list, todayStr]
+    // Hoy es descanso automático
+    if (!list.includes(todayStr)) {
+      list.push(todayStr)
+      localStorage.setItem('iron_rest_dates_v2', JSON.stringify(list))
+    }
+    return list
   })
 
   // Entrenamientos completados (Historial con sesión de ayer: 6.420 kg, 15 series efectivas)
