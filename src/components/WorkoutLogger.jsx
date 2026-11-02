@@ -524,8 +524,8 @@ export function WorkoutLogger({
       <div className="bg-[#212227] rounded-[28px] p-6 shadow-lg mb-4 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,1)]" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-white">
               EN CURSO • TIEMPO ACTIVO
             </span>
           </div>
@@ -576,8 +576,8 @@ export function WorkoutLogger({
                     </span>
                     <h3 className="text-lg font-extrabold text-white leading-snug">{exercise.name}</h3>
                     {comparison?.isProgressing && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black tracking-wide uppercase">
-                        <TrendingUp className="w-3 h-3 text-emerald-400" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/15 text-white text-[10px] font-black tracking-wide uppercase border border-white/20">
+                        <TrendingUp className="w-3 h-3 text-white" />
                         <span>PROGRESANDO {comparison.weightDiff > 0 ? `+${comparison.weightDiff}kg` : ''}</span>
                       </span>
                     )}
@@ -636,7 +636,7 @@ export function WorkoutLogger({
                     key={setIdx}
                     className={`rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-between gap-1.5 sm:gap-2 ${
                       set.completed
-                        ? 'bg-emerald-950/30 ring-1 ring-emerald-500/40 text-white'
+                        ? 'bg-white/10 ring-1 ring-white/30 text-white'
                         : 'bg-[#1A1B20]'
                     }`}
                   >
@@ -711,7 +711,7 @@ export function WorkoutLogger({
                           : set.rir === 1
                           ? 'bg-amber-500/20 text-amber-400'
                           : set.rir === 2
-                          ? 'bg-emerald-500/20 text-emerald-400'
+                          ? 'bg-[#2C2D34] text-white border border-white/20'
                           : 'bg-[#2C2D34] text-zinc-300'
                       }`}
                       title="Repeticiones en reserva (toca para cambiar)"
@@ -725,12 +725,12 @@ export function WorkoutLogger({
                       onClick={() => handleToggleComplete(exercise.id, setIdx)}
                       className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer touch-press flex-shrink-0 ${
                         set.completed
-                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105'
+                          ? 'bg-white text-black shadow-lg shadow-white/30 scale-105'
                           : 'bg-[#2C2D34] hover:bg-[#383A44] text-[#565863] hover:text-white'
                       }`}
                       title={set.completed ? 'Serie completada' : 'Marcar serie como completada'}
                     >
-                      <Check className="w-5 h-5 stroke-[2.5]" />
+                      <Check className={`w-5 h-5 stroke-[2.5] ${set.completed ? 'text-black' : 'text-zinc-400'}`} />
                     </button>
                   </div>
                 ))}

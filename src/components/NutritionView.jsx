@@ -145,7 +145,7 @@ export function NutritionView() {
       {/* Toast Notification Flotante */}
       {toastMessage && (
         <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-white text-black px-4 py-2.5 rounded-full font-black text-xs shadow-2xl flex items-center gap-2 animate-slideDown">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 stroke-[3]" />
+          <CheckCircle2 className="w-4 h-4 text-black stroke-[3]" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -234,7 +234,7 @@ export function NutritionView() {
               {todayMacros.total_protein}
               <span className="text-xs font-bold text-zinc-400">g</span>
             </div>
-            <div className="text-[9px] font-bold text-emerald-400 mt-0.5">
+            <div className="text-[9px] font-bold text-zinc-400 mt-0.5">
               Meta: {targets.protein}g ({proPercent}%)
             </div>
           </div>
@@ -369,11 +369,11 @@ export function NutritionView() {
                 {/* Macros pills & Botones de Porción rápida */}
                 <div className="mt-3 pt-2 border-t border-[#2C2D34]/60 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-[9px] font-bold text-zinc-300">
-                    <span className="text-emerald-400">{preset.protein}g P</span>
-                    <span>•</span>
+                    <span className="text-white font-extrabold">{preset.protein}g P</span>
+                    <span className="text-zinc-600">•</span>
                     <span>{preset.carbs}g C</span>
-                    <span>•</span>
-                    <span className="text-amber-400">{preset.fats}g G</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-zinc-400">{preset.fats}g G</span>
                   </div>
 
                   {/* Acceso a media porción o doble ración */}
