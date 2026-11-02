@@ -11,6 +11,7 @@ import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesView } from './components/RoutinesView'
 import { RoutineEditorModal } from './components/RoutineEditorModal'
 import { StatsView } from './components/StatsView'
+import { BodyMeasurementsModal } from './components/BodyMeasurementsModal'
 import { WatchView } from './components/WatchView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
@@ -19,6 +20,7 @@ import { GlobalRestTimer } from './components/GlobalRestTimer'
 import { evaluateAchievements } from './lib/overloadEngine'
 import { BADGES_CATALOG, DEFAULT_ROUTINES, APP_VERSION } from './lib/constants'
 import { getRealisticProgressionSeed } from './lib/statsEngine'
+import { getRealisticBodyMeasurementsSeed } from './lib/bodyMetricsEngine'
 import { syncWorkoutToCloud } from './lib/syncService'
 import { getInitialSession, signOutUser } from './lib/authService'
 import {
@@ -30,11 +32,27 @@ import {
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [activeRoutineIndex, setActiveRoutineIndex] = useState(0)
+  const [statsSubTab, setStatsSubTab] = useState('strength')
   const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isRoutineEditorOpen, setIsRoutineEditorOpen] = useState(false)
+  const [isBodyModalOpen, setIsBodyModalOpen] = useState(false)
   const [editingRoutine, setEditingRoutine] = useState(null)
   const [userSession, setUserSession] = useState(null)
+
+  // Medidas antropométricas y evolución corporal (Local-First)
+  const [bodyMeasurements, setBodyMeasurements] = useState(() => {
+    const saved = localStorage.getItem('iron_body_measurements_v1')
+    if (saved) {
+      try {
+        const list = JSON.parse(saved)
+        if (list.length > 0) return list
+      } catch (e) {}
+    }
+    const seeded = getRealisticBodyMeasurementsSeed()
+    localStorage.setItem('iron_body_measurements_v1', JSON.stringify(seeded))
+    return seeded
+  })
 
   // Cargar sesión de usuario permanente (Supabase Auth)
   useEffect(() => {
@@ -299,6 +317,26 @@ export default function App() {
     setIsRoutineEditorOpen(true)
   }
 
+  const handleSaveMeasurement = (entry) => {
+    setBodyMeasurements((prev) => {
+      const updated = [entry, ...prev]
+      localStorage.setItem('iron_body_measurements_v1', JSON.stringify(updated))
+      return updated
+    })
+    if (entry.weight && Number(entry.weight) > 0) {
+      setBodyweight(Number(entry.weight))
+      localStorage.setItem('user_weight', entry.weight.toString())
+    }
+  }
+
+  const handleDeleteMeasurement = (id) => {
+    setBodyMeasurements((prev) => {
+      const updated = prev.filter((m) => m.id !== id)
+      localStorage.setItem('iron_body_measurements_v1', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   // Marcar día de descanso (+50 XP y racha protegida)
   const handleLogRestDay = () => {
     const todayStr = new Date().toISOString().split('T')[0]
@@ -448,7 +486,14 @@ export default function App() {
             />
 
             {/* Tarjeta de Peso Corporal */}
-            <BodyweightCard weight={bodyweight} onUpdateWeight={setBodyweight} />
+            <BodyweightCard
+              weight={bodyweight}
+              onUpdateWeight={setBodyweight}
+              onOpenEvolution={() => {
+                setStatsSubTab('body')
+                setActiveTab('stats')
+              }}
+            />
 
             {/* Métricas de Fuerza & Honor Choice Watch 2i */}
             <SessionMetricsCard
@@ -526,6 +571,11 @@ export default function App() {
               personalRecords={personalRecords}
               watchData={watchData}
               onOpenWatchSync={() => setActiveTab('watch')}
+              bodyMeasurements={bodyMeasurements}
+              onOpenAddMeasurement={() => setIsBodyModalOpen(true)}
+              onDeleteMeasurement={handleDeleteMeasurement}
+              activeSubTab={statsSubTab}
+              onSelectSubTab={setStatsSubTab}
             />
           </div>
         )}
@@ -627,6 +677,15 @@ export default function App() {
           }}
           onSaveRoutine={handleSaveRoutine}
           routineToEdit={editingRoutine}
+        />
+
+        {/* Modal de Registro de Medidas & Peso Corporal */}
+        <BodyMeasurementsModal
+          isOpen={isBodyModalOpen}
+          onClose={() => setIsBodyModalOpen(false)}
+          onSaveMeasurement={handleSaveMeasurement}
+          currentWeight={bodyweight}
+          lastEntry={bodyMeasurements[0]}
         />
 
         {/* Temporizador Flotante Global (visible si estás descansando y navegando por otras tabs) */}

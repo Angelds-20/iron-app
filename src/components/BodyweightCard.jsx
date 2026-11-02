@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { TrendingUp, ArrowUpRight, Scale, Check } from 'lucide-react'
+import { TrendingUp, ArrowUpRight, Scale, Check, ChevronRight } from 'lucide-react'
 
-export function BodyweightCard({ weight = 77.9, onUpdateWeight }) {
+export function BodyweightCard({ weight = 77.9, onUpdateWeight, onOpenEvolution }) {
   const [isEditing, setIsEditing] = useState(false)
   const [tempWeight, setTempWeight] = useState(weight)
 
@@ -24,7 +24,7 @@ export function BodyweightCard({ weight = 77.9, onUpdateWeight }) {
   ]
 
   return (
-    <div className="w-full bg-white rounded-3xl p-5 shadow-sm border border-sand-200/60 mb-5">
+    <div className="w-full bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60 mb-5">
       <div className="flex items-center justify-between">
         {/* Lado izquierdo: Peso actual */}
         <div>
@@ -32,6 +32,16 @@ export function BodyweightCard({ weight = 77.9, onUpdateWeight }) {
             <span className="text-[11px] font-bold tracking-widest text-neutral-400 uppercase">
               PESO CORPORAL
             </span>
+            {onOpenEvolution && (
+              <button
+                type="button"
+                onClick={onOpenEvolution}
+                className="text-[10px] font-black text-coral-500 hover:text-coral-600 flex items-center gap-0.5 ml-1 cursor-pointer"
+              >
+                <span>Medidas</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {isEditing ? (
@@ -63,7 +73,12 @@ export function BodyweightCard({ weight = 77.9, onUpdateWeight }) {
             </div>
           )}
 
-          <div className="flex items-center gap-1 mt-1 text-xs font-semibold text-coral-500">
+          <div
+            onClick={onOpenEvolution}
+            className={`flex items-center gap-1 mt-1 text-xs font-semibold text-coral-500 ${
+              onOpenEvolution ? 'cursor-pointer hover:underline' : ''
+            }`}
+          >
             <span>Esta semana</span>
             <span className="font-bold">+1.0 kg</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -71,7 +86,10 @@ export function BodyweightCard({ weight = 77.9, onUpdateWeight }) {
         </div>
 
         {/* Lado derecho: Mini gráfico de barras semanal */}
-        <div className="flex flex-col items-end">
+        <div
+          onClick={onOpenEvolution}
+          className={`flex flex-col items-end ${onOpenEvolution ? 'cursor-pointer group' : ''}`}
+        >
           <div className="flex items-end gap-2 h-14 pb-1">
             {weeklyBars.map((bar, i) => (
               <div key={i} className="flex flex-col items-center gap-1">
