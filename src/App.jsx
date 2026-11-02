@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import confetti from 'canvas-confetti'
 import { Header } from './components/Header'
 import { WeekStrip } from './components/WeekStrip'
 import { BodyweightCard } from './components/BodyweightCard'
@@ -9,37 +10,46 @@ import { WorkoutLogger } from './components/WorkoutLogger'
 import { AchievementsView } from './components/AchievementsView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
+import { AuthModal } from './components/AuthModal'
+import { GlobalRestTimer } from './components/GlobalRestTimer'
 import { evaluateAchievements } from './lib/overloadEngine'
 import { BADGES_CATALOG, DEFAULT_ROUTINES, APP_VERSION } from './lib/constants'
 import { syncWorkoutToCloud } from './lib/syncService'
+import { getInitialSession, signOutUser } from './lib/authService'
+import {
+  getActiveSession,
+  saveActiveSession,
+  clearActiveSession
+} from './lib/workoutStorage'
 import { Trophy } from 'lucide-react'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [activeRoutineIndex, setActiveRoutineIndex] = useState(0)
   const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [userSession, setUserSession] = useState(null)
 
-  // Sesión en curso persistente (permanece aunque salgas de la app o vuelvas al home)
+  // Cargar sesión de usuario permanente (Supabase Auth)
+  useEffect(() => {
+    getInitialSession().then((session) => {
+      if (session) setUserSession(session)
+    })
+  }, [])
+
+  // Sesión en curso persistente (sobrevive a cambiar de app o ir a home)
   const [activeWorkoutSession, setActiveWorkoutSession] = useState(() => {
-    const saved = localStorage.getItem('active_workout_session')
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch (e) {
-        return null
-      }
-    }
-    return null
+    return getActiveSession()
   })
 
   const handleUpdateActiveSession = (sessionData) => {
     setActiveWorkoutSession(sessionData)
-    localStorage.setItem('active_workout_session', JSON.stringify(sessionData))
+    saveActiveSession(sessionData)
   }
 
   const handleClearActiveSession = () => {
     setActiveWorkoutSession(null)
-    localStorage.removeItem('active_workout_session')
+    clearActiveSession()
   }
 
   // Rutinas activas (predefinidas + creadas por el usuario)
@@ -56,12 +66,12 @@ export default function App() {
     return DEFAULT_ROUTINES
   })
 
-  // Estado del usuario y peso
+  // Peso Corporal
   const [bodyweight, setBodyweight] = useState(() => {
     return Number(localStorage.getItem('user_weight')) || 77.9
   })
 
-  // Días completados (Incluye hoy por la sesión de 60 kg)
+  // Días completados (Garantiza hoy por la sesión de 60 kg)
   const [completedDates, setCompletedDates] = useState(() => {
     const todayStr = new Date().toISOString().split('T')[0]
     const saved = localStorage.getItem('completed_workout_dates')
@@ -69,11 +79,17 @@ export default function App() {
     return list.includes(todayStr) ? list : [...list, todayStr]
   })
 
-  // Entrenamientos completados (Garantiza el registro de los 60 kg de hoy)
+  // Días de descanso planificados
+  const [restDates, setRestDates] = useState(() => {
+    const saved = localStorage.getItem('iron_rest_dates_v2')
+    return saved ? JSON.parse(saved) : []
+  })
+
+  // Entrenamientos completados (Historial con los 60 kg garantizados)
   const [workoutsHistory, setWorkoutsHistory] = useState(() => {
     const saved = localStorage.getItem('workouts_history')
     const list = saved ? JSON.parse(saved) : []
-    if (list.length === 0 || !list.some(w => w.maxWeight >= 60)) {
+    if (list.length === 0 || !list.some((w) => w.maxWeight >= 60)) {
       const todaySession = {
         routineId: 'torso-fuerza',
         title: 'Torso — Banca & Inclinado',
@@ -102,17 +118,17 @@ export default function App() {
     return list
   })
 
-  // Insignias y logros desbloqueados por los 60 kg de hoy
+  // Insignias y logros desbloqueados
   const [unlockedBadges, setUnlockedBadges] = useState(() => {
     const earnedCodes = ['FIRST_SESSION', 'BENCH_50KG', 'MAX_WEIGHT_60KG', 'VOLUME_2000KG']
-    const autoBadges = BADGES_CATALOG.filter(b => earnedCodes.includes(b.code))
+    const autoBadges = BADGES_CATALOG.filter((b) => earnedCodes.includes(b.code))
     const saved = localStorage.getItem('unlocked_badges')
     if (saved) {
       try {
         const list = JSON.parse(saved)
-        const codes = new Set(list.map(b => b.code))
+        const codes = new Set(list.map((b) => b.code))
         const merged = [...list]
-        autoBadges.forEach(b => {
+        autoBadges.forEach((b) => {
           if (!codes.has(b.code)) merged.push(b)
         })
         return merged
@@ -129,7 +145,7 @@ export default function App() {
     return saved > 800 ? saved : 850
   })
 
-  // Récords personales (PRs) con los 60 kg de Banca registrados
+  // Récords personales (PRs con 60 kg en banca blindados)
   const [personalRecords, setPersonalRecords] = useState(() => {
     const saved = localStorage.getItem('personal_records')
     if (saved) {
@@ -153,7 +169,24 @@ export default function App() {
   // Modal de nueva insignia desbloqueada
   const [newBadgeModal, setNewBadgeModal] = useState(null)
 
-  // Persistencia Local
+  // Temporizador flotante de descanso (sobrevive si el usuario va a Home)
+  const [globalRestSeconds, setGlobalRestSeconds] = useState(0)
+
+  useEffect(() => {
+    if (!activeWorkoutSession?.restEndsAt) {
+      setGlobalRestSeconds(0)
+      return
+    }
+    const update = () => {
+      const remaining = Math.max(0, Math.ceil((activeWorkoutSession.restEndsAt - Date.now()) / 1000))
+      setGlobalRestSeconds(remaining)
+    }
+    update()
+    const timer = setInterval(update, 1000)
+    return () => clearInterval(timer)
+  }, [activeWorkoutSession?.restEndsAt])
+
+  // Persistencia Local reactiva
   useEffect(() => {
     localStorage.setItem('user_weight', bodyweight.toString())
   }, [bodyweight])
@@ -161,6 +194,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('completed_workout_dates', JSON.stringify(completedDates))
   }, [completedDates])
+
+  useEffect(() => {
+    localStorage.setItem('iron_rest_dates_v2', JSON.stringify(restDates))
+  }, [restDates])
 
   useEffect(() => {
     localStorage.setItem('workouts_history', JSON.stringify(workoutsHistory))
@@ -184,20 +221,33 @@ export default function App() {
 
   const handleAddNewRoutine = (newRoutine) => {
     setAllRoutines((prev) => [...prev, newRoutine])
-    // Guardar solo las custom en localStorage
     const savedCustom = localStorage.getItem('user_custom_routines')
     const customList = savedCustom ? JSON.parse(savedCustom) : []
     localStorage.setItem('user_custom_routines', JSON.stringify([...customList, newRoutine]))
+  }
+
+  // Marcar día de descanso (+50 XP y racha protegida)
+  const handleLogRestDay = () => {
+    const todayStr = new Date().toISOString().split('T')[0]
+    if (!restDates.includes(todayStr) && !completedDates.includes(todayStr)) {
+      setRestDates((prev) => [...prev, todayStr])
+      setTotalXp((prev) => prev + 50)
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.8 }
+      })
+    }
   }
 
   // Volumen de la última sesión
   const lastWorkout = workoutsHistory[0]
   const currentSessionVolume = lastWorkout?.totalVolume || 0
 
-  // Manejar finalización de un entrenamiento
+  // Finalizar entrenamiento
   const handleCompleteWorkout = (workoutData) => {
     const todayStr = new Date().toISOString().split('T')[0]
-    
+
     if (!completedDates.includes(todayStr)) {
       setCompletedDates((prev) => [...prev, todayStr])
     }
@@ -209,7 +259,7 @@ export default function App() {
     const newHistory = [workoutData, ...workoutsHistory]
     setWorkoutsHistory(newHistory)
 
-    // Sincronizar en segundo plano con Supabase Cloud
+    // Sincronizar en la nube con Supabase
     syncWorkoutToCloud(workoutData, { weight: bodyweight }).catch((err) =>
       console.warn('Sync cloud warning:', err)
     )
@@ -231,36 +281,42 @@ export default function App() {
       setTotalXp((prev) => prev + 120)
     }
 
+    handleClearActiveSession()
     setActiveTab('home')
+  }
+
+  const handleSignOut = async () => {
+    await signOutUser()
+    setUserSession(null)
   }
 
   return (
     <div className="min-h-screen bg-sand-100 flex justify-center selection:bg-coral-500 selection:text-white">
       {/* Contenedor optimizado para iPhone 13 (notch 47px, barra inferior 34px) */}
       <div className="w-full max-w-md px-5 pt-3 pb-28 relative min-h-screen">
-        
         {/* Vistas según la pestaña activa */}
         {activeTab === 'home' && (
           <div>
             <Header
               title="Home"
-              streak={Math.max(1, completedDates.length)}
+              streak={Math.max(1, completedDates.length + restDates.length)}
               onOpenCalendar={() => setActiveTab('workout')}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
             />
 
-            {/* Strip de la semana con días circulares (L M M J V S D) */}
+            {/* Strip de la semana con días circulares y descanso activo */}
             <WeekStrip
               completedDates={completedDates}
+              restDates={restDates}
               activeDate={new Date()}
+              onLogRestDay={handleLogRestDay}
             />
 
-            {/* Tarjeta de Peso Corporal con mini chart */}
-            <BodyweightCard
-              weight={bodyweight}
-              onUpdateWeight={setBodyweight}
-            />
+            {/* Tarjeta de Peso Corporal */}
+            <BodyweightCard weight={bodyweight} onUpdateWeight={setBodyweight} />
 
-            {/* Métricas de Fuerza & Honor Choice Watch 2i (Volumen circular + BPM) */}
+            {/* Métricas de Fuerza & Honor Choice Watch 2i */}
             <SessionMetricsCard
               totalVolume={currentSessionVolume}
               targetVolume={2500}
@@ -298,19 +354,29 @@ export default function App() {
 
         {activeTab === 'achievements' && (
           <div>
-            <Header title="Premios" streak={Math.max(1, completedDates.length)} />
+            <Header
+              title="Premios"
+              streak={Math.max(1, completedDates.length + restDates.length)}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
             <AchievementsView
               unlockedBadges={unlockedBadges}
               totalXp={totalXp}
               personalRecords={personalRecords}
-              streak={Math.max(1, completedDates.length)}
+              streak={Math.max(1, completedDates.length + restDates.length)}
             />
           </div>
         )}
 
         {activeTab === 'watch' && (
           <div>
-            <Header title="Honor Watch" streak={Math.max(1, completedDates.length)} />
+            <Header
+              title="Honor Watch"
+              streak={Math.max(1, completedDates.length + restDates.length)}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
               <h3 className="text-lg font-black text-carbon-900 mb-1">Honor Choice Watch 2i</h3>
               <p className="text-xs text-neutral-400 mb-4">
@@ -328,7 +394,12 @@ export default function App() {
 
         {activeTab === 'settings' && (
           <div>
-            <Header title="Ajustes" streak={Math.max(1, completedDates.length)} />
+            <Header
+              title="Ajustes"
+              streak={Math.max(1, completedDates.length + restDates.length)}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
             <SettingsView
               userProfile={{ weight: bodyweight }}
               onUpdateProfile={() => {}}
@@ -342,11 +413,11 @@ export default function App() {
           onClose={() => setIsWatchModalOpen(false)}
           onSaveWatchData={(data) => {
             setWatchData(data)
-            if (!unlockedBadges.some(b => b.code === 'WATCH_SYNC')) {
-              const watchBadge = BADGES_CATALOG.find(b => b.code === 'WATCH_SYNC')
+            if (!unlockedBadges.some((b) => b.code === 'WATCH_SYNC')) {
+              const watchBadge = BADGES_CATALOG.find((b) => b.code === 'WATCH_SYNC')
               if (watchBadge) {
-                setUnlockedBadges(prev => [...prev, watchBadge])
-                setTotalXp(prev => prev + 100)
+                setUnlockedBadges((prev) => [...prev, watchBadge])
+                setTotalXp((prev) => prev + 100)
                 setNewBadgeModal(watchBadge)
               }
             }
@@ -383,7 +454,38 @@ export default function App() {
           </div>
         )}
 
-        {/* Barra de navegación flotante tipo dock */}
+        {/* Modal de Autenticación Permanente */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onAuthSuccess={(session) => setUserSession(session)}
+          onSignOut={handleSignOut}
+          currentSession={userSession}
+        />
+
+        {/* Temporizador Flotante Global (visible si estás descansando y navegando por otras tabs) */}
+        {activeTab !== 'workout' && globalRestSeconds > 0 && (
+          <GlobalRestTimer
+            restSeconds={globalRestSeconds}
+            onAddRestTime={(extra) => {
+              if (!activeWorkoutSession) return
+              const currentEnds = activeWorkoutSession.restEndsAt || Date.now()
+              const updated = {
+                ...activeWorkoutSession,
+                restEndsAt: currentEnds + extra * 1000
+              }
+              handleUpdateActiveSession(updated)
+            }}
+            onCancelRest={() => {
+              if (!activeWorkoutSession) return
+              const updated = { ...activeWorkoutSession, restEndsAt: null }
+              handleUpdateActiveSession(updated)
+            }}
+            onOpenWorkout={() => setActiveTab('workout')}
+          />
+        )}
+
+        {/* Barra de navegación flotante dock */}
         <Navbar activeTab={activeTab} onSelectTab={setActiveTab} />
 
         {/* Indicador de versión en la esquinita */}

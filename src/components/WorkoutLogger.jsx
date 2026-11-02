@@ -11,11 +11,14 @@ import {
   Sparkles,
   Watch,
   RotateCcw,
-  Volume2
+  Volume2,
+  RefreshCw,
+  Music
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
 import { initAudio, playTimerDoneSound } from '../lib/soundEngine'
+import { ExerciseSwapModal } from './ExerciseSwapModal'
 import {
   getActiveSession,
   saveActiveSession,
@@ -45,6 +48,14 @@ export function WorkoutLogger({
 
   const currentRoutine = routines[selectedRoutineIndex] || routines[0] || DEFAULT_ROUTINES[0]
   const lastWeights = getLastUsedWeights()
+
+  // Ejercicios modificables en vivo durante la sesión (ej: Predicador en vez de Curl)
+  const [dynamicExercises, setDynamicExercises] = useState(() => currentRoutine.exercises)
+  const [swapTargetExercise, setSwapTargetExercise] = useState(null)
+
+  useEffect(() => {
+    setDynamicExercises(currentRoutine.exercises)
+  }, [selectedRoutineIndex])
 
   // 2. Restaurar o inicializar series (CERO pérdida de peso ni de series)
   const [exerciseData, setExerciseData] = useState(() => {
@@ -276,6 +287,36 @@ export function WorkoutLogger({
     })
   }
 
+  const handleConfirmSwap = ({ oldExerciseId, newName, applyPermanently }) => {
+    setDynamicExercises((prev) =>
+      prev.map((ex) => (ex.id === oldExerciseId ? { ...ex, name: newName } : ex))
+    )
+    const currentWeight = exerciseData[oldExerciseId]?.[0]?.weight || 40
+    saveLastUsedWeight(oldExerciseId, currentWeight)
+  }
+
+  const handleAddNewExerciseToSession = () => {
+    const newId = `session-ex-${Date.now()}`
+    const newEx = {
+      id: newId,
+      name: 'Ejercicio Extra',
+      equipment: 'Patio / Barra',
+      targetSets: 3,
+      targetReps: '10',
+      defaultWeight: 20,
+      notes: 'Tempo 3 seg excéntrico.'
+    }
+    setDynamicExercises((prev) => [...prev, newEx])
+    setExerciseData((prev) => ({
+      ...prev,
+      [newId]: [
+        { setNumber: 1, weight: 20, reps: 10, rir: 2, completed: false },
+        { setNumber: 2, weight: 20, reps: 10, rir: 2, completed: false },
+        { setNumber: 3, weight: 20, reps: 10, rir: 2, completed: false }
+      ]
+    }))
+  }
+
   const handleDiscardSession = () => {
     if (window.confirm('¿Seguro que quieres descartar esta sesión? Se reseteará el progreso actual.')) {
       clearActiveSession()
@@ -291,7 +332,7 @@ export function WorkoutLogger({
     let maxWeight = 0
     let completedSetsCount = 0
 
-    const formattedExercises = currentRoutine.exercises.map((ex) => {
+    const formattedExercises = dynamicExercises.map((ex) => {
       const sets = exerciseData[ex.id] || []
       sets.forEach((s) => {
         if (s.completed) {
@@ -419,8 +460,18 @@ export function WorkoutLogger({
               EN CURSO • TIEMPO ACTIVO
             </span>
           </div>
-          <div className="text-xs font-black font-mono text-carbon-900 bg-sand-100 px-2.5 py-1 rounded-full">
-            {formatTime(elapsedSeconds)}
+          <div className="flex items-center gap-2">
+            <a
+              href="meulify://"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-carbon-900 text-[11px] font-bold border border-sand-200/80 transition-colors"
+              title="Abrir reproductor Meulify en iPhone"
+            >
+              <Music className="w-3 h-3 text-coral-500" />
+              <span>Meulify</span>
+            </a>
+            <div className="text-xs font-black font-mono text-carbon-900 bg-sand-100 px-2.5 py-1 rounded-full">
+              {formatTime(elapsedSeconds)}
+            </div>
           </div>
         </div>
 
@@ -432,7 +483,7 @@ export function WorkoutLogger({
 
       {/* Lista de Ejercicios */}
       <div className="space-y-4">
-        {currentRoutine.exercises.map((exercise, exIndex) => {
+        {dynamicExercises.map((exercise, exIndex) => {
           const sets = exerciseData[exercise.id] || []
 
           return (
@@ -440,7 +491,7 @@ export function WorkoutLogger({
               key={exercise.id}
               className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/60"
             >
-              {/* Encabezado del ejercicio */}
+              {/* Encabezado del ejercicio con botón de Sustitución */}
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -453,6 +504,16 @@ export function WorkoutLogger({
                     {exercise.equipment}
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSwapTargetExercise(exercise)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-neutral-600 text-[11px] font-bold border border-sand-200/80 transition-colors"
+                  title="Cambiar ejercicio (ej: predicador por curl)"
+                >
+                  <RefreshCw className="w-3 h-3 text-coral-500" />
+                  <span>Cambiar</span>
+                </button>
               </div>
 
               {/* Guía rápida de tempo / RIR */}
@@ -552,6 +613,18 @@ export function WorkoutLogger({
         })}
       </div>
 
+      {/* Botón para añadir ejercicio extra improvisado a la sesión */}
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={handleAddNewExerciseToSession}
+          className="w-full py-3.5 rounded-3xl bg-white hover:bg-sand-50 border border-dashed border-sand-300 text-neutral-600 hover:text-carbon-900 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs"
+        >
+          <Plus className="w-4 h-4 text-coral-500" />
+          <span>Añadir Otro Ejercicio a esta Sesión</span>
+        </button>
+      </div>
+
       {/* Botones de acción inferior */}
       <div className="mt-6 space-y-2.5">
         <button
@@ -572,6 +645,14 @@ export function WorkoutLogger({
           <span>Descartar progreso de esta sesión</span>
         </button>
       </div>
+
+      {/* Modal para sustituir ejercicio (ej: Curl por Predicador) */}
+      <ExerciseSwapModal
+        isOpen={Boolean(swapTargetExercise)}
+        exercise={swapTargetExercise}
+        onClose={() => setSwapTargetExercise(null)}
+        onConfirmSwap={handleConfirmSwap}
+      />
     </div>
   )
 }
