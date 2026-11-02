@@ -7,7 +7,7 @@ import { SessionMetricsCard } from './components/SessionMetricsCard'
 import { ActionCards } from './components/ActionCards'
 import { Navbar } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
-import { AchievementsView } from './components/AchievementsView'
+import { WatchView } from './components/WatchView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
 import { AuthModal } from './components/AuthModal'
@@ -21,7 +21,6 @@ import {
   saveActiveSession,
   clearActiveSession
 } from './lib/workoutStorage'
-import { Trophy } from 'lucide-react'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
@@ -42,9 +41,17 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [activeTab])
 
-  // Sesión en curso persistente (sobrevive a cambiar de app o ir a home)
+  // Sesión en curso persistente (auto-descarta si tiene más de 3 horas para evitar sesiones fantasma)
   const [activeWorkoutSession, setActiveWorkoutSession] = useState(() => {
-    return getActiveSession()
+    const saved = getActiveSession()
+    if (saved?.startedAt && Date.now() - saved.startedAt > 3 * 60 * 60 * 1000) {
+      clearActiveSession()
+      try {
+        localStorage.removeItem('active_workout_session')
+      } catch (e) {}
+      return null
+    }
+    return saved
   })
 
   const handleUpdateActiveSession = (sessionData) => {
@@ -55,6 +62,9 @@ export default function App() {
   const handleClearActiveSession = () => {
     setActiveWorkoutSession(null)
     clearActiveSession()
+    try {
+      localStorage.removeItem('active_workout_session')
+    } catch (e) {}
   }
 
   // Rutinas activas (predefinidas + creadas por el usuario)
@@ -249,6 +259,36 @@ export default function App() {
   const lastWorkout = workoutsHistory[0]
   const currentSessionVolume = lastWorkout?.totalVolume || 0
 
+  // Restablecer volumen a la sesión real de hoy (2.400 kg en banca de 60 kg)
+  const handleResetVolumeToReal = () => {
+    const cleanSession = {
+      routineId: 'torso-fuerza',
+      title: 'Torso — Banca & Inclinado',
+      category: 'torso',
+      durationMinutes: 40,
+      completedAt: new Date().toISOString(),
+      totalVolume: 2400,
+      maxWeight: 60,
+      completedSetsCount: 4,
+      watchMetrics: { avgBpm: 132, caloriesBurned: 260 },
+      exercises: [
+        {
+          id: 'bench-press',
+          name: 'Press de banca plano',
+          sets: [
+            { setNumber: 1, weight: 60, reps: 10, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, completed: true },
+            { setNumber: 3, weight: 60, reps: 10, completed: true },
+            { setNumber: 4, weight: 60, reps: 10, completed: true }
+          ]
+        }
+      ]
+    }
+    setWorkoutsHistory([cleanSession])
+    localStorage.setItem('workouts_history', JSON.stringify([cleanSession]))
+    handleClearActiveSession()
+  }
+
   // Finalizar entrenamiento
   const handleCompleteWorkout = (workoutData) => {
     const todayStr = new Date().toISOString().split('T')[0]
@@ -336,9 +376,10 @@ export default function App() {
                 setActiveRoutineIndex(idx)
                 setActiveTab('workout')
               }}
-              onOpenWatchModal={() => setIsWatchModalOpen(true)}
+              onOpenWatchModal={() => setActiveTab('watch')}
               lastWatchData={watchData}
               activeSession={activeWorkoutSession}
+              onDiscardActiveSession={handleClearActiveSession}
             />
           </div>
         )}
@@ -357,23 +398,6 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'achievements' && (
-          <div>
-            <Header
-              title="Premios"
-              streak={Math.max(1, completedDates.length + restDates.length)}
-              userSession={userSession}
-              onOpenAuth={() => setIsAuthModalOpen(true)}
-            />
-            <AchievementsView
-              unlockedBadges={unlockedBadges}
-              totalXp={totalXp}
-              personalRecords={personalRecords}
-              streak={Math.max(1, completedDates.length + restDates.length)}
-            />
-          </div>
-        )}
-
         {activeTab === 'watch' && (
           <div>
             <Header
@@ -382,18 +406,10 @@ export default function App() {
               userSession={userSession}
               onOpenAuth={() => setIsAuthModalOpen(true)}
             />
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
-              <h3 className="text-lg font-black text-carbon-900 mb-1">Honor Choice Watch 2i</h3>
-              <p className="text-xs text-neutral-400 mb-4">
-                Monitorea pulso, picos cardíacos en series pesadas y gasto calórico.
-              </p>
-              <button
-                onClick={() => setIsWatchModalOpen(true)}
-                className="w-full py-3 bg-carbon-900 hover:bg-black text-white text-xs font-bold rounded-full transition-all"
-              >
-                Actualizar Métricas del Reloj
-              </button>
-            </div>
+            <WatchView
+              currentData={watchData}
+              onSaveData={(newData) => setWatchData(newData)}
+            />
           </div>
         )}
 
@@ -408,6 +424,8 @@ export default function App() {
             <SettingsView
               userProfile={{ weight: bodyweight }}
               onUpdateProfile={() => {}}
+              onResetVolume={handleResetVolumeToReal}
+              onClearSession={handleClearActiveSession}
             />
           </div>
         )}

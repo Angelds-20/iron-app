@@ -422,28 +422,34 @@ export function WorkoutLogger({
         </div>
       </div>
 
-      {/* Timer de descanso flotante inteligente */}
+      {/* Timer de descanso flotante dinámico que ACOMPAÑA el scroll por la página */}
       {restSeconds > 0 && (
-        <div className="sticky top-2 z-30 mb-4 bg-carbon-900 text-white rounded-2xl p-3 flex items-center justify-between shadow-lg shadow-carbon-900/15 border border-carbon-800">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-coral-500 animate-spin" />
-            <span className="text-xs font-bold">Descanso:</span>
-            <span className="text-lg font-black text-coral-500 font-mono tracking-tight">
-              {Math.floor(restSeconds / 60)}:{(restSeconds % 60).toString().padStart(2, '0')}
-            </span>
+        <div className="fixed top-3 left-4 right-4 z-50 max-w-md mx-auto bg-carbon-900/95 backdrop-blur-md text-white rounded-2xl p-3.5 flex items-center justify-between shadow-2xl border border-carbon-800 animate-slideDown">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-carbon-800 flex items-center justify-center text-coral-500">
+              <Clock className="w-4 h-4 animate-spin" />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                DESCANSO EN VIVO
+              </div>
+              <div className="text-xl font-black text-coral-500 font-mono tracking-tight leading-none">
+                {Math.floor(restSeconds / 60)}:{(restSeconds % 60).toString().padStart(2, '0')}
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => addRestTime(30)}
-              className="text-[11px] font-bold px-2 py-1 rounded-lg bg-carbon-800 hover:bg-carbon-700 text-neutral-300"
+              className="text-xs font-bold px-3 py-1.5 rounded-full bg-carbon-800 hover:bg-carbon-700 text-neutral-200 transition-colors"
             >
               +30s
             </button>
             <button
               type="button"
               onClick={cancelRestTimer}
-              className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-sand-100 text-carbon-900"
+              className="text-xs font-black px-3.5 py-1.5 rounded-full bg-sand-100 hover:bg-white text-carbon-900 transition-colors shadow-xs"
             >
               Listo
             </button>

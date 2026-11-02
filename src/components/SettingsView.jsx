@@ -7,11 +7,14 @@ import {
   Dumbbell,
   Sliders,
   ExternalLink,
-  ShieldAlert
+  ShieldAlert,
+  RotateCcw,
+  Trash2,
+  RefreshCw
 } from 'lucide-react'
 import { isSupabaseConfigured } from '../lib/supabaseClient'
 
-export function SettingsView({ userProfile, onUpdateProfile }) {
+export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onClearSession }) {
   const [supabaseUrl, setSupabaseUrl] = useState(
     localStorage.getItem('custom_supabase_url') || ''
   )
@@ -19,6 +22,7 @@ export function SettingsView({ userProfile, onUpdateProfile }) {
     localStorage.getItem('custom_supabase_key') || ''
   )
   const [savedStatus, setSavedStatus] = useState(false)
+  const [actionNotice, setActionNotice] = useState('')
 
   const handleSaveSupabase = (e) => {
     e.preventDefault()
@@ -26,6 +30,28 @@ export function SettingsView({ userProfile, onUpdateProfile }) {
     localStorage.setItem('custom_supabase_key', supabaseKey)
     setSavedStatus(true)
     setTimeout(() => setSavedStatus(false), 3000)
+  }
+
+  const triggerResetVolume = () => {
+    if (onResetVolume) {
+      onResetVolume()
+      setActionNotice('¡Volumen restablecido a 2.400 kg (Banca 60 kg)!')
+      setTimeout(() => setActionNotice(''), 3000)
+    }
+  }
+
+  const triggerClearSession = () => {
+    if (onClearSession) {
+      onClearSession()
+      setActionNotice('¡Sesión en progreso eliminada con éxito!')
+      setTimeout(() => setActionNotice(''), 3000)
+    }
+  }
+
+  const forceReload = () => {
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
   }
 
   return (
@@ -139,6 +165,55 @@ export function SettingsView({ userProfile, onUpdateProfile }) {
             </div>
             <span className="font-bold text-neutral-600 text-xs">Plano + Inclinado</span>
           </div>
+        </div>
+      </div>
+
+      {/* Control de Datos & Caché */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <RotateCcw className="w-4 h-4 text-coral-500" />
+          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+            Control de Datos & Mantenimiento
+          </span>
+        </div>
+        <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
+          Si notas métricas acumuladas de pruebas o una sesión en progreso atascada, límpialas aquí con un toque.
+        </p>
+
+        {actionNotice && (
+          <div className="p-3 mb-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>{actionNotice}</span>
+          </div>
+        )}
+
+        <div className="space-y-2.5">
+          <button
+            type="button"
+            onClick={triggerResetVolume}
+            className="w-full py-3 px-4 bg-sand-100 hover:bg-sand-200 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
+          >
+            <span>Restablecer Volumen Real a Hoy (2.400 kg)</span>
+            <RotateCcw className="w-3.5 h-3.5 text-coral-500" />
+          </button>
+
+          <button
+            type="button"
+            onClick={triggerClearSession}
+            className="w-full py-3 px-4 bg-sand-100 hover:bg-rose-50 hover:text-rose-600 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
+          >
+            <span>Eliminar Sesión en Progreso Atascada</span>
+            <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+          </button>
+
+          <button
+            type="button"
+            onClick={forceReload}
+            className="w-full py-3 px-4 bg-sand-100 hover:bg-sand-200 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
+          >
+            <span>Forzar Recarga de la Web (Limpiar Caché)</span>
+            <RefreshCw className="w-3.5 h-3.5 text-neutral-500" />
+          </button>
         </div>
       </div>
 
