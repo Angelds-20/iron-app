@@ -452,9 +452,9 @@ export function WorkoutLogger({
         </div>
       </div>
 
-      {/* Timer de descanso flotante dinámico que ACOMPAÑA el scroll por la página */}
+      {/* Timer de descanso flotante dinámico con espacio para el notch */}
       {restSeconds > 0 && (
-        <div className="fixed top-3 left-4 right-4 z-50 max-w-md mx-auto bg-carbon-900/95 backdrop-blur-md text-white rounded-2xl p-3.5 flex items-center justify-between shadow-2xl border border-carbon-800 animate-slideDown">
+        <div className="fixed top-12 sm:top-14 left-4 right-4 z-50 max-w-md mx-auto bg-carbon-900/95 backdrop-blur-md text-white rounded-2xl p-3.5 flex items-center justify-between shadow-2xl border border-carbon-800 animate-slideDown">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-carbon-800 flex items-center justify-center text-coral-500">
               <Clock className="w-4 h-4 animate-spin" />

@@ -6,6 +6,7 @@ import { WeekStrip } from './components/WeekStrip'
 import { BodyweightCard } from './components/BodyweightCard'
 import { SessionMetricsCard } from './components/SessionMetricsCard'
 import { ActionCards } from './components/ActionCards'
+import { HomeHub } from './components/HomeHub'
 import { Navbar } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesView } from './components/RoutinesView'
@@ -551,8 +552,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-sand-100 flex justify-center selection:bg-coral-500 selection:text-white">
-      {/* Contenedor optimizado para iPhone 13 (notch 47px, barra inferior 34px) */}
-      <div className="w-full max-w-md px-5 pt-3 pb-28 relative min-h-screen">
+      {/* Contenedor optimizado para iPhone con espacio seguro para el notch/Dynamic Island (44-48px) */}
+      <div className="w-full max-w-md px-4 sm:px-5 pt-12 sm:pt-14 pb-28 relative min-h-screen">
         {/* Vistas según la pestaña activa */}
         {activeTab === 'home' && (
           <div>
@@ -564,44 +565,27 @@ export default function App() {
               onOpenAuth={() => setIsAuthModalOpen(true)}
             />
 
-            {/* Strip de la semana con días circulares y descanso activo */}
-            <WeekStrip
+            <HomeHub
               completedDates={completedDates}
               restDates={restDates}
-              activeDate={new Date()}
               onLogRestDay={handleLogRestDay}
-            />
-
-            {/* Tarjeta de Peso Corporal */}
-            <BodyweightCard
-              weight={bodyweight}
+              bodyweight={bodyweight}
               onUpdateWeight={setBodyweight}
               onOpenEvolution={() => {
                 setStatsSubTab('body')
                 setActiveTab('stats')
               }}
-            />
-
-            {/* Métricas de Fuerza & Honor Choice Watch 2i */}
-            <SessionMetricsCard
-              totalVolume={currentSessionVolume}
+              currentSessionVolume={currentSessionVolume}
               targetVolume={6500}
-              avgBpm={watchData.avgBpm}
-              maxBpm={watchData.maxBpm}
-              activeCalories={watchData.caloriesBurned}
-            />
-
-            {/* Tarjetas de Acción de Entrenamiento y Reloj */}
-            <ActionCards
+              watchData={watchData}
+              onOpenWatchModal={() => setActiveTab('watch')}
+              activeSession={activeWorkoutSession}
+              onDiscardActiveSession={handleClearActiveSession}
+              routines={allRoutines}
               onStartWorkout={(idx = 0) => {
                 setActiveRoutineIndex(idx)
                 setActiveTab('workout')
               }}
-              onOpenWatchModal={() => setActiveTab('watch')}
-              lastWatchData={watchData}
-              activeSession={activeWorkoutSession}
-              onDiscardActiveSession={handleClearActiveSession}
-              routines={allRoutines}
               onViewAllRoutines={() => setActiveTab('routines')}
             />
           </div>
