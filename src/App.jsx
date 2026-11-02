@@ -10,6 +10,7 @@ import { Navbar } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesView } from './components/RoutinesView'
 import { RoutineEditorModal } from './components/RoutineEditorModal'
+import { StatsView } from './components/StatsView'
 import { WatchView } from './components/WatchView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
@@ -17,6 +18,7 @@ import { AuthModal } from './components/AuthModal'
 import { GlobalRestTimer } from './components/GlobalRestTimer'
 import { evaluateAchievements } from './lib/overloadEngine'
 import { BADGES_CATALOG, DEFAULT_ROUTINES, APP_VERSION } from './lib/constants'
+import { getRealisticProgressionSeed } from './lib/statsEngine'
 import { syncWorkoutToCloud } from './lib/syncService'
 import { getInitialSession, signOutUser } from './lib/authService'
 import {
@@ -138,35 +140,14 @@ export default function App() {
     return saved ? JSON.parse(saved) : []
   })
 
-  // Entrenamientos completados (Historial con los 60 kg garantizados)
+  // Entrenamientos completados (Historial con sobrecarga progresiva y 60 kg garantizados)
   const [workoutsHistory, setWorkoutsHistory] = useState(() => {
     const saved = localStorage.getItem('workouts_history')
     const list = saved ? JSON.parse(saved) : []
-    if (list.length === 0 || !list.some((w) => w.maxWeight >= 60)) {
-      const todaySession = {
-        routineId: 'torso-fuerza',
-        title: 'Torso — Banca & Inclinado',
-        category: 'torso',
-        durationMinutes: 40,
-        completedAt: new Date().toISOString(),
-        totalVolume: 2400,
-        maxWeight: 60,
-        completedSetsCount: 4,
-        watchMetrics: { avgBpm: 135, caloriesBurned: 260 },
-        exercises: [
-          {
-            id: 'bench-press',
-            name: 'Press de banca plano',
-            sets: [
-              { setNumber: 1, weight: 60, reps: 10, completed: true },
-              { setNumber: 2, weight: 60, reps: 10, completed: true },
-              { setNumber: 3, weight: 60, reps: 9, completed: true },
-              { setNumber: 4, weight: 60, reps: 8, completed: true }
-            ]
-          }
-        ]
-      }
-      return [todaySession, ...list]
+    if (list.length <= 1 || !list.some((w) => w.maxWeight >= 60)) {
+      const seeded = getRealisticProgressionSeed()
+      localStorage.setItem('workouts_history', JSON.stringify(seeded))
+      return seeded
     }
     return list
   })
@@ -529,6 +510,24 @@ export default function App() {
             onCancel={() => setActiveTab('home')}
             previousHistory={previousExerciseHistory}
           />
+        )}
+
+        {/* Módulo de Estadísticas & Curvas de Sobrecarga */}
+        {activeTab === 'stats' && (
+          <div>
+            <Header
+              title="Progreso"
+              streak={Math.max(1, completedDates.length + restDates.length)}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
+            <StatsView
+              workoutsHistory={workoutsHistory}
+              personalRecords={personalRecords}
+              watchData={watchData}
+              onOpenWatchSync={() => setActiveTab('watch')}
+            />
+          </div>
         )}
 
         {activeTab === 'watch' && (
