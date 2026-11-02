@@ -1,0 +1,23 @@
+{
+  "name": "IRON — Progressive Overload",
+  "short_name": "IRON",
+  "description": "Entrenamiento de sobrecarga progresiva, descansos y nutrición cero fricción",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121316",
+  "theme_color": "#121316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
