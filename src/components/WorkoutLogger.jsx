@@ -298,7 +298,7 @@ export function WorkoutLogger({
       if (setWeight && Number(setWeight) > 0) {
         saveLastUsedWeight(exerciseId, Number(setWeight))
       }
-      startRestTimer(90)
+      startRestTimer(currentRoutine?.restSeconds || 90)
     }
   }
 

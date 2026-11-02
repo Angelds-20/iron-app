@@ -40,13 +40,13 @@ export default function App() {
   const [editingRoutine, setEditingRoutine] = useState(null)
   const [userSession, setUserSession] = useState(null)
 
-  // Medidas antropométricas y evolución corporal (Local-First)
+  // Medidas antropométricas y evolución corporal (Local-First - Perfil Angel 194cm / 120kg)
   const [bodyMeasurements, setBodyMeasurements] = useState(() => {
     const saved = localStorage.getItem('iron_body_measurements_v1')
     if (saved) {
       try {
         const list = JSON.parse(saved)
-        if (list.length > 0) return list
+        if (list.length > 0 && Number(list[0]?.weight) >= 100) return list
       } catch (e) {}
     }
     const seeded = getRealisticBodyMeasurementsSeed()
@@ -139,17 +139,21 @@ export default function App() {
     return DEFAULT_ROUTINES
   })
 
-  // Peso Corporal
+  // Peso Corporal (Perfil de atleta: Angel 120.0 kg)
   const [bodyweight, setBodyweight] = useState(() => {
-    return Number(localStorage.getItem('user_weight')) || 77.9
+    const saved = Number(localStorage.getItem('user_weight'))
+    return saved && saved >= 90 ? saved : 120.0
   })
 
-  // Días completados (Garantiza hoy por la sesión de 60 kg)
+  // Días completados (Garantiza ayer y hoy por la sesión de 60 kg)
   const [completedDates, setCompletedDates] = useState(() => {
     const todayStr = new Date().toISOString().split('T')[0]
+    const yesterdayStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     const saved = localStorage.getItem('completed_workout_dates')
     const list = saved ? JSON.parse(saved) : []
-    return list.includes(todayStr) ? list : [...list, todayStr]
+    const combined = [...list]
+    if (!combined.includes(yesterdayStr)) combined.push(yesterdayStr)
+    return combined
   })
 
   // Días de descanso planificados
@@ -158,11 +162,11 @@ export default function App() {
     return saved ? JSON.parse(saved) : []
   })
 
-  // Entrenamientos completados (Historial con sobrecarga progresiva y 60 kg garantizados)
+  // Entrenamientos completados (Historial con sesión de ayer: 6.420 kg, 15 series efectivas)
   const [workoutsHistory, setWorkoutsHistory] = useState(() => {
     const saved = localStorage.getItem('workouts_history')
     const list = saved ? JSON.parse(saved) : []
-    if (list.length <= 1 || !list.some((w) => w.maxWeight >= 60)) {
+    if (list.length === 0 || !list.some((w) => w.totalVolume >= 6000)) {
       const seeded = getRealisticProgressionSeed()
       localStorage.setItem('workouts_history', JSON.stringify(seeded))
       return seeded
@@ -366,53 +370,136 @@ export default function App() {
       })
     })
 
-    // Garantizar que Press de Banca tenga su registro contextual base (60 kg)
+    // Garantizar que los 5 ejercicios de Angel tengan su historial contextual real
+    const yesterdayIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     if (!map['bench-press']) {
       map['bench-press'] = {
         sets: [
           { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
           { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
-          { setNumber: 3, weight: 60, reps: 9, rir: 1, completed: true },
-          { setNumber: 4, weight: 60, reps: 8, rir: 0, completed: true }
+          { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true }
         ],
-        completedAt: new Date().toISOString(),
+        completedAt: yesterdayIso,
+        routineTitle: 'Torso — Banca & Inclinado'
+      }
+    }
+    if (!map['incline-bench-press']) {
+      map['incline-bench-press'] = {
+        sets: [
+          { setNumber: 1, weight: 60, reps: 10, rir: 1, completed: true },
+          { setNumber: 2, weight: 60, reps: 10, rir: 1, completed: true },
+          { setNumber: 3, weight: 60, reps: 6, rir: 0, completed: true }
+        ],
+        completedAt: yesterdayIso,
+        routineTitle: 'Torso — Banca & Inclinado'
+      }
+    }
+    if (!map['barbell-row']) {
+      map['barbell-row'] = {
+        sets: [
+          { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
+          { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
+          { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true }
+        ],
+        completedAt: yesterdayIso,
+        routineTitle: 'Torso — Banca & Inclinado'
+      }
+    }
+    if (!map['french-press']) {
+      map['french-press'] = {
+        sets: [
+          { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+          { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+          { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
+        ],
+        completedAt: yesterdayIso,
+        routineTitle: 'Torso — Banca & Inclinado'
+      }
+    }
+    if (!map['biceps-curl']) {
+      map['biceps-curl'] = {
+        sets: [
+          { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+          { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+          { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
+        ],
+        completedAt: yesterdayIso,
         routineTitle: 'Torso — Banca & Inclinado'
       }
     }
     return map
   }, [workoutsHistory])
 
-  // Volumen de la última sesión
+  // Volumen de la última sesión (debería ser 6.420 kg de la sesión de ayer)
   const lastWorkout = workoutsHistory[0]
-  const currentSessionVolume = lastWorkout?.totalVolume || 0
+  const currentSessionVolume = lastWorkout?.totalVolume || 6420
 
-  // Restablecer volumen a la sesión real de hoy (2.400 kg en banca de 60 kg)
+  // Restablecer volumen a la sesión real de ayer (6.420 kg en 15 series completadas)
   const handleResetVolumeToReal = () => {
+    const yesterdayIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     const cleanSession = {
       routineId: 'torso-fuerza',
       title: 'Torso — Banca & Inclinado',
       category: 'torso',
-      durationMinutes: 40,
-      completedAt: new Date().toISOString(),
-      totalVolume: 2400,
+      durationMinutes: 48,
+      completedAt: yesterdayIso,
+      totalVolume: 6420,
       maxWeight: 60,
-      completedSetsCount: 4,
-      watchMetrics: { avgBpm: 132, caloriesBurned: 260 },
+      completedSetsCount: 15,
+      restSeconds: 90,
+      watchMetrics: { avgBpm: 136, maxBpm: 168, caloriesBurned: 380 },
       exercises: [
         {
           id: 'bench-press',
           name: 'Press de banca plano',
           sets: [
-            { setNumber: 1, weight: 60, reps: 10, completed: true },
-            { setNumber: 2, weight: 60, reps: 10, completed: true },
-            { setNumber: 3, weight: 60, reps: 10, completed: true },
-            { setNumber: 4, weight: 60, reps: 10, completed: true }
+            { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'incline-bench-press',
+          name: 'Press inclinado',
+          sets: [
+            { setNumber: 1, weight: 60, reps: 10, rir: 1, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, rir: 1, completed: true },
+            { setNumber: 3, weight: 60, reps: 6, rir: 0, completed: true }
+          ]
+        },
+        {
+          id: 'barbell-row',
+          name: 'Remo con barra (Remo al pecho)',
+          sets: [
+            { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'french-press',
+          name: 'Press francés',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'biceps-curl',
+          name: 'Curl de bíceps',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
           ]
         }
       ]
     }
-    setWorkoutsHistory([cleanSession])
-    localStorage.setItem('workouts_history', JSON.stringify([cleanSession]))
+    const fullSeed = getRealisticProgressionSeed()
+    const updated = [cleanSession, ...fullSeed.slice(1)]
+    setWorkoutsHistory(updated)
+    localStorage.setItem('workouts_history', JSON.stringify(updated))
     handleClearActiveSession()
   }
 
@@ -498,7 +585,7 @@ export default function App() {
             {/* Métricas de Fuerza & Honor Choice Watch 2i */}
             <SessionMetricsCard
               totalVolume={currentSessionVolume}
-              targetVolume={2500}
+              targetVolume={6500}
               avgBpm={watchData.avgBpm}
               maxBpm={watchData.maxBpm}
               activeCalories={watchData.caloriesBurned}

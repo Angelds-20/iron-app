@@ -11,17 +11,17 @@ export function BodyMeasurementsModal({
   isOpen,
   onClose,
   onSaveMeasurement,
-  currentWeight = 77.9,
+  currentWeight = 120.0,
   lastEntry = null
 }) {
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0])
   const [weight, setWeight] = useState(currentWeight)
-  const [waist, setWaist] = useState(lastEntry?.waist || 83.0)
-  const [chest, setChest] = useState(lastEntry?.chest || 104.0)
-  const [arm, setArm] = useState(lastEntry?.arm || 38.0)
-  const [thigh, setThigh] = useState(lastEntry?.thigh || 58.5)
-  const [neck, setNeck] = useState(lastEntry?.neck || 39.0)
-  const [height, setHeight] = useState(lastEntry?.height || 175)
+  const [waist, setWaist] = useState(lastEntry?.waist || 99.0)
+  const [chest, setChest] = useState(lastEntry?.chest || 124.0)
+  const [arm, setArm] = useState(lastEntry?.arm || 42.0)
+  const [thigh, setThigh] = useState(lastEntry?.thigh || 68.0)
+  const [neck, setNeck] = useState(lastEntry?.neck || 44.0)
+  const [height, setHeight] = useState(lastEntry?.height || 194)
   const [notes, setNotes] = useState('')
 
   useEffect(() => {
@@ -60,8 +60,8 @@ export function BodyMeasurementsModal({
       chest: chest ? Number(chest) : null,
       arm: arm ? Number(arm) : null,
       thigh: thigh ? Number(thigh) : null,
-      neck: neck ? Number(neck) : 39,
-      height: height ? Number(height) : 175,
+      neck: neck ? Number(neck) : 44,
+      height: height ? Number(height) : 194,
       bodyFatPct: estimatedBodyFat,
       notes: notes.trim() || 'Pesaje matutino en ayunas.'
     }

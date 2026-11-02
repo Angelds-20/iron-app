@@ -10,7 +10,10 @@ import {
   ShieldAlert,
   RotateCcw,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  User,
+  Timer,
+  Scale
 } from 'lucide-react'
 import { isSupabaseConfigured } from '../lib/supabaseClient'
 
@@ -35,7 +38,7 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
   const triggerResetVolume = () => {
     if (onResetVolume) {
       onResetVolume()
-      setActionNotice('¡Volumen restablecido a 2.400 kg (Banca 60 kg)!')
+      setActionNotice('¡Volumen restablecido a 6.420 kg (Sesión de ayer)!')
       setTimeout(() => setActionNotice(''), 3000)
     }
   }
@@ -62,8 +65,48 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
           Ajustes & Conectividad
         </h2>
         <p className="text-xs text-neutral-400 mt-0.5">
-          Configura tu base de datos Supabase y equipamiento de entrenamiento.
+          Configura tu perfil de atleta, base de datos y equipamiento de entrenamiento.
         </p>
+      </div>
+
+      {/* Perfil del Atleta */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-coral-500" />
+            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+              Perfil de Atleta
+            </span>
+          </div>
+          <span className="text-[10px] font-black text-coral-500 bg-coral-50 px-2 py-0.5 rounded-full uppercase">
+            Activo
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between pb-3.5 border-b border-sand-200/60">
+          <div>
+            <h3 className="text-lg font-black text-carbon-900 leading-tight">Angel</h3>
+            <p className="text-xs text-neutral-400">Entrenamiento de fuerza en patio</p>
+          </div>
+          <div className="text-right">
+            <div className="text-xl font-black text-carbon-900 font-mono">120.0 <span className="text-xs text-neutral-400">kg</span></div>
+            <span className="text-[10px] font-bold text-neutral-500">194 cm de estatura</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 mt-3.5 text-xs">
+          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60">
+            <span className="text-[10px] font-bold text-neutral-400 uppercase block">Descanso entre Series</span>
+            <span className="font-extrabold text-carbon-900 font-mono text-sm">1:30 min</span>
+            <span className="text-[10px] text-neutral-400 block mt-0.5">90 segundos exactos</span>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60">
+            <span className="text-[10px] font-bold text-neutral-400 uppercase block">Sesión de Referencia</span>
+            <span className="font-extrabold text-coral-500 font-mono text-sm">6.420 kg</span>
+            <span className="text-[10px] text-neutral-400 block mt-0.5">15 series efectivas</span>
+          </div>
+        </div>
       </div>
 
       {/* Estado del Almacenamiento */}
@@ -193,7 +236,7 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
             onClick={triggerResetVolume}
             className="w-full py-3 px-4 bg-sand-100 hover:bg-sand-200 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
           >
-            <span>Restablecer Volumen Real a Hoy (2.400 kg)</span>
+            <span>Restablecer Volumen Real a Ayer (6.420 kg)</span>
             <RotateCcw className="w-3.5 h-3.5 text-coral-500" />
           </button>
 

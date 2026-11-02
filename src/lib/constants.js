@@ -23,8 +23,8 @@ export const EXERCISES_CATALOG = [
     category: 'pecho',
     equipment: 'Barra principal (60 kg) + Banco',
     defaultWeight: 60,
-    targetSets: 4,
-    targetReps: '8 - 10',
+    targetSets: 3,
+    targetReps: '10',
     defaultRir: 2,
     notes: 'Pausa de 1 segundo en el pecho. Escápulas retraídas.'
   },
@@ -33,11 +33,11 @@ export const EXERCISES_CATALOG = [
     name: 'Press inclinado',
     category: 'pecho',
     equipment: 'Barra principal (60 kg) + Banco',
-    defaultWeight: 40,
-    targetSets: 4,
-    targetReps: '8 - 10',
-    defaultRir: 2,
-    notes: 'Inclinación de 30° - 45°. Foco en haz clavicular.'
+    defaultWeight: 60,
+    targetSets: 3,
+    targetReps: '10 - 6',
+    defaultRir: 1,
+    notes: 'Inclinación en banco. 2 series x 10 reps + 1 serie x 6 reps con 60 kg.'
   },
   {
     id: 'pushups',
@@ -65,14 +65,14 @@ export const EXERCISES_CATALOG = [
   // Espalda
   {
     id: 'barbell-row',
-    name: 'Remo con barra',
+    name: 'Remo con barra (Remo al pecho)',
     category: 'espalda',
     equipment: 'Barra principal (60 kg)',
-    defaultWeight: 40,
-    targetSets: 4,
-    targetReps: '8 - 10',
+    defaultWeight: 60,
+    targetSets: 3,
+    targetReps: '10',
     defaultRir: 2,
-    notes: 'Torso a 45°. Tracción hacia la cadera para proteger hombros.'
+    notes: 'Torso a 45°. Remo al pecho con barra de 60 kg.'
   },
   {
     id: 'deadlift',
@@ -175,9 +175,9 @@ export const EXERCISES_CATALOG = [
     equipment: 'Barra chica (14 kg)',
     defaultWeight: 14,
     targetSets: 3,
-    targetReps: '10 - 12',
+    targetReps: '15',
     defaultRir: 2,
-    notes: 'Estricto sin balanceo del torso.'
+    notes: '3 series de 15 reps estrictas con barra chica de 14 kg.'
   },
   {
     id: 'preacher-curl',
@@ -186,9 +186,9 @@ export const EXERCISES_CATALOG = [
     equipment: 'Barra chica (14 kg) en banco',
     defaultWeight: 14,
     targetSets: 3,
-    targetReps: '10 - 12',
+    targetReps: '15',
     defaultRir: 2,
-    notes: 'Aislamiento total con brazos apoyados en banco.'
+    notes: '3 series de 15 reps con aislamiento total en banco.'
   },
   {
     id: 'hammer-curl',
@@ -210,9 +210,9 @@ export const EXERCISES_CATALOG = [
     equipment: 'Barra chica (14 kg) en banco',
     defaultWeight: 14,
     targetSets: 3,
-    targetReps: '10 - 12',
+    targetReps: '15',
     defaultRir: 2,
-    notes: 'Codos cerrados apuntando al techo. Bajada controlada a la frente.'
+    notes: '3 series de 15 reps con codos cerrados apuntando al techo.'
   },
   {
     id: 'close-grip-bench',
@@ -232,60 +232,66 @@ export const DEFAULT_ROUTINES = [
     id: 'torso-fuerza',
     title: 'Torso — Banca & Inclinado',
     category: 'torso',
-    estimatedTime: '40 min',
+    estimatedTime: '48 min',
     intensity: 'Alta',
+    restSeconds: 90,
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80',
-    description: 'Empujes pesados con banco, tracción compensatoria y tríceps con barra chica.',
+    description: 'Banca 60kg (10x3), Inclinado 60kg (10x2 + 1x6), Remo al pecho 60kg (10x3), Francés 14kg (15x3) y Curl 14kg (15x3). 1:30 min de descanso.',
     exercises: [
       {
         id: 'bench-press',
         name: 'Press de banca plano',
         equipment: 'Barra principal (60 kg) + Banco',
-        targetSets: 4,
-        targetReps: '8 - 10',
+        targetSets: 3,
+        targetReps: '10',
         defaultWeight: 60,
         defaultRir: 2,
-        notes: 'Pausa de 1 segundo en el pecho. Escápulas retraídas.'
+        restSeconds: 90,
+        notes: '3 series x 10 reps con 60 kg. Pausa de 1 segundo en el pecho. Escápulas retraídas.'
       },
       {
         id: 'incline-bench-press',
         name: 'Press inclinado',
         equipment: 'Barra principal (60 kg) + Banco',
-        targetSets: 4,
-        targetReps: '8 - 10',
-        defaultWeight: 40,
-        defaultRir: 2,
-        notes: 'Inclinación de 30° - 45°. Foco en haz clavicular.'
+        targetSets: 3,
+        targetReps: '10 - 6',
+        defaultWeight: 60,
+        defaultRir: 1,
+        restSeconds: 90,
+        notes: '2 series x 10 reps + 1 serie x 6 reps con 60 kg.'
       },
       {
         id: 'barbell-row',
-        name: 'Remo con barra',
+        name: 'Remo con barra (Remo al pecho)',
         equipment: 'Barra principal (60 kg)',
-        targetSets: 4,
-        targetReps: '8 - 10',
-        defaultWeight: 40,
+        targetSets: 3,
+        targetReps: '10',
+        defaultWeight: 60,
         defaultRir: 2,
-        notes: 'Torso a 45°. Tracción hacia la cadera para proteger hombros.'
+        restSeconds: 90,
+        notes: 'Remo al pecho con tus 60 kg. 3 series x 10 reps.'
       },
       {
         id: 'french-press',
         name: 'Press francés',
         equipment: 'Barra chica (14 kg) en banco',
         targetSets: 3,
-        targetReps: '10 - 12',
+        targetReps: '15',
         defaultWeight: 14,
         defaultRir: 2,
-        notes: 'Codos cerrados apuntando al techo. Bajada controlada a la frente.'
+        restSeconds: 90,
+        notes: '3 series x 15 reps con barra chica de 14 kg. Codos cerrados.'
       },
       {
         id: 'biceps-curl',
         name: 'Curl de bíceps',
         equipment: 'Barra chica (14 kg)',
         targetSets: 3,
-        targetReps: '10 - 12',
+        targetReps: '15',
         defaultWeight: 14,
         defaultRir: 2,
-        notes: 'Estricto sin balanceo del torso.'
+        restSeconds: 90,
+        notes: '3 series x 15 reps con barra chica de 14 kg.'
       }
     ]
   },

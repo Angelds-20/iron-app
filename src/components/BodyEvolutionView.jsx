@@ -31,12 +31,12 @@ export function BodyEvolutionView({
   const latest = sorted[0] || {}
   const oldest = sorted[sorted.length - 1] || {}
 
-  const currentWeight = Number(latest.weight) || 77.9
-  const currentBodyFat = latest.bodyFatPct || 16.2
+  const currentWeight = Number(latest.weight) || 120.0
+  const currentBodyFat = latest.bodyFatPct || 19.6
   const massBreakdown = calculateMassBreakdown(currentWeight, currentBodyFat)
 
-  const waistRatio = calculateWaistToHeightRatio(latest.waist || 83, latest.height || 175)
-  const vTaper = calculateChestToWaistRatio(latest.chest || 104, latest.waist || 83)
+  const waistRatio = calculateWaistToHeightRatio(latest.waist || 99, latest.height || 194)
+  const vTaper = calculateChestToWaistRatio(latest.chest || 124, latest.waist || 99)
 
   // Deltas de medidas (actual vs primera medición)
   const getDelta = (curr, init) => {
@@ -120,7 +120,7 @@ export function BodyEvolutionView({
       </div>
 
       {/* 1. Gráfico de Tendencia de Peso */}
-      <BodyweightTrendChart measurements={measurements} targetWeight={80.0} />
+      <BodyweightTrendChart measurements={measurements} targetWeight={120.0} />
 
       {/* 2. Medidas Antropométricas Actuales vs Iniciales */}
       <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 space-y-3.5">
@@ -151,10 +151,10 @@ export function BodyEvolutionView({
               )}
             </div>
             <div className="text-lg font-black text-carbon-900 mt-1 font-mono">
-              {latest.chest || 104} <span className="text-xs font-semibold text-neutral-400">cm</span>
+              {latest.chest || 124} <span className="text-xs font-semibold text-neutral-400">cm</span>
             </div>
             <span className="text-[9px] text-neutral-400 font-medium">
-              Base: {oldest.chest || 100.5} cm
+              Base: {oldest.chest || 120} cm
             </span>
           </div>
 
@@ -169,10 +169,10 @@ export function BodyEvolutionView({
               )}
             </div>
             <div className="text-lg font-black text-carbon-900 mt-1 font-mono">
-              {latest.arm || 38} <span className="text-xs font-semibold text-neutral-400">cm</span>
+              {latest.arm || 42} <span className="text-xs font-semibold text-neutral-400">cm</span>
             </div>
             <span className="text-[9px] text-neutral-400 font-medium">
-              Base: {oldest.arm || 36.5} cm
+              Base: {oldest.arm || 40.5} cm
             </span>
           </div>
 
@@ -187,10 +187,10 @@ export function BodyEvolutionView({
               )}
             </div>
             <div className="text-lg font-black text-carbon-900 mt-1 font-mono">
-              {latest.waist || 83} <span className="text-xs font-semibold text-neutral-400">cm</span>
+              {latest.waist || 99} <span className="text-xs font-semibold text-neutral-400">cm</span>
             </div>
             <span className="text-[9px] text-neutral-400 font-medium">
-              Base: {oldest.waist || 84.5} cm
+              Base: {oldest.waist || 101} cm
             </span>
           </div>
 
@@ -205,10 +205,10 @@ export function BodyEvolutionView({
               )}
             </div>
             <div className="text-lg font-black text-carbon-900 mt-1 font-mono">
-              {latest.thigh || 58.5} <span className="text-xs font-semibold text-neutral-400">cm</span>
+              {latest.thigh || 68} <span className="text-xs font-semibold text-neutral-400">cm</span>
             </div>
             <span className="text-[9px] text-neutral-400 font-medium">
-              Base: {oldest.thigh || 56.5} cm
+              Base: {oldest.thigh || 66} cm
             </span>
           </div>
         </div>

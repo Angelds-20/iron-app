@@ -286,10 +286,12 @@ export function compareLastTwoSessions(workoutsHistory = []) {
 export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
   const prs = {
     benchPress: Math.max(60, Number(basePRs.benchPress) || 60),
+    inclineBench: Math.max(60, Number(basePRs.inclineBench) || 60),
     deadlift: Math.max(60, Number(basePRs.deadlift) || 60),
     squat: Math.max(50, Number(basePRs.squat) || 50),
-    barbellRow: Math.max(40, Number(basePRs.barbellRow) || 40),
-    preacherCurl: Math.max(14, Number(basePRs.preacherCurl) || 14)
+    barbellRow: Math.max(60, Number(basePRs.barbellRow) || 60),
+    frenchPress: Math.max(14, Number(basePRs.frenchPress) || 14),
+    bicepsCurl: Math.max(14, Number(basePRs.bicepsCurl) || 14)
   }
 
   // Recorrer el historial para verificar si se batió alguna marca
@@ -297,10 +299,12 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
     session.exercises?.forEach((ex) => {
       const maxInSession = Math.max(...(ex.sets?.map((s) => Number(s.weight) || 0) || [0]))
       if (ex.id === 'bench-press' && maxInSession > prs.benchPress) prs.benchPress = maxInSession
+      if (ex.id === 'incline-bench-press' && maxInSession > prs.inclineBench) prs.inclineBench = maxInSession
       if (ex.id === 'deadlift' && maxInSession > prs.deadlift) prs.deadlift = maxInSession
       if (ex.id === 'back-squat' && maxInSession > prs.squat) prs.squat = maxInSession
       if (ex.id === 'barbell-row' && maxInSession > prs.barbellRow) prs.barbellRow = maxInSession
-      if (ex.id === 'preacher-curl' && maxInSession > prs.preacherCurl) prs.preacherCurl = maxInSession
+      if (ex.id === 'french-press' && maxInSession > prs.frenchPress) prs.frenchPress = maxInSession
+      if (ex.id === 'biceps-curl' && maxInSession > prs.bicepsCurl) prs.bicepsCurl = maxInSession
     })
   })
 
@@ -313,7 +317,47 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
       targetWeight: 70,
       equipment: 'Barra (60 kg) + Banco',
       estimated1RM: calculateEstimated1RM(prs.benchPress, 10),
-      status: prs.benchPress >= 60 ? 'Carga Máxima de Barra' : 'Progresando'
+      status: 'Ayer: 3 × 10 @ 60kg'
+    },
+    {
+      id: 'incline-bench-press',
+      name: 'Press Inclinado',
+      weight: prs.inclineBench,
+      unit: 'kg',
+      targetWeight: 70,
+      equipment: 'Barra (60 kg) + Banco',
+      estimated1RM: calculateEstimated1RM(prs.inclineBench, 10),
+      status: 'Ayer: 2 × 10, 1 × 6 @ 60kg'
+    },
+    {
+      id: 'barbell-row',
+      name: 'Remo al Pecho con Barra',
+      weight: prs.barbellRow,
+      unit: 'kg',
+      targetWeight: 70,
+      equipment: 'Barra principal (60 kg)',
+      estimated1RM: calculateEstimated1RM(prs.barbellRow, 10),
+      status: 'Ayer: 3 × 10 @ 60kg'
+    },
+    {
+      id: 'french-press',
+      name: 'Press Francés',
+      weight: prs.frenchPress,
+      unit: 'kg',
+      targetWeight: 20,
+      equipment: 'Barra chica (14 kg)',
+      estimated1RM: calculateEstimated1RM(prs.frenchPress, 15),
+      status: 'Ayer: 3 × 15 @ 14kg'
+    },
+    {
+      id: 'biceps-curl',
+      name: 'Curl de Bíceps',
+      weight: prs.bicepsCurl,
+      unit: 'kg',
+      targetWeight: 20,
+      equipment: 'Barra chica (14 kg)',
+      estimated1RM: calculateEstimated1RM(prs.bicepsCurl, 15),
+      status: 'Ayer: 3 × 15 @ 14kg'
     },
     {
       id: 'deadlift',
@@ -334,51 +378,39 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
       equipment: 'Barra sacada de soportes',
       estimated1RM: calculateEstimated1RM(prs.squat, 10),
       status: 'RIR 2 estricto'
-    },
-    {
-      id: 'barbell-row',
-      name: 'Remo con Barra',
-      weight: prs.barbellRow,
-      unit: 'kg',
-      targetWeight: 50,
-      equipment: 'Barra principal',
-      estimated1RM: calculateEstimated1RM(prs.barbellRow, 10),
-      status: 'Control lumbar'
-    },
-    {
-      id: 'preacher-curl',
-      name: 'Curl Predicador',
-      weight: prs.preacherCurl,
-      unit: 'kg',
-      targetWeight: 18,
-      equipment: 'Barra chica (14 kg)',
-      estimated1RM: calculateEstimated1RM(prs.preacherCurl, 10),
-      status: 'Aislamiento en banco'
     }
   ]
 }
 
 /**
- * Semilla realista de sesiones anteriores si el historial es nuevo,
- * demostrando la sobrecarga progresiva desde 52.5 kg hasta los 60 kg actuales.
+ * Semilla realista del historial con la sesión ejecutada ayer por Angel:
+ * - 60 kg en banca (3 x 10)
+ * - 60 kg en inclinado (2 x 10 + 1 x 6)
+ * - 60 kg en remo al pecho (3 x 10)
+ * - 14 kg en press francés (3 x 15)
+ * - 14 kg en curl (3 x 15)
+ * - 1:30 min de descanso entre series
+ * - Total: 6.420 kg de volumen
  */
 export function getRealisticProgressionSeed() {
-  const dToday = new Date()
-  const dMinus3 = new Date(dToday.getTime() - 3 * 24 * 60 * 60 * 1000)
-  const dMinus7 = new Date(dToday.getTime() - 7 * 24 * 60 * 60 * 1000)
-  const dMinus11 = new Date(dToday.getTime() - 11 * 24 * 60 * 60 * 1000)
+  const now = new Date()
+  const dYesterday = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)
+  const dMinus4 = new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000)
+  const dMinus8 = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000)
+  const dMinus12 = new Date(now.getTime() - 12 * 24 * 60 * 60 * 1000)
 
   return [
     {
       routineId: 'torso-fuerza',
       title: 'Torso — Banca & Inclinado',
       category: 'torso',
-      durationMinutes: 40,
-      completedAt: dToday.toISOString(),
-      totalVolume: 2400,
+      durationMinutes: 48,
+      completedAt: dYesterday.toISOString(),
+      totalVolume: 6420,
       maxWeight: 60,
-      completedSetsCount: 4,
-      watchMetrics: { avgBpm: 135, maxBpm: 165, caloriesBurned: 260 },
+      completedSetsCount: 15,
+      restSeconds: 90,
+      watchMetrics: { avgBpm: 138, maxBpm: 168, caloriesBurned: 380 },
       exercises: [
         {
           id: 'bench-press',
@@ -386,26 +418,43 @@ export function getRealisticProgressionSeed() {
           sets: [
             { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
             { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true },
-            { setNumber: 4, weight: 60, reps: 10, rir: 2, completed: true }
+            { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true }
           ]
         },
         {
           id: 'incline-bench-press',
           name: 'Press inclinado',
           sets: [
-            { setNumber: 1, weight: 40, reps: 10, rir: 2, completed: true },
-            { setNumber: 2, weight: 40, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 40, reps: 9, rir: 1, completed: true }
+            { setNumber: 1, weight: 60, reps: 10, rir: 1, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, rir: 1, completed: true },
+            { setNumber: 3, weight: 60, reps: 6, rir: 0, completed: true }
           ]
         },
         {
           id: 'barbell-row',
-          name: 'Remo con barra',
+          name: 'Remo con barra (Remo al pecho)',
           sets: [
-            { setNumber: 1, weight: 40, reps: 10, rir: 2, completed: true },
-            { setNumber: 2, weight: 40, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 40, reps: 10, rir: 2, completed: true }
+            { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'french-press',
+          name: 'Press francés',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'biceps-curl',
+          name: 'Curl de bíceps',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
           ]
         }
       ]
@@ -415,10 +464,11 @@ export function getRealisticProgressionSeed() {
       title: 'Pierna — Sentadilla & Peso Muerto',
       category: 'pierna',
       durationMinutes: 38,
-      completedAt: dMinus3.toISOString(),
+      completedAt: dMinus4.toISOString(),
       totalVolume: 2200,
       maxWeight: 60,
       completedSetsCount: 8,
+      restSeconds: 90,
       watchMetrics: { avgBpm: 142, maxBpm: 172, caloriesBurned: 290 },
       exercises: [
         {
@@ -447,12 +497,13 @@ export function getRealisticProgressionSeed() {
       routineId: 'torso-fuerza',
       title: 'Torso — Banca & Inclinado',
       category: 'torso',
-      durationMinutes: 42,
-      completedAt: dMinus7.toISOString(),
-      totalVolume: 2260,
+      durationMinutes: 45,
+      completedAt: dMinus8.toISOString(),
+      totalVolume: 5600,
       maxWeight: 57.5,
-      completedSetsCount: 10,
-      watchMetrics: { avgBpm: 132, maxBpm: 160, caloriesBurned: 245 },
+      completedSetsCount: 15,
+      restSeconds: 90,
+      watchMetrics: { avgBpm: 135, maxBpm: 165, caloriesBurned: 350 },
       exercises: [
         {
           id: 'bench-press',
@@ -460,17 +511,43 @@ export function getRealisticProgressionSeed() {
           sets: [
             { setNumber: 1, weight: 57.5, reps: 10, rir: 2, completed: true },
             { setNumber: 2, weight: 57.5, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 57.5, reps: 10, rir: 2, completed: true },
-            { setNumber: 4, weight: 57.5, reps: 9, rir: 1, completed: true }
+            { setNumber: 3, weight: 57.5, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'incline-bench-press',
+          name: 'Press inclinado',
+          sets: [
+            { setNumber: 1, weight: 50, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 50, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 50, reps: 8, rir: 1, completed: true }
           ]
         },
         {
           id: 'barbell-row',
-          name: 'Remo con barra',
+          name: 'Remo con barra (Remo al pecho)',
           sets: [
-            { setNumber: 1, weight: 37.5, reps: 10, rir: 2, completed: true },
-            { setNumber: 2, weight: 37.5, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 37.5, reps: 10, rir: 2, completed: true }
+            { setNumber: 1, weight: 50, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 50, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 50, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'french-press',
+          name: 'Press francés',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'biceps-curl',
+          name: 'Curl de bíceps',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 15, rir: 2, completed: true }
           ]
         }
       ]
@@ -479,12 +556,13 @@ export function getRealisticProgressionSeed() {
       routineId: 'torso-fuerza',
       title: 'Torso — Banca & Inclinado',
       category: 'torso',
-      durationMinutes: 40,
-      completedAt: dMinus11.toISOString(),
-      totalVolume: 2150,
+      durationMinutes: 44,
+      completedAt: dMinus12.toISOString(),
+      totalVolume: 5100,
       maxWeight: 55,
-      completedSetsCount: 10,
-      watchMetrics: { avgBpm: 130, maxBpm: 158, caloriesBurned: 230 },
+      completedSetsCount: 15,
+      restSeconds: 90,
+      watchMetrics: { avgBpm: 132, maxBpm: 160, caloriesBurned: 330 },
       exercises: [
         {
           id: 'bench-press',
@@ -492,8 +570,43 @@ export function getRealisticProgressionSeed() {
           sets: [
             { setNumber: 1, weight: 55, reps: 10, rir: 2, completed: true },
             { setNumber: 2, weight: 55, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 55, reps: 10, rir: 2, completed: true },
-            { setNumber: 4, weight: 55, reps: 10, rir: 2, completed: true }
+            { setNumber: 3, weight: 55, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'incline-bench-press',
+          name: 'Press inclinado',
+          sets: [
+            { setNumber: 1, weight: 45, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 45, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 45, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'barbell-row',
+          name: 'Remo con barra (Remo al pecho)',
+          sets: [
+            { setNumber: 1, weight: 45, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 45, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 45, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'french-press',
+          name: 'Press francés',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 12, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 12, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 12, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'biceps-curl',
+          name: 'Curl de bíceps',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 12, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 12, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 12, rir: 2, completed: true }
           ]
         }
       ]

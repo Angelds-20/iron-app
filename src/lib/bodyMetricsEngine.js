@@ -7,10 +7,10 @@
  * Hombres: % Grasa = 495 / (1.0324 - 0.19077 * log10(cintura - cuello) + 0.15456 * log10(altura)) - 450
  * Todas las medidas en centímetros.
  */
-export function calculateBodyFatNavy({ waist, neck = 39, height = 175 }) {
+export function calculateBodyFatNavy({ waist, neck = 44, height = 194 }) {
   const w = Number(waist) || 0
-  const n = Number(neck) || 39
-  const h = Number(height) || 175
+  const n = Number(neck) || 44
+  const h = Number(height) || 194
 
   if (w <= 0 || h <= 0 || w <= n) return null
 
@@ -35,9 +35,9 @@ export function calculateBodyFatNavy({ waist, neck = 39, height = 175 }) {
  * Calcula la relación Cintura / Estatura (Waist-to-Height Ratio - WHtR)
  * Indicador de riesgo cardiometabólico y distribución de grasa visceral.
  */
-export function calculateWaistToHeightRatio(waist, height = 175) {
+export function calculateWaistToHeightRatio(waist, height = 194) {
   const w = Number(waist) || 0
-  const h = Number(height) || 175
+  const h = Number(height) || 194
   if (w <= 0 || h <= 0) return null
 
   const ratio = Math.round((w / h) * 100) / 100
@@ -120,8 +120,10 @@ export function computeWeightTrend(entries = []) {
 
 /**
  * Datos semilla realistas de evolución corporal para Angel:
- * Refleja una recomposición/volumen limpio:
- * De 75.8 kg a 77.9 kg actual con aumento en pecho y brazo y reducción de cintura.
+ * Atleta de fuerza de 194 cm y 120.0 kg.
+ * Refleja una progresión consistente de volumen limpio y recomposición:
+ * De 117.2 kg a 120.0 kg con aumento en pecho (120 -> 124 cm) y brazos (40.5 -> 42 cm),
+ * con reducción de cintura y 19.6% de grasa corporal (fórmula Marina EE.UU.).
  */
 export function getRealisticBodyMeasurementsSeed() {
   const now = new Date()
@@ -135,66 +137,66 @@ export function getRealisticBodyMeasurementsSeed() {
     {
       id: `meas-${dToday.getTime()}`,
       date: dToday.toISOString().split('T')[0],
-      weight: 77.9,
-      waist: 83.0,
-      chest: 104.0,
-      arm: 38.0,
-      thigh: 58.5,
-      neck: 39.0,
-      height: 175,
-      bodyFatPct: 16.2,
-      notes: 'Pesaje en ayunas. Buen bombeo en pecho.'
+      weight: 120.0,
+      waist: 99.0,
+      chest: 124.0,
+      arm: 42.0,
+      thigh: 68.0,
+      neck: 44.0,
+      height: 194,
+      bodyFatPct: 19.6,
+      notes: 'Pesaje en ayunas (194 cm / 120 kg). Sesión de torso 6.420 kg.'
     },
     {
       id: `meas-${dMinus10.getTime()}`,
       date: dMinus10.toISOString().split('T')[0],
-      weight: 77.4,
-      waist: 83.0,
-      chest: 103.5,
-      arm: 37.8,
-      thigh: 58.0,
-      neck: 39.0,
-      height: 175,
-      bodyFatPct: 16.4,
-      notes: 'Constante en sobrecarga de 60 kg en banca.'
+      weight: 119.5,
+      waist: 99.5,
+      chest: 123.5,
+      arm: 41.8,
+      thigh: 67.5,
+      neck: 44.0,
+      height: 194,
+      bodyFatPct: 19.8,
+      notes: 'Constante en sobrecarga de 60 kg en banca e inclinado.'
     },
     {
       id: `meas-${dMinus25.getTime()}`,
       date: dMinus25.toISOString().split('T')[0],
-      weight: 76.8,
-      waist: 83.5,
-      chest: 102.5,
-      arm: 37.5,
-      thigh: 57.5,
-      neck: 39.0,
-      height: 175,
-      bodyFatPct: 16.7,
-      notes: 'Semana de adaptación a pesos de patio.'
+      weight: 118.8,
+      waist: 100.0,
+      chest: 122.5,
+      arm: 41.5,
+      thigh: 67.0,
+      neck: 44.0,
+      height: 194,
+      bodyFatPct: 20.1,
+      notes: 'Adaptación a cargas altas de barra de patio.'
     },
     {
       id: `meas-${dMinus45.getTime()}`,
       date: dMinus45.toISOString().split('T')[0],
-      weight: 76.2,
-      waist: 84.0,
-      chest: 101.5,
-      arm: 37.0,
-      thigh: 57.0,
-      neck: 39.0,
-      height: 175,
-      bodyFatPct: 17.1,
-      notes: 'Inicio de rutina consistente de patio.'
+      weight: 118.0,
+      waist: 100.5,
+      chest: 121.5,
+      arm: 41.0,
+      thigh: 66.5,
+      neck: 44.0,
+      height: 194,
+      bodyFatPct: 20.4,
+      notes: 'Consistencia en descanso 1:30 min y técnica estricta.'
     },
     {
       id: `meas-${dMinus60.getTime()}`,
       date: dMinus60.toISOString().split('T')[0],
-      weight: 75.8,
-      waist: 84.5,
-      chest: 100.5,
-      arm: 36.5,
-      thigh: 56.5,
-      neck: 39.0,
-      height: 175,
-      bodyFatPct: 17.5,
+      weight: 117.2,
+      waist: 101.0,
+      chest: 120.0,
+      arm: 40.5,
+      thigh: 66.0,
+      neck: 44.0,
+      height: 194,
+      bodyFatPct: 20.8,
       notes: 'Punto de partida de mediciones.'
     }
   ]
