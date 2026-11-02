@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Check,
   Plus,
@@ -10,10 +10,12 @@ import {
   ArrowLeft,
   Sparkles,
   Watch,
-  RotateCcw
+  RotateCcw,
+  Volume2
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
+import { initAudio, playTimerDoneSound } from '../lib/soundEngine'
 
 export function WorkoutLogger({
   routines = DEFAULT_ROUTINES,
@@ -60,13 +62,48 @@ export function WorkoutLogger({
     return Math.floor((Date.now() - (activeSession?.startedAt || Date.now())) / 1000)
   })
 
-  // 4. Timer de descanso entre series
-  const [restSeconds, setRestSeconds] = useState(0)
-  const [timerActive, setTimerActive] = useState(false)
+  // 4. Timer de descanso entre series (Basado en timestamp para sobrevivir a TikTok / background)
+  const [restEndsAt, setRestEndsAt] = useState(() => {
+    return activeSession?.restEndsAt || null
+  })
+
+  const [restSeconds, setRestSeconds] = useState(() => {
+    if (activeSession?.restEndsAt) {
+      return Math.max(0, Math.ceil((activeSession.restEndsAt - Date.now()) / 1000))
+    }
+    return 0
+  })
+
+  const soundPlayedRef = useRef(false)
 
   // 5. Métricas de Honor Choice Watch 2i
   const [watchBpm, setWatchBpm] = useState(activeSession?.watchBpm || 132)
   const [watchCalories, setWatchCalories] = useState(activeSession?.watchCalories || 240)
+
+  // Manejador para cuando vuelves de TikTok o bloqueas el iPhone (visibilitychange)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // Recalcular tiempo de entrenamiento real
+      setElapsedSeconds(Math.floor((Date.now() - workoutStartedAt) / 1000))
+
+      // Recalcular tiempo de descanso
+      if (restEndsAt) {
+        const remaining = Math.max(0, Math.ceil((restEndsAt - Date.now()) / 1000))
+        setRestSeconds(remaining)
+        if (remaining === 0 && !soundPlayedRef.current) {
+          soundPlayedRef.current = true
+          playTimerDoneSound()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleVisibilityChange)
+    }
+  }, [workoutStartedAt, restEndsAt])
 
   // Contador de tiempo transcurrido continuo
   useEffect(() => {
@@ -76,18 +113,25 @@ export function WorkoutLogger({
     return () => clearInterval(timer)
   }, [workoutStartedAt])
 
-  // Timer de descanso
+  // Timer de descanso basado en timestamp
   useEffect(() => {
-    let interval = null
-    if (timerActive && restSeconds > 0) {
-      interval = setInterval(() => {
-        setRestSeconds((sec) => sec - 1)
-      }, 1000)
-    } else if (restSeconds === 0) {
-      setTimerActive(false)
-    }
+    if (!restEndsAt) return
+
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((restEndsAt - Date.now()) / 1000))
+      setRestSeconds(remaining)
+
+      if (remaining === 0) {
+        if (!soundPlayedRef.current) {
+          soundPlayedRef.current = true
+          playTimerDoneSound()
+        }
+        clearInterval(interval)
+      }
+    }, 1000)
+
     return () => clearInterval(interval)
-  }, [timerActive, restSeconds])
+  }, [restEndsAt])
 
   // SINCRONIZACIÓN PERMANENTE INMEDIATA: cada cambio se guarda en localStorage
   useEffect(() => {
@@ -97,16 +141,35 @@ export function WorkoutLogger({
         routineIndex: selectedRoutineIndex,
         routineId: currentRoutine.id,
         startedAt: workoutStartedAt,
+        restEndsAt,
         exerciseData,
         watchBpm,
         watchCalories
       })
     }
-  }, [exerciseData, selectedRoutineIndex, watchBpm, watchCalories, workoutStartedAt])
+  }, [exerciseData, selectedRoutineIndex, watchBpm, watchCalories, workoutStartedAt, restEndsAt])
 
   const startRestTimer = (seconds = 90) => {
+    initAudio()
+    const ends = Date.now() + seconds * 1000
+    soundPlayedRef.current = false
+    setRestEndsAt(ends)
     setRestSeconds(seconds)
-    setTimerActive(true)
+  }
+
+  const cancelRestTimer = () => {
+    setRestEndsAt(null)
+    setRestSeconds(0)
+    soundPlayedRef.current = true
+  }
+
+  const addRestTime = (secondsToAdd = 30) => {
+    initAudio()
+    soundPlayedRef.current = false
+    const currentBase = restEndsAt && restEndsAt > Date.now() ? restEndsAt : Date.now()
+    const nextEnds = currentBase + secondsToAdd * 1000
+    setRestEndsAt(nextEnds)
+    setRestSeconds(Math.max(0, Math.ceil((nextEnds - Date.now()) / 1000)))
   }
 
   const handleSwitchRoutine = (idx) => {
@@ -282,13 +345,15 @@ export function WorkoutLogger({
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setRestSeconds((s) => s + 30)}
+              type="button"
+              onClick={() => addRestTime(30)}
               className="text-[11px] font-bold px-2 py-1 rounded-lg bg-carbon-800 hover:bg-carbon-700 text-neutral-300"
             >
               +30s
             </button>
             <button
-              onClick={() => setRestSeconds(0)}
+              type="button"
+              onClick={cancelRestTimer}
               className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-sand-100 text-carbon-900"
             >
               Listo
