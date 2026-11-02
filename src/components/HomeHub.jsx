@@ -24,9 +24,9 @@ import {
 import { ExerciseTechniqueView } from './ExerciseTechniqueView'
 import { RirGuideView } from './RirGuideView'
 
-// Componente de anillo de progreso circular idéntico al de la captura
-function ProgressCircle({ number = 1, progress = 70, size = 48 }) {
-  const strokeWidth = 3
+// Componente de anillo de progreso con blanco protagonista y brillo nítido
+function ProgressCircle({ number = 1, progress = 75, size = 50 }) {
+  const strokeWidth = 3.5
   const radius = (size - strokeWidth * 2) / 2
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (progress / 100) * circumference
@@ -55,15 +55,17 @@ function ProgressCircle({ number = 1, progress = 70, size = 48 }) {
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
           fill="none"
-          className="transition-all duration-700 ease-out"
+          className="transition-all duration-700 ease-out drop-shadow-[0_0_6px_rgba(255,255,255,0.7)]"
         />
       </svg>
-      <span className="absolute text-sm font-extrabold text-white">{number}</span>
+      <span className="absolute text-base font-black text-white leading-none">
+        {number}
+      </span>
     </div>
   )
 }
 
-// Matriz de puntos de actividad mensual idéntica a la de la captura
+// Matriz de puntos de actividad con puntos blancos brillantes de alto contraste
 function DotMatrixHeatmap() {
   const months = [
     {
@@ -95,18 +97,18 @@ function DotMatrixHeatmap() {
   return (
     <div className="grid grid-cols-3 gap-4 pb-2">
       {months.map((m) => (
-        <div key={m.name} className="space-y-2.5">
-          <span className="text-[11px] font-bold text-white block text-center">
+        <div key={m.name} className="space-y-3">
+          <span className="text-xs font-black text-white block text-center tracking-wide">
             {m.name}
           </span>
-          <div className="grid grid-cols-6 gap-x-1.5 gap-y-2 justify-items-center">
+          <div className="grid grid-cols-6 gap-x-2 gap-y-2.5 justify-items-center">
             {m.dots.map((active, i) => (
               <span
                 key={i}
                 className={`rounded-full transition-all ${
                   active
-                    ? 'w-1.5 h-1.5 bg-white shadow-xs shadow-white/80'
-                    : 'w-1 h-1 bg-[#3A3C46]/70'
+                    ? 'w-2 h-2 bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)]'
+                    : 'w-1.5 h-1.5 bg-[#383A44]'
                 }`}
               />
             ))}
@@ -134,7 +136,7 @@ export function HomeHub({
   onStartWorkout,
   onViewAllRoutines
 }) {
-  const [activeSegment, setActiveSegment] = useState('workouts') // 'workouts' | 'recovery' | 'technique' | 'rir'
+  const [activeSegment, setActiveSegment] = useState('workouts') // 'workouts' | 'recovery' | 'technique'
 
   const todayStr = new Date().toISOString().split('T')[0]
   const isTodayRest = restDates.includes(todayStr)
@@ -144,35 +146,19 @@ export function HomeHub({
     ? Object.values(activeSession.exerciseData).flatMap((sets) => sets).filter((s) => s.completed).length
     : 0
 
-  const primaryRoutine = routines[0] || {
-    id: 'torso-fuerza',
-    title: 'Torso — Banca & Inclinado',
-    category: 'torso',
-    estimatedTime: '48 min',
-    description: 'Banca 60kg, Inclinado 60kg, Remo 60kg, Francés 14kg y Curl 14kg.'
-  }
-
-  const secondaryRoutine = routines[1] || {
-    id: 'pierna-fuerza',
-    title: 'Pierna — Sentadilla & Peso Muerto',
-    category: 'pierna',
-    estimatedTime: '45 min',
-    description: 'Sentadilla 60kg, PM 60kg, Zancadas 14kg, Gemelos 60kg.'
-  }
-
   const displayVolume = currentSessionVolume || 6420
 
   return (
-    <div className="space-y-3.5 animate-fadeIn pb-24">
-      {/* Selector de Modos Sutil Superior */}
+    <div className="space-y-4 animate-fadeIn pb-24">
+      {/* Selector de Pestañas con BLANCO PROTAGONISTA en el activo */}
       <div className="flex items-center gap-2 px-1">
         <button
           type="button"
           onClick={() => setActiveSegment('workouts')}
-          className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer touch-press ${
+          className={`text-xs font-black px-4 py-2 rounded-full transition-all cursor-pointer touch-press ${
             activeSegment === 'workouts'
-              ? 'bg-[#212227] text-white shadow-sm'
-              : 'text-[#8E909A] hover:text-white'
+              ? 'bg-white text-black shadow-lg shadow-white/20'
+              : 'text-zinc-400 hover:text-white bg-[#212227]/60'
           }`}
         >
           Workouts
@@ -180,10 +166,10 @@ export function HomeHub({
         <button
           type="button"
           onClick={() => setActiveSegment('recovery')}
-          className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer touch-press ${
+          className={`text-xs font-black px-4 py-2 rounded-full transition-all cursor-pointer touch-press ${
             activeSegment === 'recovery'
-              ? 'bg-[#212227] text-white shadow-sm'
-              : 'text-[#8E909A] hover:text-white'
+              ? 'bg-white text-black shadow-lg shadow-white/20'
+              : 'text-zinc-400 hover:text-white bg-[#212227]/60'
           }`}
         >
           Recuperación Muscular
@@ -191,33 +177,33 @@ export function HomeHub({
         <button
           type="button"
           onClick={() => setActiveSegment('technique')}
-          className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer touch-press ${
+          className={`text-xs font-black px-4 py-2 rounded-full transition-all cursor-pointer touch-press ${
             activeSegment === 'technique'
-              ? 'bg-[#212227] text-white shadow-sm'
-              : 'text-[#8E909A] hover:text-white'
+              ? 'bg-white text-black shadow-lg shadow-white/20'
+              : 'text-zinc-400 hover:text-white bg-[#212227]/60'
           }`}
         >
           Técnica & RIR
         </button>
       </div>
 
-      {/* Banner de Sesión en Curso si hay entrenamiento activo */}
+      {/* Banner de Sesión en Curso */}
       {activeSession?.isActive && completedSetsCount > 0 && (
-        <div className="bg-[#212227] text-white rounded-[24px] p-5 shadow-xl flex items-center justify-between animate-slideUp">
+        <div className="bg-[#212227] text-white rounded-[28px] p-5 shadow-xl flex items-center justify-between animate-slideUp">
           <div
             onClick={() => onStartWorkout(activeSession.routineIndex || 0)}
             className="cursor-pointer flex-1 pr-3"
           >
             <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-coral-500 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest uppercase text-coral-500">
+              <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
+              <span className="text-[10px] font-black tracking-widest uppercase text-white">
                 SESIÓN EN CURSO
               </span>
             </div>
-            <h3 className="text-base font-extrabold text-white leading-tight">
+            <h3 className="text-base font-black text-white leading-tight">
               {routines[activeSession.routineIndex]?.title || 'Torso — Banca & Inclinado'}
             </h3>
-            <p className="text-xs text-[#8E909A] mt-1">
+            <p className="text-xs text-zinc-300 mt-1">
               {completedSetsCount} series completadas • Toca para continuar
             </p>
           </div>
@@ -226,10 +212,10 @@ export function HomeHub({
             <button
               type="button"
               onClick={() => onStartWorkout(activeSession.routineIndex || 0)}
-              className="px-4 py-2 rounded-full bg-coral-500 hover:bg-coral-600 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer touch-press"
+              className="px-4 py-2 rounded-full bg-white text-black hover:bg-zinc-200 text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer touch-press shadow-lg shadow-white/20"
             >
               <span>Continuar</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 text-black" />
             </button>
 
             {onDiscardActiveSession && (
@@ -241,7 +227,7 @@ export function HomeHub({
                     onDiscardActiveSession()
                   }
                 }}
-                className="p-2 rounded-full bg-[#2C2D34] text-[#8E909A] hover:text-rose-400 transition-colors touch-press"
+                className="p-2 rounded-full bg-[#2C2D34] text-zinc-300 hover:text-rose-400 transition-colors touch-press"
                 title="Descartar sesión no guardada"
               >
                 <Trash2 className="w-4 h-4" />
@@ -251,48 +237,49 @@ export function HomeHub({
         </div>
       )}
 
-      {/* 1. VISTA PRINCIPAL: EXACTAMENTE COMO EN LA CAPTURA */}
+      {/* 1. VISTA: WORKOUTS (Con Blanco Protagonista de Alto Contraste) */}
       {activeSegment === 'workouts' && (
         <div className="space-y-3.5">
-          {/* Fila 1: Dos tarjetas cuadradas idénticas a la captura */}
+          {/* Fila 1: Dos Tarjetas con Blanco Brillante */}
           <div className="grid grid-cols-2 gap-3.5">
-            {/* Tarjeta 1 (Izquierda): Rutina 1 (Chest + tricep / Torso) */}
+            {/* Tarjeta 1 (Izquierda): Rutina 1 (Chest + tricep) */}
             <div
               onClick={() => onStartWorkout(0)}
-              className="rounded-[28px] bg-[#212227] p-5 flex flex-col justify-between min-h-[165px] transition-transform active:scale-[0.98] cursor-pointer group shadow-lg"
+              className="rounded-[28px] bg-[#212227] p-5 sm:p-6 flex flex-col justify-between min-h-[175px] transition-transform active:scale-[0.98] cursor-pointer group shadow-xl"
             >
               <div className="flex items-start justify-between">
-                <ProgressCircle number={1} progress={75} size={48} />
+                <ProgressCircle number={1} progress={75} size={50} />
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation()
                     onViewAllRoutines && onViewAllRoutines()
                   }}
-                  className="text-[#565863] group-hover:text-white transition-colors p-1"
+                  className="text-zinc-400 group-hover:text-white transition-colors p-1"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                 </button>
               </div>
 
-              <div>
-                <h3 className="text-base font-extrabold text-white leading-snug">
+              <div className="mt-3">
+                <h3 className="text-lg font-black text-white leading-tight">
                   Chest + tricep
                 </h3>
-                <p className="text-xs text-[#8E909A] font-medium mt-0.5">
+                <p className="text-xs text-zinc-300 font-semibold mt-1">
                   Ayer • 60kg listo
                 </p>
               </div>
             </div>
 
-            {/* Tarjeta 2 (Derecha): Body weight (Peso corporal) */}
+            {/* Tarjeta 2 (Derecha): Body weight con Número Blanco Masivo */}
             <div
               onClick={onOpenEvolution}
-              className="rounded-[28px] bg-[#212227] p-5 flex flex-col justify-between min-h-[165px] transition-transform active:scale-[0.98] cursor-pointer group shadow-lg"
+              className="rounded-[28px] bg-[#212227] p-5 sm:p-6 flex flex-col justify-between min-h-[175px] transition-transform active:scale-[0.98] cursor-pointer group shadow-xl"
             >
               <div className="flex items-start justify-between">
-                <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-none">
-                  {Math.round(bodyweight || 120)} <span className="text-base font-normal text-[#8E909A]">kg</span>
+                <div className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none drop-shadow-[0_2px_8px_rgba(255,255,255,0.2)]">
+                  {Math.round(bodyweight || 120)}
+                  <span className="text-lg font-bold text-white/80 ml-1">kg</span>
                 </div>
                 <button
                   type="button"
@@ -300,40 +287,40 @@ export function HomeHub({
                     e.stopPropagation()
                     onOpenEvolution && onOpenEvolution()
                   }}
-                  className="text-[#565863] group-hover:text-white transition-colors p-1"
+                  className="text-zinc-400 group-hover:text-white transition-colors p-1"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                 </button>
               </div>
 
-              <div>
-                <h3 className="text-base font-extrabold text-white leading-snug">
+              <div className="mt-3">
+                <h3 className="text-lg font-black text-white leading-tight">
                   Body weight
                 </h3>
-                <p className="text-xs text-[#8E909A] font-medium mt-0.5">
+                <p className="text-xs text-zinc-300 font-semibold mt-1">
                   Hoy en ayunas
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Fila 2: Tarjeta Ancha Central con Matriz de Puntos y Rutina 2 */}
-          <div className="rounded-[28px] bg-[#212227] p-6 space-y-5 shadow-lg">
+          {/* Fila 2: Tarjeta Central con Matriz de Puntos Blancos y Rutina 2 */}
+          <div className="rounded-[28px] bg-[#212227] p-6 space-y-5 shadow-xl">
             {/* Matriz de Puntos de Actividad Jan / Feb / Mar */}
             <DotMatrixHeatmap />
 
             {/* Sección Inferior: Rutina 2 (Back + bicep + legs) */}
             <div
               onClick={() => onStartWorkout(1)}
-              className="pt-4 border-t border-[#2C2D34]/80 flex items-center justify-between cursor-pointer group transition-transform active:scale-[0.99]"
+              className="pt-4 border-t border-[#2C2D34] flex items-center justify-between cursor-pointer group transition-transform active:scale-[0.99]"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <ProgressCircle number={2} progress={35} size={44} />
+                <ProgressCircle number={2} progress={35} size={46} />
                 <div className="min-w-0">
-                  <h3 className="text-base font-extrabold text-white leading-snug truncate">
+                  <h3 className="text-base sm:text-lg font-black text-white leading-tight truncate">
                     Back + bicep + legs
                   </h3>
-                  <p className="text-xs text-[#8E909A] font-medium mt-0.5 truncate">
+                  <p className="text-xs text-zinc-300 font-semibold mt-1 truncate">
                     Mondays • Pierna & PM
                   </p>
                 </div>
@@ -341,7 +328,7 @@ export function HomeHub({
 
               <button
                 type="button"
-                className="text-[#565863] group-hover:text-white transition-colors p-2 flex-shrink-0"
+                className="text-zinc-400 group-hover:text-white transition-colors p-2 flex-shrink-0"
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
@@ -351,103 +338,118 @@ export function HomeHub({
           {/* Fila 3: Tarjeta Horizontal de Volumen Levantado */}
           <div
             onClick={onOpenEvolution}
-            className="rounded-[24px] bg-[#212227] p-5 flex items-center justify-between transition-transform active:scale-[0.99] cursor-pointer group shadow-lg"
+            className="rounded-[24px] bg-[#212227] p-5 sm:p-6 flex items-center justify-between transition-transform active:scale-[0.99] cursor-pointer group shadow-xl"
           >
             <div>
-              <h4 className="text-sm font-extrabold text-white leading-snug">
+              <h4 className="text-base font-black text-white leading-tight">
                 Volume lifted
               </h4>
-              <p className="text-xs text-[#8E909A] font-medium mt-0.5">
+              <p className="text-xs text-zinc-300 font-semibold mt-0.5">
                 Last 7 days • 15 series
               </p>
             </div>
 
             <div className="flex items-center">
-              <span className="text-2xl font-extrabold text-white tracking-tight">
-                {displayVolume.toLocaleString()} <span className="text-sm font-normal text-[#8E909A]">kg</span>
+              <span className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-[0_2px_8px_rgba(255,255,255,0.2)]">
+                {displayVolume.toLocaleString()}
+                <span className="text-sm font-bold text-white/80 ml-1">kg</span>
               </span>
-              <SlidersHorizontal className="w-4 h-4 text-[#565863] group-hover:text-white transition-colors ml-3.5" />
+              <SlidersHorizontal className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors ml-3.5" />
             </div>
           </div>
 
-          {/* Fila 4: Tarjeta de Añadir Rutina / Entrenamiento (+) de la captura */}
+          {/* Fila 4: Tarjeta de Añadir Rutina con Botón Blanco Protagonista */}
           <div
             onClick={() => (onViewAllRoutines ? onViewAllRoutines() : onStartWorkout(0))}
-            className="rounded-[28px] bg-[#212227] p-8 flex items-center justify-center text-[#565863] hover:text-white transition-all cursor-pointer active:scale-[0.98] shadow-lg group"
+            className="rounded-[28px] bg-[#212227] p-6 flex items-center justify-center transition-all cursor-pointer active:scale-[0.98] shadow-xl group hover:bg-[#272830]"
             title="Añadir nuevo entrenamiento o rutina"
           >
-            <Plus className="w-8 h-8 stroke-[2] group-hover:scale-110 transition-transform" />
+            <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg shadow-white/20 group-hover:scale-110 transition-transform">
+              <Plus className="w-6 h-6 stroke-[3]" />
+            </div>
           </div>
         </div>
       )}
 
-      {/* 2. VISTA: Recuperación Muscular (Integrada con el mismo estilo matte oscuro) */}
+      {/* 2. VISTA: Recuperación Muscular (Con Blanco Protagonista) */}
       {activeSegment === 'recovery' && (
         <div className="space-y-4 animate-fadeIn">
-          <div className="rounded-[28px] bg-[#212227] p-6 space-y-6 shadow-lg">
+          <div className="rounded-[28px] bg-[#212227] p-6 space-y-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
-                <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 w-max mb-2">
-                  <Moon className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="px-3.5 py-1 rounded-full bg-white text-black font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 w-max mb-2 shadow-md shadow-white/10">
+                  <Moon className="w-3.5 h-3.5 text-black" />
                   <span>HOY: DESCANSO ACTIVO</span>
                 </span>
-                <h2 className="text-2xl font-extrabold text-white leading-tight">
+                <h2 className="text-2xl font-black text-white leading-tight">
                   Recuperación Muscular
                 </h2>
               </div>
 
-              <div className="w-11 h-11 rounded-2xl bg-[#2C2D34] text-emerald-400 flex items-center justify-center flex-shrink-0">
-                <ShieldCheck className="w-6 h-6 text-emerald-400" />
+              <div className="w-11 h-11 rounded-2xl bg-white text-black flex items-center justify-center flex-shrink-0 shadow-lg shadow-white/20">
+                <ShieldCheck className="w-6 h-6 text-black stroke-[2.5]" />
               </div>
             </div>
 
-            {/* Dashboard Visual de Recuperación */}
-            <div className="space-y-3.5 bg-[#1A1B20] p-4 rounded-2xl">
-              <span className="text-[10px] font-black text-[#8E909A] uppercase tracking-widest block mb-2">
+            {/* Dashboard Visual de Recuperación con Barras Vibrantes */}
+            <div className="space-y-4 bg-[#1A1B20] p-5 rounded-2xl">
+              <span className="text-[10px] font-black text-zinc-300 uppercase tracking-widest block">
                 ESTADO POR GRUPO MUSCULAR
               </span>
 
               {/* Pecho: 45% */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-zinc-200">Pectoral (Banca & Inclinado)</span>
-                  <span className="text-[11px] font-mono font-black text-amber-400">45% • Reparando</span>
+                  <span className="font-bold text-white">Pectoral (Banca & Inclinado)</span>
+                  <span className="text-xs font-mono font-black text-white">45% • Reparando</span>
                 </div>
-                <div className="h-2 w-full bg-[#2C2D34] rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-400 rounded-full" style={{ width: '45%' }} />
+                <div className="h-2.5 w-full bg-[#2C2D34] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                    style={{ width: '45%' }}
+                  />
                 </div>
               </div>
 
               {/* Espalda: 55% */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-zinc-200">Dorsales & Espalda (Remo)</span>
-                  <span className="text-[11px] font-mono font-black text-amber-400">55% • Supercompensando</span>
+                  <span className="font-bold text-white">Dorsales & Espalda (Remo)</span>
+                  <span className="text-xs font-mono font-black text-white">55% • Supercompensando</span>
                 </div>
-                <div className="h-2 w-full bg-[#2C2D34] rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-400 rounded-full" style={{ width: '55%' }} />
+                <div className="h-2.5 w-full bg-[#2C2D34] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                    style={{ width: '55%' }}
+                  />
                 </div>
               </div>
 
               {/* Brazos: 60% */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-zinc-200">Tríceps & Bíceps (Brazos)</span>
-                  <span className="text-[11px] font-mono font-black text-yellow-400">60% • Síntesis Activa</span>
+                  <span className="font-bold text-white">Tríceps & Bíceps (Brazos)</span>
+                  <span className="text-xs font-mono font-black text-white">60% • Síntesis Activa</span>
                 </div>
-                <div className="h-2 w-full bg-[#2C2D34] rounded-full overflow-hidden">
-                  <div className="h-full bg-yellow-400 rounded-full" style={{ width: '60%' }} />
+                <div className="h-2.5 w-full bg-[#2C2D34] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                    style={{ width: '60%' }}
+                  />
                 </div>
               </div>
 
               {/* Piernas & Core: 100% */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-zinc-200">Piernas & Core (Sentadilla & PM)</span>
-                  <span className="text-[11px] font-mono font-black text-emerald-400">100% • Fresco & Listo</span>
+                  <span className="font-bold text-white">Piernas & Core (Sentadilla & PM)</span>
+                  <span className="text-xs font-mono font-black text-white">100% • Fresco & Listo</span>
                 </div>
-                <div className="h-2 w-full bg-[#2C2D34] rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-400 rounded-full" style={{ width: '100%' }} />
+                <div className="h-2.5 w-full bg-[#2C2D34] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.9)]"
+                    style={{ width: '100%' }}
+                  />
                 </div>
               </div>
             </div>
@@ -455,26 +457,26 @@ export function HomeHub({
             {/* Ficha Comparativa Ayer vs Hoy */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-4 rounded-2xl bg-[#1A1B20] space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8E909A]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                   Ayer: Ejercicio
                 </span>
-                <div className="text-xl font-extrabold text-white">
-                  6.420 <span className="text-xs text-[#8E909A] font-normal">kg</span>
+                <div className="text-2xl font-black text-white">
+                  6.420 <span className="text-xs text-white/70 font-normal">kg</span>
                 </div>
-                <span className="text-[10px] text-emerald-400 font-bold block pt-1">
-                  Sobrecarga completada
+                <span className="text-[11px] text-white font-bold block pt-1">
+                  15 series completadas
                 </span>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#1A1B20] space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8E909A]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                   Hoy: Descanso
                 </span>
-                <div className="text-xl font-extrabold text-emerald-400">
+                <div className="text-2xl font-black text-white">
                   Síntesis
                 </div>
-                <span className="text-[10px] text-emerald-400 font-bold block pt-1">
-                  +50 XP Racha blindada
+                <span className="text-[11px] text-white font-bold block pt-1">
+                  +50 XP Racha protegida
                 </span>
               </div>
             </div>

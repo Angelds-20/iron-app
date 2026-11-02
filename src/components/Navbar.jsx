@@ -20,15 +20,18 @@ export function Navbar({ activeTab = 'home', onSelectTab }) {
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id)}
-              className={`p-3 rounded-2xl transition-all duration-200 flex items-center justify-center cursor-pointer touch-press ${
+              className={`p-2.5 rounded-2xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer touch-press ${
                 isActive
-                  ? 'text-white scale-110'
-                  : 'text-[#565863] hover:text-[#8E909A]'
+                  ? 'text-white scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]'
+                  : 'text-zinc-500 hover:text-white'
               }`}
               title={tab.label}
               aria-label={tab.label}
             >
               <Icon className="w-6 h-6 stroke-[2.2]" />
+              {isActive && (
+                <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)] mt-1 animate-pulse" />
+              )}
             </button>
           )
         })}
