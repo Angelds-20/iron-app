@@ -61,7 +61,16 @@ export function WorkoutLogger({
 
   useEffect(() => {
     setDynamicExercises(currentRoutine.exercises)
-  }, [selectedRoutineIndex])
+  }, [selectedRoutineIndex, currentRoutine])
+
+  useEffect(() => {
+    if (initialRoutineIndex !== undefined && initialRoutineIndex !== selectedRoutineIndex) {
+      const saved = getActiveSession() || activeSession
+      if (!saved?.isActive) {
+        handleSwitchRoutine(initialRoutineIndex)
+      }
+    }
+  }, [initialRoutineIndex])
 
   // 2. Restaurar o inicializar series (CERO pérdida de peso ni de series)
   const [exerciseData, setExerciseData] = useState(() => {
@@ -212,16 +221,24 @@ export function WorkoutLogger({
   }
 
   const handleSwitchRoutine = (idx) => {
+    if (!routines[idx]) return
     setSelectedRoutineIndex(idx)
     const newRoutine = routines[idx]
     const newExData = {}
     newRoutine.exercises.forEach((ex) => {
-      newExData[ex.id] = [
-        { setNumber: 1, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
-        { setNumber: 2, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
-        { setNumber: 3, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false }
-      ]
+      const rememberedWeight = lastWeights[ex.id] || ex.defaultWeight || 20
+      const targetSetsCount = ex.targetSets || 3
+      const targetRepsNum = parseInt(ex.targetReps) || 10
+      const targetRirVal = ex.defaultRir !== undefined ? ex.defaultRir : 2
+      newExData[ex.id] = Array.from({ length: targetSetsCount }, (_, i) => ({
+        setNumber: i + 1,
+        weight: rememberedWeight,
+        reps: targetRepsNum,
+        rir: targetRirVal,
+        completed: false
+      }))
     })
+    setDynamicExercises(newRoutine.exercises)
     setExerciseData(newExData)
   }
 
@@ -418,18 +435,18 @@ export function WorkoutLogger({
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-full border border-sand-200/80 w-full shadow-xs">
-          {routines.slice(0, 2).map((rot, idx) => (
+        <div className="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 bg-white p-1 rounded-full border border-sand-200/80 shadow-xs">
+          {routines.map((rot, idx) => (
             <button
-              key={rot.id}
+              key={rot.id || idx}
               onClick={() => handleSwitchRoutine(idx)}
-              className={`py-2 text-xs font-bold rounded-full transition-all ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap flex-shrink-0 cursor-pointer ${
                 selectedRoutineIndex === idx
                   ? 'bg-carbon-900 text-white shadow-xs'
                   : 'text-neutral-500 hover:text-carbon-900'
               }`}
             >
-              {rot.category === 'torso' ? 'Torso (Banca)' : 'Pierna (Sentadilla)'}
+              {rot.title.split('—')[0].trim()}
             </button>
           ))}
         </div>

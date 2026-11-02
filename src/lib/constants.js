@@ -6,6 +6,227 @@
 
 export const APP_VERSION = 'v1.4.0'
 
+export const MUSCLE_SPLITS = [
+  { id: 'all', label: 'Todas' },
+  { id: 'torso', label: 'Torso' },
+  { id: 'pierna', label: 'Pierna' },
+  { id: 'push', label: 'Empuje (Push)' },
+  { id: 'pull', label: 'Tirón (Pull)' },
+  { id: 'fullbody', label: 'Fullbody' }
+]
+
+export const EXERCISES_CATALOG = [
+  // Pecho
+  {
+    id: 'bench-press',
+    name: 'Press de banca plano',
+    category: 'pecho',
+    equipment: 'Barra principal (60 kg) + Banco',
+    defaultWeight: 60,
+    targetSets: 4,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Pausa de 1 segundo en el pecho. Escápulas retraídas.'
+  },
+  {
+    id: 'incline-bench-press',
+    name: 'Press inclinado',
+    category: 'pecho',
+    equipment: 'Barra principal (60 kg) + Banco',
+    defaultWeight: 40,
+    targetSets: 4,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Inclinación de 30° - 45°. Foco en haz clavicular.'
+  },
+  {
+    id: 'pushups',
+    name: 'Flexiones / Lastradas',
+    category: 'pecho',
+    equipment: 'Corporal / Disco',
+    defaultWeight: 0,
+    targetSets: 3,
+    targetReps: '12 - 15',
+    defaultRir: 2,
+    notes: 'Rango completo tocando el suelo.'
+  },
+  {
+    id: 'bench-dips',
+    name: 'Fondos en banco',
+    category: 'pecho',
+    equipment: 'Banco de patio',
+    defaultWeight: 0,
+    targetSets: 3,
+    targetReps: '12 - 15',
+    defaultRir: 2,
+    notes: 'Codos hacia atrás sin hiperextender hombros.'
+  },
+
+  // Espalda
+  {
+    id: 'barbell-row',
+    name: 'Remo con barra',
+    category: 'espalda',
+    equipment: 'Barra principal (60 kg)',
+    defaultWeight: 40,
+    targetSets: 4,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Torso a 45°. Tracción hacia la cadera para proteger hombros.'
+  },
+  {
+    id: 'deadlift',
+    name: 'Peso muerto convencional',
+    category: 'espalda',
+    equipment: 'Barra (60 kg) desde el suelo',
+    defaultWeight: 60,
+    targetSets: 4,
+    targetReps: '6 - 8',
+    defaultRir: 2,
+    notes: 'Barra pegada a tibias, empuje de suelo con piernas.'
+  },
+  {
+    id: 'romanian-deadlift',
+    name: 'Peso muerto rumano',
+    category: 'espalda',
+    equipment: 'Barra principal (60 kg)',
+    defaultWeight: 45,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Bisagra de cadera profunda. Tensión en isquios.'
+  },
+
+  // Pierna
+  {
+    id: 'back-squat',
+    name: 'Sentadilla trasera',
+    category: 'pierna',
+    equipment: 'Barra (60 kg) sacada del banco',
+    defaultWeight: 50,
+    targetSets: 4,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Control total al bajar. RIR 2 obligatorio.'
+  },
+  {
+    id: 'front-squat',
+    name: 'Sentadilla frontal',
+    category: 'pierna',
+    equipment: 'Barra principal',
+    defaultWeight: 40,
+    targetSets: 3,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Codos altos y torso erguido.'
+  },
+  {
+    id: 'lunges',
+    name: 'Zancadas con barra',
+    category: 'pierna',
+    equipment: 'Barra chica / grande',
+    defaultWeight: 20,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Paso largo, rodilla trasera roza el piso.'
+  },
+  {
+    id: 'calf-raises',
+    name: 'Elevación de gemelos',
+    category: 'pierna',
+    equipment: 'Barra principal',
+    defaultWeight: 50,
+    targetSets: 4,
+    targetReps: '15',
+    defaultRir: 2,
+    notes: 'Pausa de 2 seg en estiramiento abajo.'
+  },
+
+  // Hombros
+  {
+    id: 'military-press',
+    name: 'Press militar de pie',
+    category: 'hombros',
+    equipment: 'Barra chica (14 kg) o grande',
+    defaultWeight: 25,
+    targetSets: 4,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Glúteos y abdomen activos. Empuje vertical.'
+  },
+  {
+    id: 'upright-row',
+    name: 'Remo al mentón',
+    category: 'hombros',
+    equipment: 'Barra chica (14 kg)',
+    defaultWeight: 14,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Codos guían el movimiento hacia arriba.'
+  },
+
+  // Bíceps
+  {
+    id: 'biceps-curl',
+    name: 'Curl de bíceps',
+    category: 'biceps',
+    equipment: 'Barra chica (14 kg)',
+    defaultWeight: 14,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Estricto sin balanceo del torso.'
+  },
+  {
+    id: 'preacher-curl',
+    name: 'Curl predicador',
+    category: 'biceps',
+    equipment: 'Barra chica (14 kg) en banco',
+    defaultWeight: 14,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Aislamiento total con brazos apoyados en banco.'
+  },
+  {
+    id: 'hammer-curl',
+    name: 'Curl martillo',
+    category: 'biceps',
+    equipment: 'Mancuernas / Barra chica',
+    defaultWeight: 14,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Agarre neutro. Foco en braquial y antebrazo.'
+  },
+
+  // Tríceps
+  {
+    id: 'french-press',
+    name: 'Press francés',
+    category: 'triceps',
+    equipment: 'Barra chica (14 kg) en banco',
+    defaultWeight: 14,
+    targetSets: 3,
+    targetReps: '10 - 12',
+    defaultRir: 2,
+    notes: 'Codos cerrados apuntando al techo. Bajada controlada a la frente.'
+  },
+  {
+    id: 'close-grip-bench',
+    name: 'Press de banca agarre cerrado',
+    category: 'triceps',
+    equipment: 'Barra principal en banco',
+    defaultWeight: 40,
+    targetSets: 3,
+    targetReps: '8 - 10',
+    defaultRir: 2,
+    notes: 'Manos al ancho de hombros, codos pegados al torso.'
+  }
+]
+
 export const DEFAULT_ROUTINES = [
   {
     id: 'torso-fuerza',

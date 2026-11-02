@@ -1,12 +1,14 @@
 import React from 'react'
-import { Dumbbell, ArrowRight, Flame, Watch, Play, Clock, Sparkles, Trash2 } from 'lucide-react'
+import { Dumbbell, ArrowRight, Flame, Watch, Play, Clock, Sparkles, Trash2, ChevronRight, Layers } from 'lucide-react'
 
 export function ActionCards({
   onStartWorkout,
   onOpenWatchModal,
   lastWatchData,
   activeSession,
-  onDiscardActiveSession
+  onDiscardActiveSession,
+  routines = [],
+  onViewAllRoutines
 }) {
   // Contar series completadas si hay sesión activa
   const completedSetsCount = activeSession?.exerciseData
@@ -71,66 +73,74 @@ export function ActionCards({
         <span className="text-[11px] font-bold tracking-widest text-neutral-400 uppercase">
           RUTINAS DE PATIO
         </span>
-        <span className="text-[11px] font-semibold text-neutral-400">1-Tap para entrenar</span>
+        {onViewAllRoutines ? (
+          <button
+            type="button"
+            onClick={onViewAllRoutines}
+            className="text-[11px] font-bold text-coral-500 hover:text-coral-600 flex items-center gap-0.5 cursor-pointer"
+          >
+            <span>Ver todas ({routines.length || 2})</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        ) : (
+          <span className="text-[11px] font-semibold text-neutral-400">1-Tap para entrenar</span>
+        )}
       </div>
 
-      {/* Tarjeta 1: Torso (Banca, Inclinado, Remo, Francés, Curl) */}
-      <div
-        onClick={() => onStartWorkout(0)}
-        className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
-      >
-        <div className="flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-sand-100 flex items-center justify-center text-carbon-900 border border-sand-200/60 group-hover:bg-carbon-900 group-hover:text-white transition-colors">
-              <Dumbbell className="w-5 h-5 text-coral-500 group-hover:text-white transition-colors" />
-            </div>
-            <div>
-              <div className="text-[10px] font-extrabold text-coral-500 tracking-wider uppercase">
-                5 EJERCICIOS • 40 MIN
+      {/* Tarjetas dinámicas de rutinas */}
+      {(routines.length > 0 ? routines.slice(0, 2) : [
+        {
+          id: 'torso-fuerza',
+          title: 'Torso — Banca & Inclinado',
+          category: 'torso',
+          estimatedTime: '40 MIN',
+          exercises: [1, 2, 3, 4, 5],
+          description: 'Banca plana, inclinado, remo, francés y curl'
+        },
+        {
+          id: 'pierna-fuerza',
+          title: 'Pierna — Sentadilla & Peso Muerto',
+          category: 'pierna',
+          estimatedTime: '35 MIN',
+          exercises: [1, 2],
+          description: 'Sentadilla desde banco y peso muerto 60 kg'
+        }
+      ]).map((rot, idx) => {
+        const IconComponent = rot.category === 'pierna' ? Flame : Dumbbell
+        const exCount = rot.exercises?.length || 0
+        const timeText = rot.estimatedTime || '40 MIN'
+
+        return (
+          <div
+            key={rot.id || idx}
+            onClick={() => onStartWorkout(idx)}
+            className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
+          >
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-sand-100 flex items-center justify-center text-carbon-900 border border-sand-200/60 group-hover:bg-carbon-900 group-hover:text-white transition-colors">
+                  <IconComponent className="w-5 h-5 text-coral-500 group-hover:text-white transition-colors" />
+                </div>
+                <div>
+                  <div className="text-[10px] font-extrabold text-coral-500 tracking-wider uppercase">
+                    {exCount} EJERCICIOS • {timeText.toUpperCase()}
+                  </div>
+                  <h3 className="text-base font-extrabold text-carbon-900">
+                    {rot.title}
+                  </h3>
+                  <p className="text-[11px] text-neutral-400 mt-0.5 line-clamp-1">
+                    {rot.description || 'Rutina para patio y banco'}
+                  </p>
+                </div>
               </div>
-              <h3 className="text-base font-extrabold text-carbon-900">
-                Torso — Banca & Inclinado
-              </h3>
-              <p className="text-[11px] text-neutral-400 mt-0.5">
-                Banca plana, inclinado, remo, francés y curl
-              </p>
-            </div>
-          </div>
 
-          <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-xs">
-            <ArrowRight className="w-4 h-4" />
-          </div>
-        </div>
-      </div>
-
-      {/* Tarjeta 2: Pierna (Sentadilla & Peso Muerto) */}
-      <div
-        onClick={() => onStartWorkout(1)}
-        className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 cursor-pointer active:scale-[0.98] transition-all hover:border-carbon-900 group relative overflow-hidden"
-      >
-        <div className="flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-sand-100 flex items-center justify-center text-carbon-900 border border-sand-200/60 group-hover:bg-carbon-900 group-hover:text-white transition-colors">
-              <Flame className="w-5 h-5 text-coral-500 group-hover:text-white transition-colors" />
-            </div>
-            <div>
-              <div className="text-[10px] font-extrabold text-coral-500 tracking-wider uppercase">
-                2 EJERCICIOS • 35 MIN
+              <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-xs">
+                <ArrowRight className="w-4 h-4" />
               </div>
-              <h3 className="text-base font-extrabold text-carbon-900">
-                Pierna — Sentadilla & Peso Muerto
-              </h3>
-              <p className="text-[11px] text-neutral-400 mt-0.5">
-                Sentadilla desde banco y peso muerto 60 kg
-              </p>
             </div>
           </div>
-
-          <div className="w-9 h-9 rounded-full bg-carbon-900 text-white flex items-center justify-center flex-shrink-0 group-hover:bg-coral-500 transition-colors shadow-xs">
-            <ArrowRight className="w-4 h-4" />
-          </div>
-        </div>
-      </div>
+        )
+      })}
 
       {/* Tarjeta Honor Choice Watch 2i compacta */}
       <div className="bg-white rounded-2xl p-4 shadow-xs border border-sand-200/60 flex items-center justify-between">

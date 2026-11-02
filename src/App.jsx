@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import confetti from 'canvas-confetti'
+import { Trophy } from 'lucide-react'
 import { Header } from './components/Header'
 import { WeekStrip } from './components/WeekStrip'
 import { BodyweightCard } from './components/BodyweightCard'
@@ -7,6 +8,8 @@ import { SessionMetricsCard } from './components/SessionMetricsCard'
 import { ActionCards } from './components/ActionCards'
 import { Navbar } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
+import { RoutinesView } from './components/RoutinesView'
+import { RoutineEditorModal } from './components/RoutineEditorModal'
 import { WatchView } from './components/WatchView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
@@ -27,6 +30,8 @@ export default function App() {
   const [activeRoutineIndex, setActiveRoutineIndex] = useState(0)
   const [isWatchModalOpen, setIsWatchModalOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isRoutineEditorOpen, setIsRoutineEditorOpen] = useState(false)
+  const [editingRoutine, setEditingRoutine] = useState(null)
   const [userSession, setUserSession] = useState(null)
 
   // Cargar sesión de usuario permanente (Supabase Auth)
@@ -267,11 +272,50 @@ export default function App() {
     localStorage.setItem('honor_watch_data', JSON.stringify(watchData))
   }, [watchData])
 
-  const handleAddNewRoutine = (newRoutine) => {
-    setAllRoutines((prev) => [...prev, newRoutine])
-    const savedCustom = localStorage.getItem('user_custom_routines')
-    const customList = savedCustom ? JSON.parse(savedCustom) : []
-    localStorage.setItem('user_custom_routines', JSON.stringify([...customList, newRoutine]))
+  const handleSaveRoutine = (routineData) => {
+    setAllRoutines((prev) => {
+      const existingIdx = prev.findIndex((r) => r.id === routineData.id)
+      let updated
+      if (existingIdx >= 0) {
+        updated = [...prev]
+        updated[existingIdx] = routineData
+      } else {
+        updated = [...prev, routineData]
+      }
+      const customOnly = updated.filter((r) => r.isCustom)
+      localStorage.setItem('user_custom_routines', JSON.stringify(customOnly))
+      return updated
+    })
+  }
+
+  const handleDeleteRoutine = (routineId) => {
+    setAllRoutines((prev) => {
+      const updated = prev.filter((r) => r.id !== routineId)
+      const customOnly = updated.filter((r) => r.isCustom)
+      localStorage.setItem('user_custom_routines', JSON.stringify(customOnly))
+      return updated
+    })
+  }
+
+  const handleDuplicateRoutine = (routine) => {
+    const duplicated = {
+      ...routine,
+      id: `routine-custom-${Date.now()}`,
+      title: `${routine.title} (Copia)`,
+      isCustom: true,
+      updatedAt: new Date().toISOString()
+    }
+    handleSaveRoutine(duplicated)
+  }
+
+  const handleOpenCreateRoutine = () => {
+    setEditingRoutine(null)
+    setIsRoutineEditorOpen(true)
+  }
+
+  const handleOpenEditRoutine = (routine) => {
+    setEditingRoutine(routine)
+    setIsRoutineEditorOpen(true)
   }
 
   // Marcar día de descanso (+50 XP y racha protegida)
@@ -444,6 +488,31 @@ export default function App() {
               lastWatchData={watchData}
               activeSession={activeWorkoutSession}
               onDiscardActiveSession={handleClearActiveSession}
+              routines={allRoutines}
+              onViewAllRoutines={() => setActiveTab('routines')}
+            />
+          </div>
+        )}
+
+        {/* Gestor y Constructor de Rutinas */}
+        {activeTab === 'routines' && (
+          <div>
+            <Header
+              title="Rutinas"
+              streak={Math.max(1, completedDates.length + restDates.length)}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
+            <RoutinesView
+              routines={allRoutines}
+              onStartRoutine={(idx) => {
+                setActiveRoutineIndex(idx)
+                setActiveTab('workout')
+              }}
+              onCreateRoutine={handleOpenCreateRoutine}
+              onEditRoutine={handleOpenEditRoutine}
+              onDuplicateRoutine={handleDuplicateRoutine}
+              onDeleteRoutine={handleDeleteRoutine}
             />
           </div>
         )}
@@ -455,7 +524,7 @@ export default function App() {
             activeSession={activeWorkoutSession}
             onUpdateActiveSession={handleUpdateActiveSession}
             onClearActiveSession={handleClearActiveSession}
-            onAddNewRoutine={handleAddNewRoutine}
+            onAddNewRoutine={handleSaveRoutine}
             onCompleteWorkout={handleCompleteWorkout}
             onCancel={() => setActiveTab('home')}
             previousHistory={previousExerciseHistory}
@@ -548,6 +617,17 @@ export default function App() {
           onAuthSuccess={(session) => setUserSession(session)}
           onSignOut={handleSignOut}
           currentSession={userSession}
+        />
+
+        {/* Modal de Creación y Edición de Rutinas */}
+        <RoutineEditorModal
+          isOpen={isRoutineEditorOpen}
+          onClose={() => {
+            setIsRoutineEditorOpen(false)
+            setEditingRoutine(null)
+          }}
+          onSaveRoutine={handleSaveRoutine}
+          routineToEdit={editingRoutine}
         />
 
         {/* Temporizador Flotante Global (visible si estás descansando y navegando por otras tabs) */}
