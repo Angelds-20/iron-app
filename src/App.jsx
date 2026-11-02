@@ -814,7 +814,7 @@ export default function App() {
         <Navbar activeTab={activeTab} onSelectTab={setActiveTab} />
 
         {/* Indicador de versión en la esquinita */}
-        <div className="fixed bottom-1 right-2.5 z-40 pointer-events-none text-[9px] font-mono font-bold text-neutral-400/80 tracking-wider">
+        <div className="fixed bottom-1 right-2.5 z-40 pointer-events-none text-[9px] font-mono font-bold text-zinc-500/80 tracking-wider">
           {APP_VERSION}
         </div>
       </div>

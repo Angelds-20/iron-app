@@ -4,7 +4,7 @@
 // - Banco plano / inclinado con soporte
 // - Honor Choice Watch 2i sync
 
-export const APP_VERSION = 'v1.4.0'
+export const APP_VERSION = 'v1.4.3'
 
 export const MUSCLE_SPLITS = [
   { id: 'all', label: 'Todas' },
