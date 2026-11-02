@@ -37,6 +37,11 @@ export default function App() {
     })
   }, [])
 
+  // Auto-scroll al inicio en cada cambio de pestaña (mejora UX móvil)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [activeTab])
+
   // Sesión en curso persistente (sobrevive a cambiar de app o ir a home)
   const [activeWorkoutSession, setActiveWorkoutSession] = useState(() => {
     return getActiveSession()

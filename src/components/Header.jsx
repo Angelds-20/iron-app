@@ -11,11 +11,11 @@ export function Header({
 }) {
   return (
     <header className="flex items-center justify-between pt-1.5 pb-3">
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-black text-carbon-900 tracking-tight">
+      <div className="flex items-center gap-2 min-w-0">
+        <h1 className="text-xl sm:text-2xl font-black text-carbon-900 tracking-tight whitespace-nowrap">
           {title}
         </h1>
-        <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-sand-200/80 text-neutral-600 border border-sand-300/40">
+        <span className="hidden sm:inline-block text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-sand-200/80 text-neutral-600 border border-sand-300/40 flex-shrink-0">
           {APP_VERSION}
         </span>
       </div>
