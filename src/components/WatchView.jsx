@@ -1,11 +1,23 @@
 import React, { useState } from 'react'
-import { Watch, HeartPulse, Flame, Check, Activity, RefreshCw } from 'lucide-react'
+import {
+  Watch,
+  HeartPulse,
+  Flame,
+  Check,
+  Activity,
+  RefreshCw,
+  Copy,
+  ExternalLink,
+  Sparkles,
+  Zap
+} from 'lucide-react'
 
 export function WatchView({ currentData, onSaveData }) {
   const [avgBpm, setAvgBpm] = useState(currentData?.avgBpm || 132)
   const [maxBpm, setMaxBpm] = useState(currentData?.maxBpm || 165)
   const [calories, setCalories] = useState(currentData?.caloriesBurned || 260)
   const [savedSuccess, setSavedSuccess] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   const handleSave = (e) => {
     e.preventDefault()
@@ -25,8 +37,32 @@ export function WatchView({ currentData, onSaveData }) {
     setCalories(presetCal)
   }
 
+  const copyShortcutUrl = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://tu-app.onrender.com'
+    const template = `${origin}/?watchSync=1&avgBpm=PULSO&maxBpm=PICO&cal=CALORIAS`
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(template)
+      setCopiedLink(true)
+      setTimeout(() => setCopiedLink(false), 3000)
+    }
+  }
+
+  const testShortcutSync = () => {
+    onSaveData({
+      avgBpm: 140,
+      maxBpm: 172,
+      caloriesBurned: 285,
+      updatedAt: new Date().toISOString()
+    })
+    setAvgBpm(140)
+    setMaxBpm(172)
+    setCalories(285)
+    setSavedSuccess(true)
+    setTimeout(() => setSavedSuccess(false), 2500)
+  }
+
   return (
-    <div className="space-y-4 pb-20 animate-fadeIn">
+    <div className="space-y-4 pb-24 animate-fadeIn">
       {/* Tarjeta Principal de Pulso */}
       <div className="bg-carbon-900 text-white rounded-3xl p-6 shadow-xl border border-carbon-800">
         <div className="flex items-center justify-between mb-4">
@@ -38,7 +74,7 @@ export function WatchView({ currentData, onSaveData }) {
               <h2 className="text-lg font-black text-white">Honor Choice Watch 2i</h2>
               <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Sincronización manual / Apple Health
+                Sincronización iPhone & Salud
               </span>
             </div>
           </div>
@@ -77,22 +113,81 @@ export function WatchView({ currentData, onSaveData }) {
         </div>
       </div>
 
+      {/* Automatización con Atajos de iOS (Apple Health) */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60">
+        <div className="flex items-center gap-2 mb-2">
+          <Zap className="w-4 h-4 text-coral-500" />
+          <h3 className="text-sm font-black text-carbon-900 uppercase tracking-wider">
+            Conexión con Atajos de iOS
+          </h3>
+        </div>
+        <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
+          Tu Honor Watch escribe en la app <strong>Honor Health</strong> y ésta se refleja en <strong>Apple Health (Salud)</strong>. Con un Atajo de iOS puedes leer Salud y cargar tus BPM en IRON automáticamente con 1 toque.
+        </p>
+
+        {/* Pasos Rápidos */}
+        <div className="p-3.5 rounded-2xl bg-sand-50 border border-sand-200/80 mb-4 space-y-2 text-xs text-neutral-600">
+          <div className="font-bold text-carbon-900 text-[11px] uppercase tracking-wider">
+            Configuración en 3 Pasos:
+          </div>
+          <ol className="list-decimal pl-4 space-y-1 text-[11px] text-neutral-600">
+            <li>
+              En <strong>Honor Health</strong>: Activa compartir datos con <strong>Apple Health (Salud)</strong> en Ajustes.
+            </li>
+            <li>
+              En la app <strong>Atajos de iOS</strong>: Crea un atajo llamado <em>"Sincronizar IRON"</em> con la acción <em>Buscar muestras de Salud (Frecuencia cardíaca)</em> y <em>Abrir URL</em>.
+            </li>
+            <li>
+              Al terminar de entrenar, toca el widget de Atajo o usa el botón de abajo.
+            </li>
+          </ol>
+        </div>
+
+        <div className="space-y-2">
+          <a
+            href="shortcuts://run-shortcut?name=Sincronizar%20IRON"
+            className="w-full py-3 px-4 bg-carbon-900 hover:bg-black text-white text-xs font-bold rounded-2xl transition-all flex items-center justify-between shadow-xs"
+          >
+            <span>Ejecutar Atajo en iPhone ("Sincronizar IRON")</span>
+            <ExternalLink className="w-3.5 h-3.5 text-coral-500" />
+          </a>
+
+          <button
+            type="button"
+            onClick={copyShortcutUrl}
+            className="w-full py-3 px-4 bg-sand-100 hover:bg-sand-200 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
+          >
+            <span>{copiedLink ? '¡Plantilla Copiada al Portapapeles!' : 'Copiar Plantilla de URL para Atajos'}</span>
+            <Copy className="w-3.5 h-3.5 text-neutral-500" />
+          </button>
+
+          <button
+            type="button"
+            onClick={testShortcutSync}
+            className="w-full py-2.5 px-4 bg-sand-50 hover:bg-sand-100 text-neutral-600 text-xs font-semibold rounded-2xl transition-all flex items-center justify-between border border-dashed border-sand-300"
+          >
+            <span>Probar Recepción de Atajo (Simulación en Vivo)</span>
+            <Sparkles className="w-3.5 h-3.5 text-coral-500" />
+          </button>
+        </div>
+      </div>
+
       {/* Formulario de Registro Real */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60">
         <div className="flex items-center gap-2 mb-2">
           <Activity className="w-4 h-4 text-coral-500" />
           <h3 className="text-sm font-black text-carbon-900 uppercase tracking-wider">
-            Registrar Datos Reales del Reloj
+            Ingreso Manual Directo
           </h3>
         </div>
         <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
-          Mira tu reloj al terminar el entreno e ingresa tus valores reales para que el cálculo de sobrecarga progresiva y esfuerzo cardíaco sean 100% exactos.
+          Si prefieres registrarlo directamente al terminar tu rutina de patio:
         </p>
 
         {/* Atajos rápidos por tipo de sesión */}
         <div className="mb-4">
           <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5">
-            Atajos Rápidos:
+            Atajos Rápidos de Fuerza:
           </div>
           <div className="flex flex-wrap gap-2">
             <button
@@ -186,7 +281,7 @@ export function WatchView({ currentData, onSaveData }) {
                 <span>¡Métricas Reales Guardadas!</span>
               </>
             ) : (
-              <span>Actualizar Métricas en IRON</span>
+              <span>Guardar en IRON</span>
             )}
           </button>
         </form>

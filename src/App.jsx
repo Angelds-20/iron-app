@@ -41,6 +41,39 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [activeTab])
 
+  // Sincronización automática vía Atajos de Apple (iOS Shortcuts Deep Link)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('watchSync') === '1' || params.has('avgBpm') || params.has('bpm')) {
+      const avg = Number(params.get('avgBpm') || params.get('bpm'))
+      const max = Number(params.get('maxBpm') || params.get('max'))
+      const cal = Number(params.get('cal') || params.get('calories') || params.get('kcal'))
+
+      if (avg > 0 || cal > 0) {
+        const syncedData = {
+          avgBpm: avg || 132,
+          maxBpm: max || (avg ? avg + 28 : 165),
+          caloriesBurned: cal || 260,
+          updatedAt: new Date().toISOString()
+        }
+        setWatchData(syncedData)
+        localStorage.setItem('honor_watch_data', JSON.stringify(syncedData))
+
+        confetti({
+          particleCount: 50,
+          spread: 70,
+          origin: { y: 0.7 }
+        })
+
+        setActiveTab('watch')
+
+        const cleanUrl = window.location.pathname + window.location.hash
+        window.history.replaceState({}, document.title, cleanUrl)
+      }
+    }
+  }, [])
+
   // Sesión en curso persistente (auto-descarta si tiene más de 3 horas para evitar sesiones fantasma)
   const [activeWorkoutSession, setActiveWorkoutSession] = useState(() => {
     const saved = getActiveSession()
