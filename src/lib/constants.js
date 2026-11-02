@@ -100,47 +100,51 @@ export const EXERCISES_CATALOG = [
   // Pierna
   {
     id: 'back-squat',
-    name: 'Sentadilla trasera',
+    name: 'Sentadilla con barra',
     category: 'pierna',
     equipment: 'Barra (60 kg) sacada del banco',
-    defaultWeight: 50,
+    defaultWeight: 60,
     targetSets: 4,
     targetReps: '8 - 10',
     defaultRir: 2,
-    notes: 'Control total al bajar. RIR 2 obligatorio.'
+    restSeconds: 90,
+    notes: 'Stance amplio para fémures largos (194 cm). Control excéntrico en 3s. RIR 2 obligatorio para re-enjaular con seguridad.'
   },
   {
     id: 'front-squat',
     name: 'Sentadilla frontal',
     category: 'pierna',
-    equipment: 'Barra principal',
-    defaultWeight: 40,
+    equipment: 'Barra principal (60 kg)',
+    defaultWeight: 50,
     targetSets: 3,
     targetReps: '8 - 10',
     defaultRir: 2,
-    notes: 'Codos altos y torso erguido.'
+    restSeconds: 90,
+    notes: 'Codos altos y torso erguido. Maniobra de Valsalva activa.'
   },
   {
     id: 'lunges',
-    name: 'Zancadas con barra',
+    name: 'Zancadas con barra chica',
     category: 'pierna',
-    equipment: 'Barra chica / grande',
-    defaultWeight: 20,
+    equipment: 'Barra chica (14 kg)',
+    defaultWeight: 14,
     targetSets: 3,
     targetReps: '10 - 12',
     defaultRir: 2,
-    notes: 'Paso largo, rodilla trasera roza el piso.'
+    restSeconds: 90,
+    notes: 'Paso largo, rodilla trasera a 2 cm del suelo. Foco en glúteo mayor y estabilidad unilateral.'
   },
   {
     id: 'calf-raises',
     name: 'Elevación de gemelos',
     category: 'pierna',
-    equipment: 'Barra principal',
-    defaultWeight: 50,
-    targetSets: 4,
+    equipment: 'Barra principal (60 kg)',
+    defaultWeight: 60,
+    targetSets: 3,
     targetReps: '15',
     defaultRir: 2,
-    notes: 'Pausa de 2 seg en estiramiento abajo.'
+    restSeconds: 90,
+    notes: 'Pausa de 2 seg en estiramiento profundo abajo para anular el tendón de Aquiles y 2 seg arriba en contracción.'
   },
 
   // Hombros
@@ -148,12 +152,13 @@ export const EXERCISES_CATALOG = [
     id: 'military-press',
     name: 'Press militar de pie',
     category: 'hombros',
-    equipment: 'Barra chica (14 kg) o grande',
-    defaultWeight: 25,
+    equipment: 'Barra chica (14 kg)',
+    defaultWeight: 14,
     targetSets: 4,
-    targetReps: '8 - 10',
+    targetReps: '10 - 12',
     defaultRir: 2,
-    notes: 'Glúteos y abdomen activos. Empuje vertical.'
+    restSeconds: 90,
+    notes: 'Glúteos y abdomen activos. Empuje vertical estricto pasando la cabeza al extender.'
   },
   {
     id: 'upright-row',
@@ -162,9 +167,10 @@ export const EXERCISES_CATALOG = [
     equipment: 'Barra chica (14 kg)',
     defaultWeight: 14,
     targetSets: 3,
-    targetReps: '10 - 12',
+    targetReps: '12',
     defaultRir: 2,
-    notes: 'Codos guían el movimiento hacia arriba.'
+    restSeconds: 90,
+    notes: 'Codos guían el movimiento hacia arriba y afuera.'
   },
 
   // Bíceps
@@ -177,7 +183,8 @@ export const EXERCISES_CATALOG = [
     targetSets: 3,
     targetReps: '15',
     defaultRir: 2,
-    notes: '3 series de 15 reps estrictas con barra chica de 14 kg.'
+    restSeconds: 90,
+    notes: '3 series de 15 reps estrictas con barra chica de 14 kg. Bajada de 3s.'
   },
   {
     id: 'preacher-curl',
@@ -188,18 +195,20 @@ export const EXERCISES_CATALOG = [
     targetSets: 3,
     targetReps: '15',
     defaultRir: 2,
+    restSeconds: 90,
     notes: '3 series de 15 reps con aislamiento total en banco.'
   },
   {
     id: 'hammer-curl',
     name: 'Curl martillo',
     category: 'biceps',
-    equipment: 'Mancuernas / Barra chica',
+    equipment: 'Barra chica (14 kg)',
     defaultWeight: 14,
     targetSets: 3,
-    targetReps: '10 - 12',
+    targetReps: '12 - 15',
     defaultRir: 2,
-    notes: 'Agarre neutro. Foco en braquial y antebrazo.'
+    restSeconds: 90,
+    notes: 'Agarre neutro. Foco en braquial y antebrazo con bajada en 3s.'
   },
 
   // Tríceps
@@ -212,18 +221,20 @@ export const EXERCISES_CATALOG = [
     targetSets: 3,
     targetReps: '15',
     defaultRir: 2,
-    notes: '3 series de 15 reps con codos cerrados apuntando al techo.'
+    restSeconds: 90,
+    notes: '3 series de 15 reps con codos cerrados apuntando al techo. Descenso tras la coronilla.'
   },
   {
     id: 'close-grip-bench',
     name: 'Press de banca agarre cerrado',
     category: 'triceps',
-    equipment: 'Barra principal en banco',
-    defaultWeight: 40,
+    equipment: 'Barra principal (60 kg) + Banco',
+    defaultWeight: 60,
     targetSets: 3,
     targetReps: '8 - 10',
     defaultRir: 2,
-    notes: 'Manos al ancho de hombros, codos pegados al torso.'
+    restSeconds: 90,
+    notes: 'Manos al ancho de hombros, codos pegados al torso para aislar tríceps.'
   }
 ]
 
@@ -299,30 +310,122 @@ export const DEFAULT_ROUTINES = [
     id: 'pierna-fuerza',
     title: 'Pierna — Sentadilla & Peso Muerto',
     category: 'pierna',
-    estimatedTime: '40 min',
+    estimatedTime: '45 min',
     intensity: 'Alta',
-    image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
-    description: 'Sentadilla sacada desde soportes del banco y peso muerto con tus 60 kg.',
+    restSeconds: 90,
+    image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=800&q=80',
+    description: 'Sentadilla (60 kg) sacada del banco, Peso muerto (60 kg), Zancadas (14 kg) y Gemelos (60 kg). 1:30 min de descanso.',
     exercises: [
       {
         id: 'back-squat',
-        name: 'Sentadilla',
+        name: 'Sentadilla con barra',
         equipment: 'Barra (60 kg) sacada del banco',
         targetSets: 4,
         targetReps: '8 - 10',
-        defaultWeight: 50,
+        defaultWeight: 60,
         defaultRir: 2,
-        notes: 'Control total al bajar. RIR 2 obligatorio para re-enjaular con seguridad.'
+        restSeconds: 90,
+        notes: 'Stance amplio para fémures largos (194 cm). Control en bajada (3s). RIR 2 obligatorio para re-enjaular con seguridad.'
       },
       {
         id: 'deadlift',
-        name: 'Peso muerto',
+        name: 'Peso muerto con barra',
         equipment: 'Barra (60 kg) desde el suelo',
         targetSets: 4,
-        targetReps: '6 - 8',
+        targetReps: '8',
         defaultWeight: 60,
         defaultRir: 2,
-        notes: 'Tus 60 kg actuales. Barra pegada a tibias, empuje de suelo con piernas.'
+        restSeconds: 90,
+        notes: 'Barra a 2-3 cm de tibias. Empuje de piernas contra el suelo. Bloqueo con glúteos sin arquear lumbares.'
+      },
+      {
+        id: 'lunges',
+        name: 'Zancadas con barra chica',
+        equipment: 'Barra chica (14 kg)',
+        targetSets: 3,
+        targetReps: '10 - 12',
+        defaultWeight: 14,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Paso largo, rodilla trasera a 2 cm del suelo. Foco en glúteo mayor y estabilidad unilateral.'
+      },
+      {
+        id: 'calf-raises',
+        name: 'Elevación de gemelos',
+        equipment: 'Barra principal (60 kg)',
+        targetSets: 3,
+        targetReps: '15',
+        defaultWeight: 60,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Pausa de 2 seg en estiramiento profundo abajo para anular el tendón de Aquiles y 2 seg arriba en contracción.'
+      }
+    ]
+  },
+  {
+    id: 'torso-b-hombros',
+    title: 'Torso B — Hombros & Espalda',
+    category: 'torso',
+    estimatedTime: '42 min',
+    intensity: 'Alta',
+    restSeconds: 90,
+    image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80',
+    description: 'Press militar (14 kg), Remo al pecho (60 kg), Press cerrado (60 kg), Remo al mentón (14 kg) y Curl martillo (14 kg). 1:30 min descanso.',
+    exercises: [
+      {
+        id: 'military-press',
+        name: 'Press militar de pie',
+        equipment: 'Barra chica (14 kg)',
+        targetSets: 4,
+        targetReps: '10 - 12',
+        defaultWeight: 14,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Core y glúteos apretados. Empuje vertical estricto.'
+      },
+      {
+        id: 'barbell-row',
+        name: 'Remo con barra (Remo al pecho)',
+        equipment: 'Barra principal (60 kg)',
+        targetSets: 3,
+        targetReps: '10',
+        defaultWeight: 60,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Torso a 45°. Tirón explosivo a esternón inferior y 1s de contracción escapular.'
+      },
+      {
+        id: 'close-grip-bench',
+        name: 'Press de banca agarre cerrado',
+        equipment: 'Barra principal (60 kg) + Banco',
+        targetSets: 3,
+        targetReps: '8 - 10',
+        defaultWeight: 60,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Agarre al ancho de hombros, codos cerca del tronco para aislar tríceps.'
+      },
+      {
+        id: 'upright-row',
+        name: 'Remo al mentón',
+        equipment: 'Barra chica (14 kg)',
+        targetSets: 3,
+        targetReps: '12',
+        defaultWeight: 14,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Codos liderando el movimiento hacia arriba y afuera.'
+      },
+      {
+        id: 'hammer-curl',
+        name: 'Curl martillo',
+        equipment: 'Barra chica (14 kg)',
+        targetSets: 3,
+        targetReps: '12 - 15',
+        defaultWeight: 14,
+        defaultRir: 2,
+        restSeconds: 90,
+        notes: 'Aislamiento de braquial y antebrazos con bajada en 3s.'
       }
     ]
   }

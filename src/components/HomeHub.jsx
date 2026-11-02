@@ -267,13 +267,16 @@ export function HomeHub({
               </div>
 
               {/* Próximo Entreno & Opción de Entrenar Hoy */}
-              <div className="pt-3 border-t border-sand-200/60 flex items-center justify-between text-xs">
-                <div>
+              <div className="pt-3 border-t border-sand-200/60 flex items-center justify-between text-xs gap-3">
+                <div className="min-w-0">
                   <span className="text-[10px] font-bold text-neutral-400 uppercase block">
                     Próxima Sesión (Mañana)
                   </span>
-                  <span className="font-extrabold text-carbon-900 text-xs">
+                  <span className="font-extrabold text-carbon-900 text-xs block truncate">
                     Pierna — Sentadilla & Peso Muerto
+                  </span>
+                  <span className="text-[10px] text-neutral-400 block truncate">
+                    4 ejercicios • Sentadilla 60kg, PM 60kg, Zancadas 14kg, Gemelos 60kg
                   </span>
                 </div>
 
@@ -281,7 +284,7 @@ export function HomeHub({
                 <button
                   type="button"
                   onClick={() => onStartWorkout(1)}
-                  className="px-3 py-2 rounded-xl bg-sand-100 hover:bg-sand-200 text-carbon-900 font-bold text-[11px] flex items-center gap-1 border border-sand-200/80 transition-all cursor-pointer"
+                  className="px-3 py-2 rounded-xl bg-sand-100 hover:bg-sand-200 text-carbon-900 font-bold text-[11px] flex items-center gap-1 border border-sand-200/80 transition-all cursor-pointer flex-shrink-0"
                   title="Iniciar rutina de pierna hoy"
                 >
                   <span>¿Entrenar hoy?</span>
@@ -452,6 +455,50 @@ export function HomeHub({
                   <ArrowRight className="w-3 h-3 text-coral-500" />
                 </div>
               </div>
+
+              {/* Card 5: Sentadilla */}
+              <div
+                onClick={() => setActiveSegment('technique')}
+                className="w-64 flex-shrink-0 snap-start bg-white rounded-2xl p-4 shadow-xs border border-sand-200/70 cursor-pointer hover:border-carbon-900 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <span className="text-[9px] font-black text-neutral-400 uppercase tracking-wider block mb-1">
+                    SENTADILLA 60 KG
+                  </span>
+                  <h4 className="text-sm font-black text-carbon-900 leading-tight">
+                    Stance Ancho (Puntas 30°)
+                  </h4>
+                  <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
+                    A 194 cm con fémures largos, baja paralelo sin dolor lumbar ni guiño de glúteo.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between mt-3 text-[10px] font-bold text-carbon-900">
+                  <span>Ver biomecánica</span>
+                  <ArrowRight className="w-3 h-3 text-coral-500" />
+                </div>
+              </div>
+
+              {/* Card 6: Peso Muerto */}
+              <div
+                onClick={() => setActiveSegment('technique')}
+                className="w-64 flex-shrink-0 snap-start bg-white rounded-2xl p-4 shadow-xs border border-sand-200/70 cursor-pointer hover:border-carbon-900 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <span className="text-[9px] font-black text-neutral-400 uppercase tracking-wider block mb-1">
+                    PESO MUERTO 60 KG
+                  </span>
+                  <h4 className="text-sm font-black text-carbon-900 leading-tight">
+                    Barra Pegada a Tibias
+                  </h4>
+                  <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
+                    A 2 cm de tibias. Quita la holgura de la barra y empuja el suelo con talones.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between mt-3 text-[10px] font-bold text-carbon-900">
+                  <span>Ver biomecánica</span>
+                  <ArrowRight className="w-3 h-3 text-coral-500" />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -473,23 +520,25 @@ export function HomeHub({
               )}
             </div>
 
-            {routines.slice(1, 2).map((rot, idx) => (
-              <div
-                key={rot.id || idx}
-                onClick={() => onStartWorkout(idx + 1)}
-                className="bg-white rounded-2xl p-3.5 shadow-xs border border-sand-200/70 flex items-center justify-between cursor-pointer hover:border-carbon-900 transition-all group"
-              >
-                <div>
-                  <h4 className="text-xs font-black text-carbon-900 group-hover:text-coral-600 transition-colors">
-                    {rot.title}
-                  </h4>
-                  <span className="text-[10px] text-neutral-400">
-                    {rot.exercises?.length || 2} ejercicios • {rot.estimatedTime || '40 min'}
-                  </span>
+            <div className="space-y-2">
+              {routines.slice(1).map((rot, idx) => (
+                <div
+                  key={rot.id || idx}
+                  onClick={() => onStartWorkout(idx + 1)}
+                  className="bg-white rounded-2xl p-3.5 shadow-xs border border-sand-200/70 flex items-center justify-between cursor-pointer hover:border-carbon-900 transition-all group"
+                >
+                  <div>
+                    <h4 className="text-xs font-black text-carbon-900 group-hover:text-coral-600 transition-colors">
+                      {rot.title}
+                    </h4>
+                    <span className="text-[10px] text-neutral-400">
+                      {rot.exercises?.length || 4} ejercicios • {rot.estimatedTime || '45 min'} • 1:30 descanso
+                    </span>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-carbon-900 group-hover:translate-x-0.5 transition-all" />
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-carbon-900 group-hover:translate-x-0.5 transition-all" />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

@@ -158,6 +158,180 @@ export function ExerciseTechniqueView({ onStartExerciseRoutine = null }) {
         }
       ],
       mistake: 'Tirar la espalda hacia atrás para impulsarse en las últimas 3 repeticiones.'
+    },
+    {
+      id: 'back-squat',
+      title: 'Sentadilla con Barra en Banco',
+      category: 'pierna',
+      equipment: 'Barra 60 kg • Soportes de Banco',
+      muscles: 'Cuádriceps, Glúteo Mayor, Aductores, Abdomen',
+      image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=700&q=80',
+      tempo: '3-1-1-0 (3s bajada lenta, 1s pausa paralela, subida firme)',
+      athleteNote: 'A 194 cm y 120 kg con fémures largos, necesitas un stance algo más ancho que tus hombros y puntas abiertas a 30°. Esto permite que la pelvis baje sin flexión lumbar. Mantén RIR 2 para re-enjaular seguro.',
+      cues: [
+        {
+          title: 'Stance Ancho (Puntas a 30°)',
+          desc: 'Abre los pies más allá del ancho de hombros para que tu fémur largo quepa entre las caderas.'
+        },
+        {
+          title: 'Apertura Forzada de Rodillas',
+          desc: 'Empuja activamente las rodillas hacia afuera en línea con la dirección de los dedos de los pies.'
+        },
+        {
+          title: 'Maniobra de Valsalva (Aire en Abdomen)',
+          desc: 'Inhala hondo inflando el diafragma antes de descender para crear un cinturón de presión intratorácica.'
+        },
+        {
+          title: 'Re-enjaulado Controlado en Soportes',
+          desc: 'Termina erguido, camina hasta chocar ambos postes del soporte del banco y baja la barra.'
+        }
+      ],
+      mistake: 'Rebotar bruscamente en el fondo. A 120 kg corporales más 60 kg de carga, el rebote castiga meniscos; la pausa controlada de 1s hipertrofia y protege.'
+    },
+    {
+      id: 'deadlift',
+      title: 'Peso Muerto con Barra',
+      category: 'pierna',
+      equipment: 'Barra 60 kg • Desde el Suelo',
+      muscles: 'Isquiosurales, Glúteos, Dorsales, Erectores Espinales',
+      image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=700&q=80',
+      tempo: '1-1-2-0 (Tracción firme de suelo, 1s bloqueo de glúteo, 2s bajada)',
+      athleteNote: 'Con 194 cm de altura, la distancia de recorrido es larga. La barra debe colocarse a 2-3 cm de tus tibias. Quita la holgura de la barra antes de despegar empujando el piso.',
+      cues: [
+        {
+          title: 'Barra Pegada a las Tibias',
+          desc: 'Si la barra se separa hacia adelante, el brazo de palanca lesiona la zona lumbar. Mantenla pegada.'
+        },
+        {
+          title: 'Empuje de Suelo con Talones',
+          desc: 'Piensa en alejar el suelo con las piernas, no en levantar la barra con la espalda baja.'
+        },
+        {
+          title: 'Escápulas Sobre la Barra',
+          desc: 'Al posicionarte, los hombros y escápulas deben quedar justo encima o milimétricamente por delante de la barra.'
+        },
+        {
+          title: 'Bloqueo con Glúteo (Sin Hiperextensión)',
+          desc: 'Al llegar arriba, aprieta los glúteos con fuerza hacia adelante. Cero arqueo de columna hacia atrás.'
+        }
+      ],
+      mistake: 'Iniciar el levantamiento con la cadera demasiado baja tipo sentadilla o redondear la espalda dorsal en el despegue.'
+    },
+    {
+      id: 'lunges',
+      title: 'Zancadas con Barra Chica',
+      category: 'pierna',
+      equipment: 'Barra chica 14 kg • Espacio Patio',
+      muscles: 'Cuádriceps, Glúteo Medio, Isquiotibiales',
+      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=700&q=80',
+      tempo: '2-0-1-0 (2s descenso largo, empuje desde el talón delantero)',
+      athleteNote: 'El trabajo unilateral con los 14 kg descarga la compresión axial de la columna vertebral y fortalece los estabilizadores de rodilla y cadera para tus 120 kg.',
+      cues: [
+        {
+          title: 'Paso Amplio a 90°',
+          desc: 'Da un paso largo de modo que la tibia delantera quede vertical y la rodilla forme un ángulo recto.'
+        },
+        {
+          title: 'Rodilla Trasera a 2 cm del Piso',
+          desc: 'Baja en vertical con control sin impactar la rótula contra el suelo del patio.'
+        },
+        {
+          title: 'Torso Levemente Inclinado (10°)',
+          desc: 'Una suave inclinación hacia adelante carga el glúteo mayor y alivia tensión patelar.'
+        },
+        {
+          title: 'Empuje de Talón Delantero',
+          desc: 'Sube impulsando todo el peso desde la planta y el talón del pie adelantado.'
+        }
+      ],
+      mistake: 'Caminar en "cuerda floja". Mantén los pies al ancho de tus caderas para conservar la base de equilibrio.'
+    },
+    {
+      id: 'calf-raises',
+      title: 'Elevación de Gemelos con Barra',
+      category: 'pierna',
+      equipment: 'Barra 60 kg • Sobre Trapecios',
+      muscles: 'Gastrocnemio (Gemelos), Sóleo, Tobillos',
+      image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=700&q=80',
+      tempo: '2-2-1-2 (1s subida en punta, 2s pausa arriba, 2s bajada, 2s estiramiento profundo abajo)',
+      athleteNote: 'Tus gemelos cargan 120 kg todos los días. Para romper su adaptación y hacerlos crecer, la pausa de 2 segundos en el estiramiento profundo abajo anula el tendón elástico.',
+      cues: [
+        {
+          title: 'Pausa de 2 Segundos Abajo',
+          desc: 'Permanece en el punto de máximo estiramiento 2 segundos para anular la energía elástica del tendón de Aquiles.'
+        },
+        {
+          title: 'Subida Sobre el Dedo Gordo',
+          desc: 'Empuja concentrando la presión en el primer metatarsiano para reclutar la cabeza medial del gemelo.'
+        },
+        {
+          title: 'Pausa de 2 Segundos en Contracción Arriba',
+          desc: 'Aprieta al máximo arriba antes de iniciar el descenso controlado.'
+        },
+        {
+          title: 'Rodillas con Microflexión Fija',
+          desc: 'No bloquees las rodillas rígidamente; mantenlas con un mínimo ángulo para transferir la carga al músculo.'
+        }
+      ],
+      mistake: 'Rebotar rápido como resorte. Los gemelos crecen con pausas isométricas estrictas.'
+    },
+    {
+      id: 'military-press',
+      title: 'Press Militar de Pie con Barra Chica',
+      category: 'hombros',
+      equipment: 'Barra chica 14 kg • De Pie',
+      muscles: 'Deltoides Anterior, Lateral, Tríceps, Core',
+      image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=700&q=80',
+      tempo: '2-0-1-0 (Empuje vertical explosivo, 2s descenso a clavículas)',
+      athleteNote: 'A 194 cm, tu palanca de empuje sobre la cabeza es muy alta. Apretar glúteos y abdomen es indispensable para evitar que la pelvis se proyecte hacia adelante.',
+      cues: [
+        {
+          title: 'Base de Piedra (Glúteos & Core)',
+          desc: 'Aprieta glúteos y cuádriceps antes de empujar para convertir tu cuerpo en un pilar sólido.'
+        },
+        {
+          title: 'Paso de la Cabeza',
+          desc: 'Inclina la barbilla levemente hacia atrás al subir la barra y pasa la cabeza hacia adelante al bloquear arriba.'
+        },
+        {
+          title: 'Codos por Delante de la Barra',
+          desc: 'Al descender a la altura de las clavículas, mantén los antebrazos perfectamente verticales.'
+        },
+        {
+          title: 'Bloqueo en Línea con las Orejas',
+          desc: 'Arriba la barra debe quedar exactamente alineada con la coronilla y las orejas.'
+        }
+      ],
+      mistake: 'Arquear la espalda lumbar hacia atrás para convertir el ejercicio en un press de banca inclinado de pie.'
+    },
+    {
+      id: 'close-grip-bench',
+      title: 'Press de Banca Agarre Cerrado',
+      category: 'brazos',
+      equipment: 'Barra 60 kg • Banco Plano',
+      muscles: 'Tríceps (Las 3 Cabezas), Pectoral Medio, Deltoides Anterior',
+      image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=700&q=80',
+      tempo: '3-1-1-0 (3s bajada lenta con codos pegados, subida firme)',
+      athleteNote: 'Excelente ejercicio compuesto para sobrecargar los tríceps con 60 kg de barra. El agarre no debe ser demasiado estrecho para no lesionar las muñecas.',
+      cues: [
+        {
+          title: 'Agarre al Ancho de Hombros',
+          desc: 'Separa las manos al ancho exacto de tus hombros (30-35 cm). Un agarre más cerrado lesiona muñecas.'
+        },
+        {
+          title: 'Codos Pegados a las Costillas',
+          desc: 'Desciende manteniendo los codos a 30° respecto al cuerpo para dirigir todo el estrés a los tríceps.'
+        },
+        {
+          title: 'Toque en el Esternón Inferior',
+          desc: 'Baja la barra un poco más abajo que en el press de banca normal, tocando la parte baja del pecho.'
+        },
+        {
+          title: 'Extensión Completa sin Golpear',
+          desc: 'Empuja y bloquea con la fuerza de los tríceps sin hiperextender bruscamente los codos.'
+        }
+      ],
+      mistake: 'Juntar las manos tocándose los pulgares. Eso destruye las muñecas con 60 kg de carga.'
     }
   ]
 
@@ -179,14 +353,14 @@ export function ExerciseTechniqueView({ onStartExerciseRoutine = null }) {
           </h2>
         </div>
 
-        {/* Filtros de Categoría */}
-        <div className="flex items-center gap-1">
-          {['all', 'pecho', 'espalda', 'brazos'].map((cat) => (
+        {/* Filtros de Categoría con scroll suave */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[200px] sm:max-w-none">
+          {['all', 'pecho', 'espalda', 'pierna', 'brazos', 'hombros'].map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setActiveCategory(cat)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${
                 activeCategory === cat
                   ? 'bg-carbon-900 text-white shadow-2xs'
                   : 'text-neutral-500 hover:text-carbon-900 bg-white border border-sand-200/80'

@@ -72,6 +72,47 @@ export function WorkoutLogger({
     }
   }, [initialRoutineIndex])
 
+  // Helper para calibrar series según perfil del atleta (Angel: 194cm, 120kg, 60kg / 14kg)
+  const buildInitialExerciseSets = (ex) => {
+    const isHeavyBar =
+      ex.id === 'bench-press' ||
+      ex.id === 'incline-bench-press' ||
+      ex.id === 'barbell-row' ||
+      ex.id === 'back-squat' ||
+      ex.id === 'deadlift' ||
+      ex.id === 'calf-raises' ||
+      ex.id === 'close-grip-bench'
+    const rememberedWeight = lastWeights[ex.id] || ex.defaultWeight || (isHeavyBar ? 60 : 14)
+    const targetSetsCount = ex.targetSets || 3
+    const targetRirVal = ex.defaultRir !== undefined ? ex.defaultRir : 2
+
+    return Array.from({ length: targetSetsCount }, (_, i) => {
+      let repVal = 10
+      if (ex.id === 'incline-bench-press') {
+        repVal = i === 2 ? 6 : 10
+      } else if (
+        ex.id === 'french-press' ||
+        ex.id === 'biceps-curl' ||
+        ex.id === 'preacher-curl' ||
+        ex.id === 'calf-raises'
+      ) {
+        repVal = 15
+      } else if (ex.id === 'deadlift') {
+        repVal = 8
+      } else if (ex.targetReps) {
+        const parsed = parseInt(ex.targetReps)
+        if (!isNaN(parsed)) repVal = parsed
+      }
+      return {
+        setNumber: i + 1,
+        weight: rememberedWeight,
+        reps: repVal,
+        rir: targetRirVal,
+        completed: false
+      }
+    })
+  }
+
   // 2. Restaurar o inicializar series (CERO pérdida de peso ni de series)
   const [exerciseData, setExerciseData] = useState(() => {
     const saved = getActiveSession() || activeSession
@@ -80,12 +121,7 @@ export function WorkoutLogger({
     }
     const initial = {}
     currentRoutine.exercises.forEach((ex) => {
-      const rememberedWeight = lastWeights[ex.id] || ex.defaultWeight || (ex.id === 'bench-press' ? 60 : 40)
-      initial[ex.id] = [
-        { setNumber: 1, weight: rememberedWeight, reps: 10, rir: 2, completed: false },
-        { setNumber: 2, weight: rememberedWeight, reps: 10, rir: 2, completed: false },
-        { setNumber: 3, weight: rememberedWeight, reps: 10, rir: 2, completed: false }
-      ]
+      initial[ex.id] = buildInitialExerciseSets(ex)
     })
     return initial
   })
@@ -226,17 +262,7 @@ export function WorkoutLogger({
     const newRoutine = routines[idx]
     const newExData = {}
     newRoutine.exercises.forEach((ex) => {
-      const rememberedWeight = lastWeights[ex.id] || ex.defaultWeight || 20
-      const targetSetsCount = ex.targetSets || 3
-      const targetRepsNum = parseInt(ex.targetReps) || 10
-      const targetRirVal = ex.defaultRir !== undefined ? ex.defaultRir : 2
-      newExData[ex.id] = Array.from({ length: targetSetsCount }, (_, i) => ({
-        setNumber: i + 1,
-        weight: rememberedWeight,
-        reps: targetRepsNum,
-        rir: targetRirVal,
-        completed: false
-      }))
+      newExData[ex.id] = buildInitialExerciseSets(ex)
     })
     setDynamicExercises(newRoutine.exercises)
     setExerciseData(newExData)

@@ -288,10 +288,12 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
     benchPress: Math.max(60, Number(basePRs.benchPress) || 60),
     inclineBench: Math.max(60, Number(basePRs.inclineBench) || 60),
     deadlift: Math.max(60, Number(basePRs.deadlift) || 60),
-    squat: Math.max(50, Number(basePRs.squat) || 50),
+    squat: Math.max(60, Number(basePRs.squat) || 60),
     barbellRow: Math.max(60, Number(basePRs.barbellRow) || 60),
     frenchPress: Math.max(14, Number(basePRs.frenchPress) || 14),
-    bicepsCurl: Math.max(14, Number(basePRs.bicepsCurl) || 14)
+    bicepsCurl: Math.max(14, Number(basePRs.bicepsCurl) || 14),
+    lunges: Math.max(14, Number(basePRs.lunges) || 14),
+    calfRaises: Math.max(60, Number(basePRs.calfRaises) || 60)
   }
 
   // Recorrer el historial para verificar si se batió alguna marca
@@ -305,6 +307,8 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
       if (ex.id === 'barbell-row' && maxInSession > prs.barbellRow) prs.barbellRow = maxInSession
       if (ex.id === 'french-press' && maxInSession > prs.frenchPress) prs.frenchPress = maxInSession
       if (ex.id === 'biceps-curl' && maxInSession > prs.bicepsCurl) prs.bicepsCurl = maxInSession
+      if (ex.id === 'lunges' && maxInSession > prs.lunges) prs.lunges = maxInSession
+      if (ex.id === 'calf-raises' && maxInSession > prs.calfRaises) prs.calfRaises = maxInSession
     })
   })
 
@@ -340,11 +344,31 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
       status: 'Ayer: 3 × 10 @ 60kg'
     },
     {
+      id: 'back-squat',
+      name: 'Sentadilla con Barra',
+      weight: prs.squat,
+      unit: 'kg',
+      targetWeight: 70,
+      equipment: 'Barra sacada de soportes',
+      estimated1RM: calculateEstimated1RM(prs.squat, 10),
+      status: '4 × 10 @ 60kg • RIR 2'
+    },
+    {
+      id: 'deadlift',
+      name: 'Peso Muerto',
+      weight: prs.deadlift,
+      unit: 'kg',
+      targetWeight: 80,
+      equipment: 'Barra (60 kg) desde el suelo',
+      estimated1RM: calculateEstimated1RM(prs.deadlift, 8),
+      status: '4 × 8 @ 60kg'
+    },
+    {
       id: 'french-press',
       name: 'Press Francés',
       weight: prs.frenchPress,
       unit: 'kg',
-      targetWeight: 20,
+      targetWeight: 18,
       equipment: 'Barra chica (14 kg)',
       estimated1RM: calculateEstimated1RM(prs.frenchPress, 15),
       status: 'Ayer: 3 × 15 @ 14kg'
@@ -354,30 +378,20 @@ export function getAuditedPersonalRecords(workoutsHistory = [], basePRs = {}) {
       name: 'Curl de Bíceps',
       weight: prs.bicepsCurl,
       unit: 'kg',
-      targetWeight: 20,
+      targetWeight: 18,
       equipment: 'Barra chica (14 kg)',
       estimated1RM: calculateEstimated1RM(prs.bicepsCurl, 15),
       status: 'Ayer: 3 × 15 @ 14kg'
     },
     {
-      id: 'deadlift',
-      name: 'Peso Muerto',
-      weight: prs.deadlift,
+      id: 'calf-raises',
+      name: 'Elevación de Gemelos',
+      weight: prs.calfRaises,
       unit: 'kg',
-      targetWeight: 100,
-      equipment: 'Barra (60 kg) desde el suelo',
-      estimated1RM: calculateEstimated1RM(prs.deadlift, 8),
-      status: 'Dominio de 60 kg'
-    },
-    {
-      id: 'back-squat',
-      name: 'Sentadilla Trasera',
-      weight: prs.squat,
-      unit: 'kg',
-      targetWeight: 60,
-      equipment: 'Barra sacada de soportes',
-      estimated1RM: calculateEstimated1RM(prs.squat, 10),
-      status: 'RIR 2 estricto'
+      targetWeight: 70,
+      equipment: 'Barra principal (60 kg)',
+      estimated1RM: calculateEstimated1RM(prs.calfRaises, 15),
+      status: '3 × 15 @ 60kg'
     }
   ]
 }
@@ -463,32 +477,50 @@ export function getRealisticProgressionSeed() {
       routineId: 'pierna-fuerza',
       title: 'Pierna — Sentadilla & Peso Muerto',
       category: 'pierna',
-      durationMinutes: 38,
+      durationMinutes: 44,
       completedAt: dMinus4.toISOString(),
-      totalVolume: 2200,
+      totalVolume: 7440,
       maxWeight: 60,
-      completedSetsCount: 8,
+      completedSetsCount: 14,
       restSeconds: 90,
-      watchMetrics: { avgBpm: 142, maxBpm: 172, caloriesBurned: 290 },
+      watchMetrics: { avgBpm: 144, maxBpm: 174, caloriesBurned: 410 },
       exercises: [
         {
           id: 'back-squat',
-          name: 'Sentadilla',
+          name: 'Sentadilla con barra',
           sets: [
-            { setNumber: 1, weight: 50, reps: 10, rir: 2, completed: true },
-            { setNumber: 2, weight: 50, reps: 10, rir: 2, completed: true },
-            { setNumber: 3, weight: 50, reps: 10, rir: 2, completed: true },
-            { setNumber: 4, weight: 50, reps: 10, rir: 2, completed: true }
+            { setNumber: 1, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 60, reps: 10, rir: 2, completed: true },
+            { setNumber: 4, weight: 60, reps: 10, rir: 2, completed: true }
           ]
         },
         {
           id: 'deadlift',
-          name: 'Peso muerto',
+          name: 'Peso muerto con barra',
           sets: [
             { setNumber: 1, weight: 60, reps: 8, rir: 2, completed: true },
             { setNumber: 2, weight: 60, reps: 8, rir: 2, completed: true },
             { setNumber: 3, weight: 60, reps: 8, rir: 2, completed: true },
             { setNumber: 4, weight: 60, reps: 8, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'lunges',
+          name: 'Zancadas con barra chica',
+          sets: [
+            { setNumber: 1, weight: 14, reps: 10, rir: 2, completed: true },
+            { setNumber: 2, weight: 14, reps: 10, rir: 2, completed: true },
+            { setNumber: 3, weight: 14, reps: 10, rir: 2, completed: true }
+          ]
+        },
+        {
+          id: 'calf-raises',
+          name: 'Elevación de gemelos',
+          sets: [
+            { setNumber: 1, weight: 60, reps: 15, rir: 2, completed: true },
+            { setNumber: 2, weight: 60, reps: 15, rir: 2, completed: true },
+            { setNumber: 3, weight: 60, reps: 15, rir: 2, completed: true }
           ]
         }
       ]
