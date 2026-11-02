@@ -20,7 +20,7 @@ export const DEFAULT_ROUTINES = [
         equipment: 'Barra principal (60 kg) + Banco',
         targetSets: 4,
         targetReps: '8 - 10',
-        defaultWeight: 45,
+        defaultWeight: 60,
         defaultRir: 2,
         notes: 'Pausa de 1 segundo en el pecho. Escápulas retraídas.'
       },
@@ -141,6 +141,13 @@ export const BADGES_CATALOG = [
     description: 'Levantaste los 60 kg completos de tu barra.',
     iconName: 'Trophy',
     xpReward: 400
+  },
+  {
+    code: 'VOLUME_2000KG',
+    title: 'Levantador de Toneladas',
+    description: 'Moviste más de 2,000 kg de volumen total en una sesión.',
+    iconName: 'Dumbbell',
+    xpReward: 250
   },
   {
     code: 'FUTURE_100KG_GOAL',

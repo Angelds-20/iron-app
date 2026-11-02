@@ -16,6 +16,13 @@ import {
 import confetti from 'canvas-confetti'
 import { DEFAULT_ROUTINES } from '../lib/constants'
 import { initAudio, playTimerDoneSound } from '../lib/soundEngine'
+import {
+  getActiveSession,
+  saveActiveSession,
+  clearActiveSession,
+  getLastUsedWeights,
+  saveLastUsedWeight
+} from '../lib/workoutStorage'
 
 export function WorkoutLogger({
   routines = DEFAULT_ROUTINES,
@@ -27,27 +34,31 @@ export function WorkoutLogger({
   onCancel,
   previousHistory = {}
 }) {
-  // 1. Restaurar o inicializar índice de rutina
+  // 1. Restaurar o inicializar índice de rutina (Directo de storage)
   const [selectedRoutineIndex, setSelectedRoutineIndex] = useState(() => {
-    if (activeSession?.routineIndex !== undefined) {
-      return activeSession.routineIndex
+    const saved = getActiveSession() || activeSession
+    if (saved && saved.routineIndex !== undefined) {
+      return saved.routineIndex
     }
     return initialRoutineIndex
   })
 
   const currentRoutine = routines[selectedRoutineIndex] || routines[0] || DEFAULT_ROUTINES[0]
+  const lastWeights = getLastUsedWeights()
 
-  // 2. Restaurar o inicializar series (PERMANENTE en localStorage)
+  // 2. Restaurar o inicializar series (CERO pérdida de peso ni de series)
   const [exerciseData, setExerciseData] = useState(() => {
-    if (activeSession?.exerciseData && activeSession.routineIndex === selectedRoutineIndex) {
-      return activeSession.exerciseData
+    const saved = getActiveSession() || activeSession
+    if (saved?.exerciseData && saved.routineIndex === selectedRoutineIndex) {
+      return saved.exerciseData
     }
     const initial = {}
     currentRoutine.exercises.forEach((ex) => {
+      const rememberedWeight = lastWeights[ex.id] || ex.defaultWeight || (ex.id === 'bench-press' ? 60 : 40)
       initial[ex.id] = [
-        { setNumber: 1, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
-        { setNumber: 2, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false },
-        { setNumber: 3, weight: ex.defaultWeight || 45, reps: 10, rir: 2, completed: false }
+        { setNumber: 1, weight: rememberedWeight, reps: 10, rir: 2, completed: false },
+        { setNumber: 2, weight: rememberedWeight, reps: 10, rir: 2, completed: false },
+        { setNumber: 3, weight: rememberedWeight, reps: 10, rir: 2, completed: false }
       ]
     })
     return initial
@@ -55,21 +66,25 @@ export function WorkoutLogger({
 
   // 3. Tiempo de inicio de entrenamiento persistente
   const [workoutStartedAt] = useState(() => {
-    return activeSession?.startedAt || Date.now()
+    const saved = getActiveSession() || activeSession
+    return saved?.startedAt || Date.now()
   })
 
   const [elapsedSeconds, setElapsedSeconds] = useState(() => {
-    return Math.floor((Date.now() - (activeSession?.startedAt || Date.now())) / 1000)
+    const saved = getActiveSession() || activeSession
+    return Math.floor((Date.now() - (saved?.startedAt || Date.now())) / 1000)
   })
 
   // 4. Timer de descanso entre series (Basado en timestamp para sobrevivir a TikTok / background)
   const [restEndsAt, setRestEndsAt] = useState(() => {
-    return activeSession?.restEndsAt || null
+    const saved = getActiveSession() || activeSession
+    return saved?.restEndsAt || null
   })
 
   const [restSeconds, setRestSeconds] = useState(() => {
-    if (activeSession?.restEndsAt) {
-      return Math.max(0, Math.ceil((activeSession.restEndsAt - Date.now()) / 1000))
+    const saved = getActiveSession() || activeSession
+    if (saved?.restEndsAt) {
+      return Math.max(0, Math.ceil((saved.restEndsAt - Date.now()) / 1000))
     }
     return 0
   })
@@ -77,8 +92,15 @@ export function WorkoutLogger({
   const soundPlayedRef = useRef(false)
 
   // 5. Métricas de Honor Choice Watch 2i
-  const [watchBpm, setWatchBpm] = useState(activeSession?.watchBpm || 132)
-  const [watchCalories, setWatchCalories] = useState(activeSession?.watchCalories || 240)
+  const [watchBpm, setWatchBpm] = useState(() => {
+    const saved = getActiveSession() || activeSession
+    return saved?.watchBpm || 132
+  })
+
+  const [watchCalories, setWatchCalories] = useState(() => {
+    const saved = getActiveSession() || activeSession
+    return saved?.watchCalories || 240
+  })
 
   // Manejador para cuando vuelves de TikTok o bloqueas el iPhone (visibilitychange)
   useEffect(() => {
@@ -193,7 +215,25 @@ export function WorkoutLogger({
         ...currentSets[setIdx],
         [field]: value
       }
-      return { ...prev, [exerciseId]: currentSets }
+      const updated = { ...prev, [exerciseId]: currentSets }
+
+      // Persistir peso inmediatamente para que nunca más se resetee
+      if (field === 'weight' && Number(value) > 0) {
+        saveLastUsedWeight(exerciseId, Number(value))
+      }
+
+      saveActiveSession({
+        isActive: true,
+        routineIndex: selectedRoutineIndex,
+        routineId: currentRoutine.id,
+        startedAt: workoutStartedAt,
+        restEndsAt,
+        exerciseData: updated,
+        watchBpm,
+        watchCalories
+      })
+
+      return updated
     })
   }
 
@@ -213,6 +253,10 @@ export function WorkoutLogger({
     const isNowCompleted = !exerciseData[exerciseId][setIdx].completed
     handleUpdateSet(exerciseId, setIdx, 'completed', isNowCompleted)
     if (isNowCompleted) {
+      const setWeight = exerciseData[exerciseId][setIdx].weight
+      if (setWeight && Number(setWeight) > 0) {
+        saveLastUsedWeight(exerciseId, Number(setWeight))
+      }
       startRestTimer(90)
     }
   }
@@ -234,6 +278,7 @@ export function WorkoutLogger({
 
   const handleDiscardSession = () => {
     if (window.confirm('¿Seguro que quieres descartar esta sesión? Se reseteará el progreso actual.')) {
+      clearActiveSession()
       if (onClearActiveSession) {
         onClearActiveSession()
       }
@@ -255,6 +300,8 @@ export function WorkoutLogger({
           totalVolume += w * r
           if (w > maxWeight) maxWeight = w
           completedSetsCount += 1
+          // Guardar el peso alcanzado
+          saveLastUsedWeight(ex.id, w)
         }
       })
       return {
@@ -271,6 +318,7 @@ export function WorkoutLogger({
     })
 
     // Limpiar sesión activa en progreso
+    clearActiveSession()
     if (onClearActiveSession) {
       onClearActiveSession()
     }

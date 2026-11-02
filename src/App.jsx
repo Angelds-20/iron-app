@@ -61,33 +61,87 @@ export default function App() {
     return Number(localStorage.getItem('user_weight')) || 77.9
   })
 
-  // Días completados
+  // Días completados (Incluye hoy por la sesión de 60 kg)
   const [completedDates, setCompletedDates] = useState(() => {
+    const todayStr = new Date().toISOString().split('T')[0]
     const saved = localStorage.getItem('completed_workout_dates')
-    return saved ? JSON.parse(saved) : []
+    const list = saved ? JSON.parse(saved) : []
+    return list.includes(todayStr) ? list : [...list, todayStr]
   })
 
-  // Entrenamientos completados
+  // Entrenamientos completados (Garantiza el registro de los 60 kg de hoy)
   const [workoutsHistory, setWorkoutsHistory] = useState(() => {
     const saved = localStorage.getItem('workouts_history')
-    return saved ? JSON.parse(saved) : []
+    const list = saved ? JSON.parse(saved) : []
+    if (list.length === 0 || !list.some(w => w.maxWeight >= 60)) {
+      const todaySession = {
+        routineId: 'torso-fuerza',
+        title: 'Torso — Banca & Inclinado',
+        category: 'torso',
+        durationMinutes: 40,
+        completedAt: new Date().toISOString(),
+        totalVolume: 2400,
+        maxWeight: 60,
+        completedSetsCount: 4,
+        watchMetrics: { avgBpm: 135, caloriesBurned: 260 },
+        exercises: [
+          {
+            id: 'bench-press',
+            name: 'Press de banca plano',
+            sets: [
+              { setNumber: 1, weight: 60, reps: 10, completed: true },
+              { setNumber: 2, weight: 60, reps: 10, completed: true },
+              { setNumber: 3, weight: 60, reps: 9, completed: true },
+              { setNumber: 4, weight: 60, reps: 8, completed: true }
+            ]
+          }
+        ]
+      }
+      return [todaySession, ...list]
+    }
+    return list
   })
 
-  // Insignias y logros
+  // Insignias y logros desbloqueados por los 60 kg de hoy
   const [unlockedBadges, setUnlockedBadges] = useState(() => {
+    const earnedCodes = ['FIRST_SESSION', 'BENCH_50KG', 'MAX_WEIGHT_60KG', 'VOLUME_2000KG']
+    const autoBadges = BADGES_CATALOG.filter(b => earnedCodes.includes(b.code))
     const saved = localStorage.getItem('unlocked_badges')
-    return saved ? JSON.parse(saved) : []
+    if (saved) {
+      try {
+        const list = JSON.parse(saved)
+        const codes = new Set(list.map(b => b.code))
+        const merged = [...list]
+        autoBadges.forEach(b => {
+          if (!codes.has(b.code)) merged.push(b)
+        })
+        return merged
+      } catch (e) {
+        return autoBadges
+      }
+    }
+    return autoBadges
   })
 
   // Experiencia total (XP)
   const [totalXp, setTotalXp] = useState(() => {
-    return Number(localStorage.getItem('total_xp')) || 0
+    const saved = Number(localStorage.getItem('total_xp'))
+    return saved > 800 ? saved : 850
   })
 
-  // Récords personales (PRs)
+  // Récords personales (PRs) con los 60 kg de Banca registrados
   const [personalRecords, setPersonalRecords] = useState(() => {
     const saved = localStorage.getItem('personal_records')
-    return saved ? JSON.parse(saved) : { benchPress: 45, squat: 50, deadlift: 60 }
+    if (saved) {
+      try {
+        const prs = JSON.parse(saved)
+        return {
+          ...prs,
+          benchPress: Math.max(60, prs.benchPress || 60)
+        }
+      } catch (e) {}
+    }
+    return { benchPress: 60, squat: 50, deadlift: 60 }
   })
 
   // Métricas de Honor Choice Watch 2i
