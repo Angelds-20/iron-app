@@ -93,32 +93,32 @@ export function StatsView({
   )
 
   return (
-    <div className="space-y-4 pb-12 animate-fadeIn">
+    <div className="space-y-4 pb-28 animate-fadeIn text-white">
       {/* Selector Principal de Vista: Fuerza & Cargas vs Físico & Medidas */}
-      <div className="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-full border border-sand-200/80 shadow-xs">
+      <div className="grid grid-cols-2 gap-1.5 bg-[#212227] p-1.5 rounded-full border border-[#2C2D34] shadow-xl">
         <button
           type="button"
           onClick={() => handleSubTabChange('strength')}
-          className={`py-2 text-xs font-black rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`py-2.5 text-xs font-black rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-press ${
             currentSubTab === 'strength'
-              ? 'bg-carbon-900 text-white shadow-xs'
-              : 'text-neutral-500 hover:text-carbon-900'
+              ? 'bg-white text-black shadow-lg font-black'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <Dumbbell className="w-3.5 h-3.5 text-coral-500" />
+          <Dumbbell className="w-3.5 h-3.5" />
           <span>Fuerza & Cargas</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleSubTabChange('body')}
-          className={`py-2 text-xs font-black rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`py-2.5 text-xs font-black rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-press ${
             currentSubTab === 'body'
-              ? 'bg-carbon-900 text-white shadow-xs'
-              : 'text-neutral-500 hover:text-carbon-900'
+              ? 'bg-white text-black shadow-lg font-black'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <Scale className="w-3.5 h-3.5 text-coral-500" />
+          <Scale className="w-3.5 h-3.5" />
           <span>Físico & Medidas</span>
         </button>
       </div>
@@ -129,16 +129,16 @@ export function StatsView({
           {/* Encabezado */}
           <div className="flex items-center justify-between pt-1">
             <div>
-              <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+              <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                 MÉTRICAS & SOBRECARGA
               </span>
-              <h2 className="text-xl font-black text-carbon-900 leading-tight">
+              <h2 className="text-xl font-black text-white leading-tight">
                 Estadísticas de Fuerza
               </h2>
             </div>
 
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sand-100 border border-sand-200/80 text-xs font-bold text-carbon-900">
-              <Activity className="w-3.5 h-3.5 text-coral-500" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#212227] border border-[#2C2D34] text-xs font-bold text-white shadow-sm">
+              <Activity className="w-3.5 h-3.5 text-white" />
               <span>{workoutsHistory.length} Entrenamientos</span>
             </div>
           </div>
@@ -146,10 +146,10 @@ export function StatsView({
           {/* Selector de Ejercicio para la Curva de Progresión */}
           <div>
             <div className="flex items-center justify-between px-1 mb-1.5">
-              <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+              <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                 SELECCIONAR EJERCICIO
               </span>
-              <span className="text-[10px] font-bold text-neutral-400">
+              <span className="text-[10px] font-bold text-zinc-400">
                 {availableExercises.length} ejercicios
               </span>
             </div>
@@ -161,10 +161,10 @@ export function StatsView({
                   <button
                     key={ex.id}
                     onClick={() => setSelectedExerciseId(ex.id)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer touch-press ${
                       isSelected
-                        ? 'bg-carbon-900 text-white shadow-xs'
-                        : 'bg-white text-neutral-500 hover:text-carbon-900 border border-sand-200/80'
+                        ? 'bg-white text-black font-black shadow-md'
+                        : 'bg-[#1A1B20] text-zinc-400 hover:text-white border border-[#2C2D34]'
                     }`}
                   >
                     {ex.name}
@@ -193,17 +193,17 @@ export function StatsView({
           <PRBoardCard personalRecordsList={auditedPRs} />
 
           {/* 5. Biometría de Honor Choice Watch 2i */}
-          <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 space-y-3">
+          <div className="bg-[#212227] rounded-[28px] p-5 sm:p-6 shadow-xl border border-[#2C2D34]/40 space-y-3">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-sand-100 flex items-center justify-center text-coral-500">
-                  <Watch className="w-4 h-4" />
+                <div className="w-10 h-10 rounded-2xl bg-[#1A1B20] border border-[#2C2D34] flex items-center justify-center text-white">
+                  <Watch className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+                  <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                     BIOMETRÍA CARDÍACA
                   </span>
-                  <h3 className="text-base font-black text-carbon-900 leading-tight">
+                  <h3 className="text-base font-black text-white leading-tight">
                     Honor Choice Watch 2i
                   </h3>
                 </div>
@@ -213,7 +213,7 @@ export function StatsView({
                 <button
                   type="button"
                   onClick={onOpenWatchSync}
-                  className="text-xs font-bold text-coral-500 hover:text-coral-600 flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-bold text-white hover:text-zinc-300 flex items-center gap-1 cursor-pointer"
                 >
                   <span>Ajustar</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -222,22 +222,22 @@ export function StatsView({
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center pt-1">
-              <div className="p-2.5 bg-sand-50 rounded-2xl border border-sand-200/60">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Promedio</span>
-                <div className="text-base font-black text-carbon-900 mt-0.5 font-mono">
-                  {watchData?.avgBpm || 132} <span className="text-[10px] font-bold text-neutral-400">BPM</span>
+              <div className="p-3 bg-[#1A1B20] rounded-2xl border border-[#2C2D34]">
+                <span className="text-[9px] font-bold text-zinc-400 uppercase">Promedio</span>
+                <div className="text-base font-black text-white mt-0.5">
+                  {watchData?.avgBpm || 132} <span className="text-[10px] font-bold text-zinc-400">BPM</span>
                 </div>
               </div>
-              <div className="p-2.5 bg-sand-50 rounded-2xl border border-sand-200/60">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Pico Máx</span>
-                <div className="text-base font-black text-coral-500 mt-0.5 font-mono">
-                  {watchData?.maxBpm || 165} <span className="text-[10px] font-bold text-coral-400">BPM</span>
+              <div className="p-3 bg-[#1A1B20] rounded-2xl border border-[#2C2D34]">
+                <span className="text-[9px] font-bold text-zinc-400 uppercase">Pico Máx</span>
+                <div className="text-base font-black text-amber-400 mt-0.5">
+                  {watchData?.maxBpm || 165} <span className="text-[10px] font-bold text-amber-400/80">BPM</span>
                 </div>
               </div>
-              <div className="p-2.5 bg-sand-50 rounded-2xl border border-sand-200/60">
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Calorías</span>
-                <div className="text-base font-black text-carbon-900 mt-0.5 font-mono">
-                  {watchData?.caloriesBurned || 260} <span className="text-[10px] font-bold text-neutral-400">kcal</span>
+              <div className="p-3 bg-[#1A1B20] rounded-2xl border border-[#2C2D34]">
+                <span className="text-[9px] font-bold text-zinc-400 uppercase">Calorías</span>
+                <div className="text-base font-black text-white mt-0.5">
+                  {watchData?.caloriesBurned || 260} <span className="text-[10px] font-bold text-zinc-400">kcal</span>
                 </div>
               </div>
             </div>

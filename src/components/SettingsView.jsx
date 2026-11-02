@@ -1,23 +1,41 @@
 import React, { useState } from 'react'
 import {
   Database,
-  CloudUpload,
   CheckCircle2,
-  HardDrive,
   Dumbbell,
   Sliders,
-  ExternalLink,
-  ShieldAlert,
   RotateCcw,
   Trash2,
-  RefreshCw,
   User,
-  Timer,
-  Scale
+  Scale,
+  Ruler,
+  Clock,
+  Sparkles,
+  Save
 } from 'lucide-react'
 import { isSupabaseConfigured } from '../lib/supabaseClient'
 
-export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onClearSession }) {
+export function SettingsView({
+  userProfile = {},
+  onUpdateProfile,
+  onResetVolume,
+  onClearSession,
+  onOpenMeasurementsModal
+}) {
+  // Estado de edición de Perfil de Atleta
+  const [name, setName] = useState(userProfile.name || 'Angel')
+  const [weight, setWeight] = useState(userProfile.weight || 120.0)
+  const [height, setHeight] = useState(userProfile.height || 194)
+  const [restSeconds, setRestSeconds] = useState(userProfile.restSeconds || 90)
+
+  // Estado de edición de Equipamiento de Gimnasio / Patio
+  const [mainBarWeight, setMainBarWeight] = useState(userProfile.mainBarWeight || 60)
+  const [smallBarWeight, setSmallBarWeight] = useState(userProfile.smallBarWeight || 14)
+  const [benchType, setBenchType] = useState(
+    userProfile.benchType || 'Plano + Inclinado con soportes'
+  )
+
+  // Estado Supabase
   const [supabaseUrl, setSupabaseUrl] = useState(
     localStorage.getItem('custom_supabase_url') || ''
   )
@@ -26,6 +44,23 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
   )
   const [savedStatus, setSavedStatus] = useState(false)
   const [actionNotice, setActionNotice] = useState('')
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault()
+    if (onUpdateProfile) {
+      onUpdateProfile({
+        name,
+        weight: Number(weight),
+        height: Number(height),
+        restSeconds: Number(restSeconds),
+        mainBarWeight: Number(mainBarWeight),
+        smallBarWeight: Number(smallBarWeight),
+        benchType
+      })
+      setActionNotice('¡Perfil de Atleta y Métricas de Gym guardados con éxito!')
+      setTimeout(() => setActionNotice(''), 3500)
+    }
+  }
 
   const handleSaveSupabase = (e) => {
     e.preventDefault()
@@ -38,7 +73,7 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
   const triggerResetVolume = () => {
     if (onResetVolume) {
       onResetVolume()
-      setActionNotice('¡Volumen restablecido a 6.420 kg (Sesión de ayer)!')
+      setActionNotice('¡Volumen restablecido a 6.420 kg!')
       setTimeout(() => setActionNotice(''), 3000)
     }
   }
@@ -51,97 +86,203 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
     }
   }
 
-  const forceReload = () => {
-    if (typeof window !== 'undefined') {
-      window.location.reload()
-    }
-  }
-
   return (
-    <div className="pb-32">
+    <div className="space-y-4 pb-32 animate-fadeIn text-white">
       {/* Header */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
-        <h2 className="text-xl font-black text-carbon-900 tracking-tight">
-          Ajustes & Conectividad
+      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl">
+        <h2 className="text-2xl font-black text-white tracking-tight">
+          Ajustes & Métricas
         </h2>
-        <p className="text-xs text-neutral-400 mt-0.5">
-          Configura tu perfil de atleta, base de datos y equipamiento de entrenamiento.
+        <p className="text-xs text-zinc-400 mt-1">
+          Edita tu peso, medidas corporales y configuración de gimnasio/patio.
         </p>
       </div>
 
-      {/* Perfil del Atleta */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-coral-500" />
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-              Perfil de Atleta
+      {actionNotice && (
+        <div className="p-4 rounded-2xl bg-white text-black font-black text-xs flex items-center gap-2 shadow-lg animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 stroke-[3]" />
+          <span>{actionNotice}</span>
+        </div>
+      )}
+
+      {/* FORMULARIO EDITABLE: PERFIL DEL ATLETA & GYM */}
+      <form onSubmit={handleSaveProfile} className="space-y-4">
+        {/* 1. Tarjeta: Perfil del Atleta */}
+        <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[#2C2D34]">
+            <div className="flex items-center gap-2">
+              <User className="w-5 h-5 text-white" />
+              <span className="text-xs font-black uppercase tracking-wider text-white">
+                Perfil de Atleta
+              </span>
+            </div>
+            <span className="text-[10px] font-black text-white bg-[#2C2D34] px-3 py-1 rounded-full uppercase">
+              Editable
             </span>
           </div>
-          <span className="text-[10px] font-black text-coral-500 bg-coral-50 px-2 py-0.5 rounded-full uppercase">
-            Activo
-          </span>
-        </div>
 
-        <div className="flex items-center justify-between pb-3.5 border-b border-sand-200/60">
-          <div>
-            <h3 className="text-lg font-black text-carbon-900 leading-tight">Angel</h3>
-            <p className="text-xs text-neutral-400">Entrenamiento de fuerza en patio</p>
-          </div>
-          <div className="text-right">
-            <div className="text-xl font-black text-carbon-900 font-mono">120.0 <span className="text-xs text-neutral-400">kg</span></div>
-            <span className="text-[10px] font-bold text-neutral-500">194 cm de estatura</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 mt-3.5 text-xs">
-          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase block">Descanso entre Series</span>
-            <span className="font-extrabold text-carbon-900 font-mono text-sm">1:30 min</span>
-            <span className="text-[10px] text-neutral-400 block mt-0.5">90 segundos exactos</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60">
-            <span className="text-[10px] font-bold text-neutral-400 uppercase block">Sesión de Referencia</span>
-            <span className="font-extrabold text-coral-500 font-mono text-sm">6.420 kg</span>
-            <span className="text-[10px] text-neutral-400 block mt-0.5">15 series efectivas</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Estado del Almacenamiento */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Database className="w-4 h-4 text-coral-500" />
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-            Modo de Base de Datos
-          </span>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-sand-50 border border-sand-200/80 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-xs font-bold text-carbon-900">
-                {isSupabaseConfigured || supabaseUrl
-                  ? 'Supabase Conectado'
-                  : 'Modo Local Activo (Offline)'}
-              </div>
-              <div className="text-[10px] text-neutral-400">
-                {isSupabaseConfigured || supabaseUrl
-                  ? 'Tus datos se sincronizan con la nube'
-                  : 'Tus entrenamientos se guardan de forma instantánea y segura en tu navegador'}
-              </div>
+              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                Nombre del Atleta
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-black text-white outline-none focus:ring-1 focus:ring-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                Peso Corporal (kg)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-black text-white font-mono outline-none focus:ring-1 focus:ring-white"
+                required
+              />
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                Estatura (cm)
+              </label>
+              <input
+                type="number"
+                step="1"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-black text-white font-mono outline-none focus:ring-1 focus:ring-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                Descanso Series (seg)
+              </label>
+              <input
+                type="number"
+                step="5"
+                value={restSeconds}
+                onChange={(e) => setRestSeconds(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-black text-white font-mono outline-none focus:ring-1 focus:ring-white"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Botón rápido para abrir Medidas Corporales */}
+          {onOpenMeasurementsModal && (
+            <button
+              type="button"
+              onClick={onOpenMeasurementsModal}
+              className="w-full py-3 px-4 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white text-xs font-black flex items-center justify-between transition-all cursor-pointer touch-press"
+            >
+              <div className="flex items-center gap-2">
+                <Ruler className="w-4 h-4 text-white" />
+                <span>Registrar Medidas Antropométricas (Cintura, Bíceps, etc.)</span>
+              </div>
+              <span className="text-zinc-400">Abrir &rarr;</span>
+            </button>
+          )}
         </div>
 
-        {/* Formulario Supabase */}
-        <form onSubmit={handleSaveSupabase} className="mt-4 space-y-3">
+        {/* 2. Tarjeta: Equipamiento de Gimnasio / Patio (GYM) */}
+        <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[#2C2D34]">
+            <div className="flex items-center gap-2">
+              <Dumbbell className="w-5 h-5 text-white" />
+              <span className="text-xs font-black uppercase tracking-wider text-white">
+                Equipamiento de Gimnasio (Patio)
+              </span>
+            </div>
+            <span className="text-[10px] font-black text-white bg-[#2C2D34] px-3 py-1 rounded-full uppercase">
+              Cargas
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                Barra Principal (kg)
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                value={mainBarWeight}
+                onChange={(e) => setMainBarWeight(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-black text-white font-mono outline-none focus:ring-1 focus:ring-white"
+                required
+              />
+              <span className="text-[10px] text-zinc-500 mt-1 block">Banca, Remo, Sentadilla</span>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                Barra Chica (kg)
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                value={smallBarWeight}
+                onChange={(e) => setSmallBarWeight(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-black text-white font-mono outline-none focus:ring-1 focus:ring-white"
+                required
+              />
+              <span className="text-[10px] text-zinc-500 mt-1 block">Francés, Curl, Militar</span>
+            </div>
+          </div>
+
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+              Banco & Soportes
+            </label>
+            <input
+              type="text"
+              value={benchType}
+              onChange={(e) => setBenchType(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-bold text-white outline-none focus:ring-1 focus:ring-white"
+              required
+            />
+          </div>
+
+          {/* Botón de Guardar en Blanco Protagonista */}
+          <button
+            type="submit"
+            className="w-full py-4 bg-white hover:bg-zinc-200 text-black font-black text-sm rounded-[20px] transition-all flex items-center justify-center gap-2 cursor-pointer touch-press shadow-xl shadow-white/20"
+          >
+            <Save className="w-4 h-4 stroke-[2.5]" />
+            <span>Guardar Perfil & Equipamiento</span>
+          </button>
+        </div>
+      </form>
+
+      {/* 3. Tarjeta: Base de Datos & Supabase */}
+      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-[#2C2D34]">
+          <div className="flex items-center gap-2">
+            <Database className="w-5 h-5 text-white" />
+            <span className="text-xs font-black uppercase tracking-wider text-white">
+              Base de Datos
+            </span>
+          </div>
+          <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/40 px-3 py-1 rounded-full uppercase">
+            {isSupabaseConfigured || supabaseUrl ? 'Conectado' : 'Local'}
+          </span>
+        </div>
+
+        <form onSubmit={handleSaveSupabase} className="space-y-3">
+          <div>
+            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
               Supabase Project URL
             </label>
             <input
@@ -149,12 +290,12 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
               placeholder="https://xyzcompany.supabase.co"
               value={supabaseUrl}
               onChange={(e) => setSupabaseUrl(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-sand-100 rounded-xl text-xs font-mono text-carbon-900 border border-sand-200 outline-none focus:border-coral-500"
+              className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-mono text-white outline-none focus:ring-1 focus:ring-white"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-neutral-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
               Supabase Anon Key
             </label>
             <input
@@ -162,115 +303,42 @@ export function SettingsView({ userProfile, onUpdateProfile, onResetVolume, onCl
               placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
               value={supabaseKey}
               onChange={(e) => setSupabaseKey(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-sand-100 rounded-xl text-xs font-mono text-carbon-900 border border-sand-200 outline-none focus:border-coral-500"
+              className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-mono text-white outline-none focus:ring-1 focus:ring-white"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-2.5 bg-carbon-900 hover:bg-black text-white text-xs font-bold rounded-full transition-all"
+            className="w-full py-3 bg-[#2C2D34] hover:bg-white hover:text-black text-white text-xs font-black rounded-xl transition-all cursor-pointer touch-press"
           >
-            {savedStatus ? 'Credenciales Guardadas' : 'Guardar Credenciales Supabase'}
+            {savedStatus ? '✓ Credenciales Guardadas' : 'Guardar Credenciales Supabase'}
           </button>
         </form>
       </div>
 
-      {/* Configuración de Equipamiento de Patio */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Dumbbell className="w-4 h-4 text-coral-500" />
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-            Equipamiento Registrado
-          </span>
-        </div>
+      {/* 4. Tarjeta: Mantenimiento & Caché */}
+      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-3">
+        <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+          MANTENIMIENTO DE DATOS
+        </span>
 
-        <div className="space-y-2 text-xs">
-          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60 flex items-center justify-between">
-            <div>
-              <div className="font-bold text-carbon-900">Barra Principal</div>
-              <div className="text-[11px] text-neutral-400">Press banca, sentadillas, peso muerto</div>
-            </div>
-            <span className="font-extrabold text-coral-500 text-sm">60 kg máx</span>
-          </div>
+        <button
+          type="button"
+          onClick={triggerResetVolume}
+          className="w-full py-3 px-4 bg-[#1A1B20] hover:bg-[#2C2D34] text-white text-xs font-black rounded-xl transition-all flex items-center justify-between cursor-pointer touch-press"
+        >
+          <span>Restablecer Volumen a Ayer (6.420 kg)</span>
+          <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
+        </button>
 
-          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60 flex items-center justify-between">
-            <div>
-              <div className="font-bold text-carbon-900">Barra Chica</div>
-              <div className="text-[11px] text-neutral-400">Press francés, curl de bíceps, hombros</div>
-            </div>
-            <span className="font-extrabold text-carbon-900 text-sm">14 kg fija</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-sand-50 border border-sand-200/60 flex items-center justify-between">
-            <div>
-              <div className="font-bold text-carbon-900">Banco de Fuerza</div>
-              <div className="text-[11px] text-neutral-400">Con soporte integrado para barra</div>
-            </div>
-            <span className="font-bold text-neutral-600 text-xs">Plano + Inclinado</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Control de Datos & Caché */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60 mb-5">
-        <div className="flex items-center gap-2 mb-2">
-          <RotateCcw className="w-4 h-4 text-coral-500" />
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-            Control de Datos & Mantenimiento
-          </span>
-        </div>
-        <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
-          Si notas métricas acumuladas de pruebas o una sesión en progreso atascada, límpialas aquí con un toque.
-        </p>
-
-        {actionNotice && (
-          <div className="p-3 mb-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>{actionNotice}</span>
-          </div>
-        )}
-
-        <div className="space-y-2.5">
-          <button
-            type="button"
-            onClick={triggerResetVolume}
-            className="w-full py-3 px-4 bg-sand-100 hover:bg-sand-200 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
-          >
-            <span>Restablecer Volumen Real a Ayer (6.420 kg)</span>
-            <RotateCcw className="w-3.5 h-3.5 text-coral-500" />
-          </button>
-
-          <button
-            type="button"
-            onClick={triggerClearSession}
-            className="w-full py-3 px-4 bg-sand-100 hover:bg-rose-50 hover:text-rose-600 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
-          >
-            <span>Eliminar Sesión en Progreso Atascada</span>
-            <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-          </button>
-
-          <button
-            type="button"
-            onClick={forceReload}
-            className="w-full py-3 px-4 bg-sand-100 hover:bg-sand-200 text-carbon-900 text-xs font-bold rounded-2xl transition-all flex items-center justify-between border border-sand-200"
-          >
-            <span>Forzar Recarga de la Web (Limpiar Caché)</span>
-            <RefreshCw className="w-3.5 h-3.5 text-neutral-500" />
-          </button>
-        </div>
-      </div>
-
-      {/* Deploy a Render */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-sand-200/60">
-        <div className="flex items-center gap-2 mb-2">
-          <CloudUpload className="w-4 h-4 text-carbon-900" />
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-            Despliegue en Render
-          </span>
-        </div>
-        <p className="text-xs text-neutral-500 leading-relaxed mb-3">
-          El proyecto incluye <code className="bg-sand-100 px-1 py-0.5 rounded text-[11px] text-carbon-900">render.yaml</code> y <code className="bg-sand-100 px-1 py-0.5 rounded text-[11px] text-carbon-900">Dockerfile</code> listo para conectar con tu repositorio de GitHub y tener tu app online en minutos.
-        </p>
+        <button
+          type="button"
+          onClick={triggerClearSession}
+          className="w-full py-3 px-4 bg-[#1A1B20] hover:bg-rose-950/40 text-rose-300 text-xs font-black rounded-xl transition-all flex items-center justify-between cursor-pointer touch-press"
+        >
+          <span>Eliminar Sesión en Progreso Atascada</span>
+          <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+        </button>
       </div>
     </div>
   )

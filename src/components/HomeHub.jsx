@@ -126,6 +126,7 @@ export function HomeHub({
   bodyweight,
   onUpdateWeight,
   onOpenEvolution,
+  onOpenAddMeasurement,
   currentSessionVolume,
   targetVolume = 6500,
   watchData,
@@ -271,10 +272,10 @@ export function HomeHub({
               </div>
             </div>
 
-            {/* Tarjeta 2 (Derecha): Body weight con Número Blanco Masivo */}
+            {/* Tarjeta 2 (Derecha): Body weight con Número Blanco Masivo y Edición Directa */}
             <div
-              onClick={onOpenEvolution}
-              className="rounded-[28px] bg-[#212227] p-5 sm:p-6 flex flex-col justify-between min-h-[175px] transition-transform active:scale-[0.98] cursor-pointer group shadow-xl"
+              onClick={() => (onOpenAddMeasurement ? onOpenAddMeasurement() : onOpenEvolution())}
+              className="rounded-[28px] bg-[#212227] p-5 sm:p-6 flex flex-col justify-between min-h-[175px] transition-transform active:scale-[0.98] cursor-pointer group shadow-xl border border-transparent hover:border-[#2C2D34]"
             >
               <div className="flex items-start justify-between">
                 <div className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none drop-shadow-[0_2px_8px_rgba(255,255,255,0.2)]">
@@ -285,18 +286,25 @@ export function HomeHub({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation()
-                    onOpenEvolution && onOpenEvolution()
+                    if (onOpenAddMeasurement) onOpenAddMeasurement()
+                    else if (onOpenEvolution) onOpenEvolution()
                   }}
-                  className="text-zinc-400 group-hover:text-white transition-colors p-1"
+                  className="p-1.5 rounded-xl bg-[#2C2D34] text-zinc-300 group-hover:text-white transition-colors"
+                  title="Editar peso y medidas"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="mt-3">
-                <h3 className="text-lg font-black text-white leading-tight">
-                  Body weight
-                </h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-black text-white leading-tight">
+                    Body weight
+                  </h3>
+                  <span className="text-[10px] font-bold text-zinc-400 group-hover:text-white transition-colors">
+                    • Editar
+                  </span>
+                </div>
                 <p className="text-xs text-zinc-300 font-semibold mt-1">
                   Hoy en ayunas
                 </p>

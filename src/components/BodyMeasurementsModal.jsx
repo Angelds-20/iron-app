@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Check, Scale, Ruler, Sparkles, Activity } from 'lucide-react'
+import { X, Check, Scale, Ruler, Sparkles, Activity, Plus, Minus } from 'lucide-react'
 import {
   calculateBodyFatNavy,
   calculateWaistToHeightRatio,
@@ -27,7 +27,7 @@ export function BodyMeasurementsModal({
   useEffect(() => {
     if (isOpen) {
       setDate(new Date().toISOString().split('T')[0])
-      setWeight(currentWeight)
+      setWeight(currentWeight || 120.0)
       if (lastEntry) {
         if (lastEntry.waist) setWaist(lastEntry.waist)
         if (lastEntry.chest) setChest(lastEntry.chest)
@@ -47,6 +47,13 @@ export function BodyMeasurementsModal({
   const waistRatio = calculateWaistToHeightRatio(waist, height)
   const vTaper = calculateChestToWaistRatio(chest, waist)
   const breakdown = estimatedBodyFat ? calculateMassBreakdown(weight, estimatedBodyFat) : null
+
+  const handleAdjustWeight = (delta) => {
+    setWeight((prev) => {
+      const val = Number(prev) || 120.0
+      return Math.round((val + delta) * 10) / 10
+    })
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -71,26 +78,26 @@ export function BodyMeasurementsModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/65 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-4xl p-5 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl border border-sand-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <div className="bg-[#212227] rounded-[28px] p-6 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl text-white space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-sand-200">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-carbon-900 flex items-center justify-center text-coral-500 shadow-sm">
-              <Scale className="w-4 h-4" />
+        <div className="flex items-center justify-between pb-3 border-b border-[#2C2D34]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#2C2D34] flex items-center justify-center text-white shadow-sm">
+              <Scale className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black text-carbon-900 leading-tight">
-                Registrar Medidas & Peso
+              <h3 className="text-lg font-black text-white leading-tight">
+                Métricas & Medidas
               </h3>
-              <p className="text-[10px] text-neutral-400 font-semibold">
-                Control antropométrico y composición corporal
+              <p className="text-xs text-zinc-400 font-medium">
+                Edita tu peso corporal y perímetros
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-sand-100 text-neutral-400 transition-colors cursor-pointer"
+            className="p-2 rounded-full hover:bg-[#2C2D34] text-zinc-400 hover:text-white transition-colors cursor-pointer touch-press"
             aria-label="Cerrar modal"
           >
             <X className="w-5 h-5" />
@@ -98,179 +105,175 @@ export function BodyMeasurementsModal({
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto no-scrollbar py-3.5 space-y-4">
-          {/* Fecha y Peso Principal */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="block text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-1">
-                Fecha
-              </label>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto no-scrollbar space-y-4 pr-0.5">
+          {/* Peso Principal con Steppers Grandes (A prueba de dedos) */}
+          <div className="p-4 rounded-2xl bg-[#1A1B20] space-y-2">
+            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block text-center">
+              PESO CORPORAL ACTUAL (EN AYUNAS)
+            </span>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleAdjustWeight(-0.5)}
+                className="w-11 h-11 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white flex items-center justify-center touch-press cursor-pointer"
+                title="Restar 0.5 kg"
+              >
+                <Minus className="w-4 h-4 stroke-[2.5]" />
+              </button>
+
+              <div className="flex items-baseline justify-center min-w-[120px]">
+                <input
+                  type="number"
+                  step="0.1"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  className="w-24 bg-transparent text-4xl font-black font-mono text-white text-center outline-none tracking-tight"
+                  required
+                  autoFocus
+                />
+                <span className="text-lg font-bold text-zinc-400 ml-1">kg</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleAdjustWeight(0.5)}
+                className="w-11 h-11 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white flex items-center justify-center touch-press cursor-pointer"
+                title="Sumar 0.5 kg"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 pt-1 text-xs text-zinc-400">
+              <span>Fecha:</span>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-1">
-                Peso Corporal (kg)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                placeholder="77.9"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                className="w-full px-3 py-2.5 bg-sand-100 rounded-xl text-xs font-black text-carbon-900 border border-sand-200 outline-none focus:border-coral-500 font-mono text-center"
-                required
-                autoFocus
+                className="bg-[#2C2D34] px-2.5 py-1 rounded-lg text-white font-mono text-xs outline-none"
               />
             </div>
           </div>
 
-          {/* Tarjeta de Estimación Biométrica en Vivo */}
+          {/* Estimación de Grasa & V-Taper */}
           {estimatedBodyFat && (
-            <div className="p-3.5 bg-sand-50 rounded-2xl border border-sand-200/80 space-y-2">
+            <div className="p-4 bg-[#1A1B20] rounded-2xl space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+                <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                   COMPOSICIÓN ESTIMADA (US NAVY)
                 </span>
-                <span className="text-xs font-black text-coral-500 font-mono">
+                <span className="text-xs font-black text-white font-mono bg-[#2C2D34] px-2.5 py-0.5 rounded-full">
                   {estimatedBodyFat}% Grasa
                 </span>
               </div>
 
               {breakdown && (
                 <div className="grid grid-cols-2 gap-2 pt-1">
-                  <div className="p-2 bg-white rounded-xl border border-sand-200/60 text-center">
-                    <span className="text-[9px] text-neutral-400 font-bold uppercase">Masa Magra</span>
-                    <div className="text-xs font-black text-carbon-900 mt-0.5">
+                  <div className="p-2.5 bg-[#212227] rounded-xl text-center">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase block">Masa Magra</span>
+                    <div className="text-sm font-black text-white mt-0.5">
                       {breakdown.leanKg} kg
                     </div>
                   </div>
-                  <div className="p-2 bg-white rounded-xl border border-sand-200/60 text-center">
-                    <span className="text-[9px] text-neutral-400 font-bold uppercase">Masa Grasa</span>
-                    <div className="text-xs font-black text-neutral-600 mt-0.5">
+                  <div className="p-2.5 bg-[#212227] rounded-xl text-center">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase block">Masa Grasa</span>
+                    <div className="text-sm font-black text-white mt-0.5">
                       {breakdown.fatKg} kg
                     </div>
                   </div>
-                </div>
-              )}
-
-              {vTaper && (
-                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-sand-200/60">
-                  <span className="text-neutral-500 font-semibold">Índice V-Taper (Pecho/Cintura):</span>
-                  <span className="font-bold text-carbon-900">{vTaper.ratio} ({vTaper.label})</span>
                 </div>
               )}
             </div>
           )}
 
           {/* Perímetros en Centímetros */}
-          <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Ruler className="w-3.5 h-3.5 text-coral-500" />
-              <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
-                PERÍMETROS CORPORALES (CM)
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 px-1">
+              <Ruler className="w-4 h-4 text-white" />
+              <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
+                MEDIDAS CORPORALES (CM)
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Cintura</span>
+              <div className="p-2.5 bg-[#1A1B20] rounded-xl">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Cintura</span>
                 <input
                   type="number"
                   step="0.5"
-                  placeholder="83"
                   value={waist}
                   onChange={(e) => setWaist(e.target.value)}
-                  className="w-full text-center py-1.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                  className="w-full text-center bg-[#2C2D34] py-1.5 rounded-lg text-sm font-black text-white outline-none"
                 />
               </div>
-              <div>
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Pecho</span>
+
+              <div className="p-2.5 bg-[#1A1B20] rounded-xl">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Pecho</span>
                 <input
                   type="number"
                   step="0.5"
-                  placeholder="104"
                   value={chest}
                   onChange={(e) => setChest(e.target.value)}
-                  className="w-full text-center py-1.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                  className="w-full text-center bg-[#2C2D34] py-1.5 rounded-lg text-sm font-black text-white outline-none"
                 />
               </div>
-              <div>
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Brazo</span>
+
+              <div className="p-2.5 bg-[#1A1B20] rounded-xl">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Brazo</span>
                 <input
                   type="number"
                   step="0.5"
-                  placeholder="38"
                   value={arm}
                   onChange={(e) => setArm(e.target.value)}
-                  className="w-full text-center py-1.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                  className="w-full text-center bg-[#2C2D34] py-1.5 rounded-lg text-sm font-black text-white outline-none"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center mt-2">
-              <div>
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Muslo</span>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2.5 bg-[#1A1B20] rounded-xl">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Muslo</span>
                 <input
                   type="number"
                   step="0.5"
-                  placeholder="58.5"
                   value={thigh}
                   onChange={(e) => setThigh(e.target.value)}
-                  className="w-full text-center py-1.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                  className="w-full text-center bg-[#2C2D34] py-1.5 rounded-lg text-sm font-black text-white outline-none"
                 />
               </div>
-              <div>
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Cuello</span>
+
+              <div className="p-2.5 bg-[#1A1B20] rounded-xl">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Cuello</span>
                 <input
                   type="number"
                   step="0.5"
-                  placeholder="39"
                   value={neck}
                   onChange={(e) => setNeck(e.target.value)}
-                  className="w-full text-center py-1.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                  className="w-full text-center bg-[#2C2D34] py-1.5 rounded-lg text-sm font-black text-white outline-none"
                 />
               </div>
-              <div>
-                <span className="text-[9px] font-bold text-neutral-400 uppercase">Estatura</span>
+
+              <div className="p-2.5 bg-[#1A1B20] rounded-xl">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Estatura</span>
                 <input
                   type="number"
-                  placeholder="175"
+                  step="1"
                   value={height}
                   onChange={(e) => setHeight(e.target.value)}
-                  className="w-full text-center py-1.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                  className="w-full text-center bg-[#2C2D34] py-1.5 rounded-lg text-sm font-black text-white outline-none"
                 />
               </div>
             </div>
           </div>
 
-          {/* Notas */}
-          <div>
-            <label className="block text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-1">
-              Notas del Check-in
-            </label>
-            <input
-              type="text"
-              placeholder="Ej: Pesaje en ayunas, pre-desayuno..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 bg-sand-100 rounded-xl text-xs font-medium text-carbon-900 border border-sand-200 outline-none"
-            />
-          </div>
-
-          {/* Botón de Enviar */}
+          {/* Botón de Guardado Blanco Protagonista */}
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3 bg-carbon-900 hover:bg-black text-white text-xs font-black rounded-full transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
+              className="w-full py-4 bg-white hover:bg-zinc-200 text-black font-black text-sm rounded-[20px] transition-all flex items-center justify-center gap-2 cursor-pointer touch-press shadow-xl shadow-white/20"
             >
-              <Check className="w-4 h-4 text-coral-500" />
-              <span>Guardar Registro Físico</span>
+              <Check className="w-4 h-4 stroke-[3]" />
+              <span>Guardar Peso & Medidas</span>
             </button>
           </div>
         </form>

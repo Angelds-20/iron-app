@@ -151,6 +151,26 @@ export default function App() {
     return saved && saved >= 90 ? saved : 120.0
   })
 
+  // Perfil de Atleta y Métricas de Gym (Local-First - Personalizado para Angel)
+  const [athleteProfile, setAthleteProfile] = useState(() => {
+    const saved = localStorage.getItem('iron_athlete_profile_v1')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed && typeof parsed === 'object') return parsed
+      } catch (e) {}
+    }
+    return {
+      name: 'Angel',
+      weight: 120.0,
+      height: 194,
+      restSeconds: 90,
+      mainBarWeight: 60,
+      smallBarWeight: 14,
+      benchType: 'Plano + Inclinado con soporte'
+    }
+  })
+
   // Días completados (Registra SOLO ayer como sesión completada de 60 kg)
   const [completedDates, setCompletedDates] = useState(() => {
     const todayStr = new Date().toISOString().split('T')[0]
@@ -345,8 +365,27 @@ export default function App() {
       return updated
     })
     if (entry.weight && Number(entry.weight) > 0) {
-      setBodyweight(Number(entry.weight))
-      localStorage.setItem('user_weight', entry.weight.toString())
+      const newW = Number(entry.weight)
+      setBodyweight(newW)
+      localStorage.setItem('user_weight', newW.toString())
+      setAthleteProfile((prev) => {
+        const updated = { ...prev, weight: newW }
+        localStorage.setItem('iron_athlete_profile_v1', JSON.stringify(updated))
+        return updated
+      })
+    }
+  }
+
+  const handleUpdateProfile = (newProfile) => {
+    setAthleteProfile((prev) => {
+      const updated = { ...prev, ...newProfile }
+      localStorage.setItem('iron_athlete_profile_v1', JSON.stringify(updated))
+      return updated
+    })
+    if (newProfile.weight && Number(newProfile.weight) > 0) {
+      const newW = Number(newProfile.weight)
+      setBodyweight(newW)
+      localStorage.setItem('user_weight', newW.toString())
     }
   }
 
@@ -600,6 +639,7 @@ export default function App() {
                 setStatsSubTab('body')
                 setActiveTab('stats')
               }}
+              onOpenAddMeasurement={() => setIsBodyModalOpen(true)}
               currentSessionVolume={currentSessionVolume}
               targetVolume={6500}
               watchData={watchData}
@@ -704,10 +744,11 @@ export default function App() {
               onGoHome={() => setActiveTab('home')}
             />
             <SettingsView
-              userProfile={{ weight: bodyweight }}
-              onUpdateProfile={() => {}}
+              userProfile={athleteProfile}
+              onUpdateProfile={handleUpdateProfile}
               onResetVolume={handleResetVolumeToReal}
               onClearSession={handleClearActiveSession}
+              onOpenMeasurementsModal={() => setIsBodyModalOpen(true)}
             />
           </div>
         )}

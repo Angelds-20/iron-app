@@ -3,7 +3,7 @@ import { TrendingUp, Scale, Target, Calendar } from 'lucide-react'
 
 export function BodyweightTrendChart({
   measurements = [],
-  targetWeight = 80.0
+  targetWeight = 120.0
 }) {
   const [selectedPointIndex, setSelectedPointIndex] = useState(null)
 
@@ -14,10 +14,10 @@ export function BodyweightTrendChart({
 
   if (sorted.length === 0) {
     return (
-      <div className="bg-white rounded-3xl p-6 text-center border border-sand-200">
-        <Scale className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
-        <h4 className="text-sm font-bold text-carbon-900">Sin registros de peso</h4>
-        <p className="text-xs text-neutral-400 mt-1">
+      <div className="bg-[#212227] rounded-[28px] p-6 text-center border border-[#2C2D34]">
+        <Scale className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
+        <h4 className="text-sm font-bold text-white">Sin registros de peso</h4>
+        <p className="text-xs text-zinc-400 mt-1">
           Registra tus pesajes en ayunas para ver la curva de tendencia.
         </p>
       </div>
@@ -73,23 +73,23 @@ export function BodyweightTrendChart({
   }
 
   return (
-    <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 space-y-3.5">
+    <div className="bg-[#212227] rounded-[28px] p-5 sm:p-6 shadow-xl border border-[#2C2D34]/40 space-y-4 text-white">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+          <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
             TENDENCIA DE PESO CORPORAL
           </span>
-          <h3 className="text-base font-black text-carbon-900 leading-tight mt-0.5">
+          <h3 className="text-base font-black text-white leading-tight mt-0.5">
             Evolución de Masa
           </h3>
         </div>
 
         <div
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black ${
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black ${
             totalDelta >= 0
-              ? 'bg-emerald-50 text-emerald-700'
-              : 'bg-sand-100 text-neutral-700'
+              ? 'bg-emerald-950/50 text-emerald-400 border border-emerald-800/40'
+              : 'bg-[#2C2D34] text-white'
           }`}
         >
           <TrendingUp className="w-3.5 h-3.5" />
@@ -101,23 +101,23 @@ export function BodyweightTrendChart({
       </div>
 
       {/* Métricas: Actual, Inicial, Meta */}
-      <div className="grid grid-cols-3 gap-2 py-2 px-3 rounded-2xl bg-sand-50 border border-sand-200/60 text-center">
+      <div className="grid grid-cols-3 gap-2 py-3 px-3 rounded-2xl bg-[#1A1B20] border border-[#2C2D34] text-center">
         <div>
-          <span className="text-[9px] font-bold text-neutral-400 uppercase">Actual</span>
-          <div className="text-sm font-black text-carbon-900 mt-0.5">
-            {latestWeight} <span className="text-[10px] font-semibold text-neutral-500">kg</span>
+          <span className="text-[9px] font-bold text-zinc-400 uppercase">Actual</span>
+          <div className="text-base font-black text-white mt-0.5">
+            {latestWeight} <span className="text-[10px] font-semibold text-zinc-400">kg</span>
           </div>
         </div>
         <div>
-          <span className="text-[9px] font-bold text-neutral-400 uppercase">Punto Inicio</span>
-          <div className="text-sm font-black text-neutral-600 mt-0.5">
-            {firstWeight} <span className="text-[10px] font-semibold text-neutral-400">kg</span>
+          <span className="text-[9px] font-bold text-zinc-400 uppercase">Punto Inicio</span>
+          <div className="text-base font-black text-zinc-300 mt-0.5">
+            {firstWeight} <span className="text-[10px] font-semibold text-zinc-400">kg</span>
           </div>
         </div>
         <div>
-          <span className="text-[9px] font-bold text-neutral-400 uppercase">Objetivo</span>
-          <div className="text-sm font-black text-coral-500 mt-0.5">
-            {targetWeight} <span className="text-[10px] font-semibold text-coral-400">kg</span>
+          <span className="text-[9px] font-bold text-zinc-400 uppercase">Objetivo</span>
+          <div className="text-base font-black text-amber-400 mt-0.5">
+            {targetWeight} <span className="text-[10px] font-semibold text-amber-400/80">kg</span>
           </div>
         </div>
       </div>
@@ -129,9 +129,9 @@ export function BodyweightTrendChart({
           className="w-full h-auto overflow-visible select-none"
         >
           <defs>
-            <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#141416" stopOpacity="0.15" />
-              <stop offset="100%" stopColor="#141416" stopOpacity="0.0" />
+            <linearGradient id="weightDarkGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -145,7 +145,7 @@ export function BodyweightTrendChart({
                   y1={y}
                   x2={width - paddingX + 10}
                   y2={y}
-                  stroke="#E9E6DE"
+                  stroke="#2C2D34"
                   strokeDasharray="3,3"
                   strokeWidth="1"
                 />
@@ -153,7 +153,7 @@ export function BodyweightTrendChart({
                   x={paddingX - 14}
                   y={y + 3}
                   textAnchor="end"
-                  fill="#A3A3A3"
+                  fill="#71717A"
                   fontSize="8"
                   fontWeight="600"
                   fontFamily="monospace"
@@ -172,7 +172,7 @@ export function BodyweightTrendChart({
                 y1={targetY}
                 x2={width - paddingX}
                 y2={targetY}
-                stroke="#FF5A36"
+                stroke="#F59E0B"
                 strokeDasharray="4,4"
                 strokeWidth="1.2"
                 strokeOpacity="0.8"
@@ -180,7 +180,7 @@ export function BodyweightTrendChart({
               <text
                 x={width - paddingX + 5}
                 y={targetY + 2.5}
-                fill="#FF5A36"
+                fill="#F59E0B"
                 fontSize="7.5"
                 fontWeight="800"
               >
@@ -191,7 +191,7 @@ export function BodyweightTrendChart({
 
           {/* Relleno con gradiente */}
           {sorted.length > 1 && (
-            <polygon points={areaCoords} fill="url(#weightGradient)" />
+            <polygon points={areaCoords} fill="url(#weightDarkGradient)" />
           )}
 
           {/* Línea principal de pesajes */}
@@ -199,7 +199,7 @@ export function BodyweightTrendChart({
             <polyline
               points={polylineCoords}
               fill="none"
-              stroke="#141416"
+              stroke="#FFFFFF"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -226,9 +226,9 @@ export function BodyweightTrendChart({
                   <circle
                     cx={cx}
                     cy={cy}
-                    r="8"
-                    fill="#141416"
-                    fillOpacity="0.2"
+                    r="9"
+                    fill="#FFFFFF"
+                    fillOpacity="0.25"
                     className="animate-pulse"
                   />
                 )}
@@ -236,9 +236,9 @@ export function BodyweightTrendChart({
                 <circle
                   cx={cx}
                   cy={cy}
-                  r={isSelected ? '5' : '3.5'}
-                  fill={isSelected ? '#FF5A36' : '#141416'}
-                  stroke="#FFFFFF"
+                  r={isSelected ? '5.5' : '3.5'}
+                  fill={isSelected ? '#FFFFFF' : '#71717A'}
+                  stroke="#121316"
                   strokeWidth="2"
                 />
 
@@ -246,7 +246,7 @@ export function BodyweightTrendChart({
                   x={cx}
                   y={height - 10}
                   textAnchor="middle"
-                  fill={isSelected ? '#141416' : '#A3A3A3'}
+                  fill={isSelected ? '#FFFFFF' : '#71717A'}
                   fontSize="8.5"
                   fontWeight={isSelected ? '800' : '600'}
                 >
@@ -260,28 +260,28 @@ export function BodyweightTrendChart({
 
       {/* Inspector del punto seleccionado */}
       {activePoint && (
-        <div className="p-3 bg-carbon-900 text-white rounded-2xl flex items-center justify-between text-xs animate-fadeIn">
+        <div className="p-3.5 bg-[#1A1B20] text-white rounded-2xl border border-[#2C2D34] flex items-center justify-between text-xs animate-fadeIn">
           <div>
-            <div className="text-[9px] font-bold tracking-wider text-coral-500 uppercase">
+            <div className="text-[9px] font-black tracking-wider text-amber-400 uppercase">
               PESAJE DEL {formatDate(activePoint.date).toUpperCase()}
             </div>
             <div className="font-bold text-white text-sm mt-0.5">
               {activePoint.weight} kg
               {activePoint.bodyFatPct && (
-                <span className="text-xs text-neutral-300 font-normal ml-2">
+                <span className="text-xs text-zinc-400 font-normal ml-2">
                   • {activePoint.bodyFatPct}% Grasa
                 </span>
               )}
             </div>
             {activePoint.notes && (
-              <div className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1">
+              <div className="text-[10px] text-zinc-400 mt-0.5 line-clamp-1">
                 {activePoint.notes}
               </div>
             )}
           </div>
 
           <div className="text-right">
-            <span className="text-[9px] font-bold text-neutral-400 uppercase block">Cintura</span>
+            <span className="text-[9px] font-bold text-zinc-400 uppercase block">Cintura</span>
             <span className="font-mono font-black text-white text-xs">
               {activePoint.waist ? `${activePoint.waist} cm` : '—'}
             </span>
