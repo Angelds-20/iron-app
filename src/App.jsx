@@ -12,6 +12,7 @@ import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesView } from './components/RoutinesView'
 import { RoutineEditorModal } from './components/RoutineEditorModal'
 import { StatsView } from './components/StatsView'
+import { NutritionView } from './components/NutritionView'
 import { BodyMeasurementsModal } from './components/BodyMeasurementsModal'
 import { WatchView } from './components/WatchView'
 import { SettingsView } from './components/SettingsView'
@@ -653,7 +654,22 @@ export default function App() {
                 setActiveTab('workout')
               }}
               onViewAllRoutines={() => setActiveTab('routines')}
+              onOpenNutrition={() => setActiveTab('nutrition')}
             />
+          </div>
+        )}
+
+        {/* Módulo de Nutrición & Macros Cero Fricción */}
+        {activeTab === 'nutrition' && (
+          <div>
+            <Header
+              title="Nutrición"
+              streak={Math.max(1, completedDates.length + restDates.length)}
+              userSession={userSession}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+              onGoHome={() => setActiveTab('home')}
+            />
+            <NutritionView />
           </div>
         )}
 

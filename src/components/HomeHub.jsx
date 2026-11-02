@@ -21,7 +21,8 @@ import {
   SlidersHorizontal,
   Plus,
   Play,
-  Calendar
+  Calendar,
+  Utensils
 } from 'lucide-react'
 import { ExerciseTechniqueView } from './ExerciseTechniqueView'
 import { RirGuideView } from './RirGuideView'
@@ -138,7 +139,8 @@ export function HomeHub({
   onDiscardActiveSession,
   routines = [],
   onStartWorkout,
-  onViewAllRoutines
+  onViewAllRoutines,
+  onOpenNutrition
 }) {
   const [activeSegment, setActiveSegment] = useState('workouts') // 'workouts' | 'recovery' | 'technique'
 
@@ -534,6 +536,40 @@ export function HomeHub({
               <SlidersHorizontal className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors ml-3.5" />
             </div>
           </div>
+
+          {/* Fila: Tarjeta Rápida de Nutrición & Macros Cero Fricción */}
+          {onOpenNutrition && (
+            <div
+              onClick={onOpenNutrition}
+              className="rounded-[24px] bg-[#212227] hover:bg-[#28292F] p-5 sm:p-6 flex items-center justify-between transition-all cursor-pointer group shadow-xl border border-transparent hover:border-[#2C2D34]"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-[#1A1B20] border border-[#2C2D34] flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                  <Utensils className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-base font-black text-white leading-tight">
+                    Dieta & Macros
+                  </h4>
+                  <p className="text-xs text-zinc-400 font-semibold mt-0.5">
+                    Cero Fricción • Bloques rápidos de comida
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-right">
+                <div>
+                  <span className="text-xs font-black text-white">
+                    6 bloques
+                  </span>
+                  <span className="text-[10px] text-zinc-400 block font-medium">
+                    Toca para sumar
+                  </span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
+              </div>
+            </div>
+          )}
 
           {/* Fila 4: Tarjeta de Añadir Rutina con Botón Blanco Protagonista */}
           <div

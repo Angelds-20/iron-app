@@ -1,9 +1,10 @@
 import React from 'react'
-import { LayoutGrid, Calendar, BarChart2, Sliders } from 'lucide-react'
+import { LayoutGrid, Calendar, BarChart2, Sliders, Utensils } from 'lucide-react'
 
 export function Navbar({ activeTab = 'home', onSelectTab }) {
   const tabs = [
     { id: 'home', icon: LayoutGrid, label: 'Workouts' },
+    { id: 'nutrition', icon: Utensils, label: 'Nutrición' },
     { id: 'routines', icon: Calendar, label: 'Calendario' },
     { id: 'stats', icon: BarChart2, label: 'Estadísticas' },
     { id: 'settings', icon: Sliders, label: 'Ajustes' }
