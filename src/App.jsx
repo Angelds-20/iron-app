@@ -10,7 +10,7 @@ import { AchievementsView } from './components/AchievementsView'
 import { SettingsView } from './components/SettingsView'
 import { WatchModal } from './components/WatchModal'
 import { evaluateAchievements } from './lib/overloadEngine'
-import { BADGES_CATALOG, DEFAULT_ROUTINES } from './lib/constants'
+import { BADGES_CATALOG, DEFAULT_ROUTINES, APP_VERSION } from './lib/constants'
 import { syncWorkoutToCloud } from './lib/syncService'
 import { Trophy } from 'lucide-react'
 
@@ -385,6 +385,11 @@ export default function App() {
 
         {/* Barra de navegación flotante tipo dock */}
         <Navbar activeTab={activeTab} onSelectTab={setActiveTab} />
+
+        {/* Indicador de versión en la esquinita */}
+        <div className="fixed bottom-1 right-2.5 z-40 pointer-events-none text-[9px] font-mono font-bold text-neutral-400/80 tracking-wider">
+          {APP_VERSION}
+        </div>
       </div>
     </div>
   )

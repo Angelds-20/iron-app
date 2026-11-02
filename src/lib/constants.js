@@ -4,6 +4,8 @@
 // - Banco plano / inclinado con soporte
 // - Honor Choice Watch 2i sync
 
+export const APP_VERSION = 'v1.2.0'
+
 export const DEFAULT_ROUTINES = [
   {
     id: 'torso-fuerza',
