@@ -13,7 +13,9 @@ import {
   Copy,
   CheckCircle2,
   ChevronRight,
-  Info
+  Info,
+  Search,
+  Sparkles
 } from 'lucide-react'
 import {
   loadMealPresets,
@@ -23,6 +25,7 @@ import {
   loadTodayMacros,
   logQuickMealLocalAndRemote,
   removeMealLog,
+  MEAL_CATEGORIES,
   SUPABASE_NUTRITION_SQL
 } from '../lib/nutritionEngine'
 
@@ -30,6 +33,8 @@ export function NutritionView() {
   const [presets, setPresets] = useState(() => loadMealPresets())
   const [targets, setTargets] = useState(() => loadTargetMacros())
   const [todayMacros, setTodayMacros] = useState(() => loadTodayMacros())
+  const [selectedCategory, setSelectedCategory] = useState('todos')
+  const [searchQuery, setSearchQuery] = useState('')
   const [toastMessage, setToastMessage] = useState('')
   const [isNewPresetOpen, setIsNewPresetOpen] = useState(false)
   const [isSqlModalOpen, setIsSqlModalOpen] = useState(false)
@@ -42,6 +47,7 @@ export function NutritionView() {
   const [newProtein, setNewProtein] = useState('')
   const [newCarbs, setNewCarbs] = useState('')
   const [newFats, setNewFats] = useState('')
+  const [newCategory, setNewCategory] = useState('almuerzo')
 
   // Notificación flotante temporal
   const showToast = (msg) => {
@@ -53,7 +59,7 @@ export function NutritionView() {
   const handleQuickAdd = async (preset, multiplier = 1) => {
     const updated = await logQuickMealLocalAndRemote(preset, multiplier)
     setTodayMacros(updated)
-    const portionText = multiplier === 1 ? '1 porción' : `${multiplier}x`
+    const portionText = multiplier === 1 ? '1 porción' : multiplier === 0.5 ? '½ porción' : `${multiplier}x`
     showToast(`+${Math.round(preset.calories * multiplier)} kcal • ${preset.name} (${portionText})`)
   }
 
@@ -86,7 +92,7 @@ export function NutritionView() {
       protein: Number(newProtein) || 0,
       carbs: Number(newCarbs) || 0,
       fats: Number(newFats) || 0,
-      category: 'personalizado'
+      category: newCategory
     }
 
     const updated = [...presets, newPreset]
@@ -102,16 +108,6 @@ export function NutritionView() {
     setNewFats('')
     setIsNewPresetOpen(false)
     showToast(`¡Bloque "${newPreset.name}" creado con éxito!`)
-  }
-
-  // Eliminar un preset
-  const handleDeletePreset = (id, name) => {
-    if (window.confirm(`¿Eliminar el bloque "${name}" de tus frecuentes?`)) {
-      const updated = presets.filter((p) => p.id !== id)
-      setPresets(updated)
-      saveMealPresets(updated)
-      showToast(`Bloque "${name}" eliminado.`)
-    }
   }
 
   // Copiar SQL de Supabase
@@ -136,6 +132,16 @@ export function NutritionView() {
       .reduce((acc, curr) => acc + (curr.multiplier || 1), 0)
   }
 
+  // Filtrado por categoría y búsqueda
+  const filteredPresets = presets.filter((p) => {
+    const matchesCategory = selectedCategory === 'todos' || p.category === selectedCategory
+    const matchesSearch =
+      searchQuery.trim() === '' ||
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.serving_label.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
+
   return (
     <div className="space-y-4 pb-32 animate-fadeIn text-white">
       {/* Toast Notification Flotante */}
@@ -150,10 +156,10 @@ export function NutritionView() {
       <div className="flex items-center justify-between pt-1">
         <div>
           <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
-            NUTRICIÓN CERO FRICCIÓN
+            NUTRICIÓN REAL • DIETA CHILENA
           </span>
           <h2 className="text-xl font-black text-white leading-tight">
-            Dieta & Macros
+            Comidas & Macros
           </h2>
         </div>
 
@@ -195,7 +201,7 @@ export function NutritionView() {
         <div className="flex items-start justify-between">
           <div>
             <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
-              CALORÍAS CONSUMIDAS HOY
+              CALORÍAS DEL DÍA
             </span>
             <div className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none mt-1 drop-shadow-[0_2px_8px_rgba(255,255,255,0.15)]">
               {todayMacros.total_calories}
@@ -224,7 +230,7 @@ export function NutritionView() {
           </div>
           <div className="flex items-center justify-between text-[10px] font-bold text-zinc-400 px-0.5">
             <span>{calPercent}% de tu meta</span>
-            <span>Objetivo: {targets.calories} kcal</span>
+            <span>Meta recomendada: {targets.calories} kcal</span>
           </div>
         </div>
 
@@ -274,31 +280,72 @@ export function NutritionView() {
         </div>
       </div>
 
-      {/* TARJETA 2: EL PANEL DE BLOQUES FRECUENTES (UN TOQUE) */}
+      {/* SELECTOR DE CATEGORÍAS & FILTROS */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <div>
             <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
-              BLOQUES DE COMIDA (UN TOQUE)
+              BASE DE COMIDAS CHILENAS (CERO FRICCIÓN)
             </span>
             <h3 className="text-base font-black text-white leading-tight">
-              Toca para sumar a tu día
+              Toca para sumar • Sin pesar nada
             </h3>
           </div>
-          <span className="text-[10px] text-zinc-400 font-semibold">
-            {presets.length} bloques listos
-          </span>
         </div>
 
-        {/* Grid de Bloques */}
-        <div className="grid grid-cols-2 gap-3">
-          {presets.map((preset) => {
+        {/* Chips de Categorías */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          {MEAL_CATEGORIES.map((cat) => {
+            const isSelected = selectedCategory === cat.id
+            const count =
+              cat.id === 'todos'
+                ? presets.length
+                : presets.filter((p) => p.category === cat.id).length
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-black whitespace-nowrap transition-all cursor-pointer touch-press ${
+                  isSelected
+                    ? 'bg-white text-black shadow-md shadow-white/20'
+                    : 'bg-[#212227] text-zinc-400 hover:text-white border border-[#2C2D34]'
+                }`}
+              >
+                {cat.label} ({count})
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Buscador Rápido */}
+        <div className="relative">
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Buscar porotos, marraqueta, cazuela, completo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-[#212227] rounded-2xl text-xs font-medium text-white placeholder-zinc-500 border border-[#2C2D34] outline-none focus:border-zinc-400 transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Grid de Bloques de Comida Chilena */}
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          {filteredPresets.map((preset) => {
             const eatenCount = countsToday(preset.id)
             return (
               <div
                 key={preset.id}
                 onClick={() => handleQuickAdd(preset, 1)}
-                className="relative rounded-[24px] bg-[#212227] hover:bg-[#28292F] p-4 flex flex-col justify-between min-h-[150px] border border-[#2C2D34] hover:border-zinc-400 transition-all active:scale-[0.97] cursor-pointer group shadow-lg"
+                className="relative rounded-[24px] bg-[#212227] hover:bg-[#28292F] p-4 flex flex-col justify-between min-h-[160px] border border-[#2C2D34] hover:border-zinc-400 transition-all active:scale-[0.98] cursor-pointer group shadow-lg"
               >
                 {/* Header de la tarjeta */}
                 <div className="flex items-start justify-between">
@@ -321,36 +368,51 @@ export function NutritionView() {
                 </div>
 
                 {/* Info del alimento */}
-                <div className="mt-2">
+                <div className="mt-2.5">
                   <h4 className="text-sm font-black text-white leading-tight line-clamp-1">
                     {preset.name}
                   </h4>
-                  <p className="text-[10px] text-zinc-400 font-semibold mt-0.5">
+                  <p className="text-[10px] text-zinc-400 font-semibold mt-0.5 line-clamp-1">
                     {preset.serving_label}
                   </p>
                 </div>
 
-                {/* Macros pills */}
-                <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[#2C2D34]/60 text-[9px] font-bold text-zinc-300">
-                  <span className="text-emerald-400">{preset.protein}g P</span>
-                  <span>•</span>
-                  <span>{preset.carbs}g C</span>
-                  <span>•</span>
-                  <span className="text-amber-400">{preset.fats}g G</span>
-                </div>
+                {/* Macros pills & Botones de Porción rápida */}
+                <div className="mt-3 pt-2 border-t border-[#2C2D34]/60 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold text-zinc-300">
+                    <span className="text-emerald-400">{preset.protein}g P</span>
+                    <span>•</span>
+                    <span>{preset.carbs}g C</span>
+                    <span>•</span>
+                    <span className="text-amber-400">{preset.fats}g G</span>
+                  </div>
 
-                {/* Botón flotante para sumar media porción (0.5x) */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleQuickAdd(preset, 0.5)
-                  }}
-                  className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-[#1A1B20] text-zinc-400 hover:text-white text-[8px] font-bold border border-[#2C2D34] hover:border-zinc-400 transition-colors"
-                  title="Sumar media porción (0.5x)"
-                >
-                  +0.5
-                </button>
+                  {/* Acceso a media porción o doble ración */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleQuickAdd(preset, 0.5)
+                      }}
+                      className="px-1.5 py-0.5 rounded-md bg-[#1A1B20] text-zinc-400 hover:text-white text-[8px] font-bold border border-[#2C2D34] hover:border-zinc-400 transition-colors cursor-pointer"
+                      title="Sumar media porción (½)"
+                    >
+                      ½
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleQuickAdd(preset, 2)
+                      }}
+                      className="px-1.5 py-0.5 rounded-md bg-[#1A1B20] text-zinc-400 hover:text-white text-[8px] font-bold border border-[#2C2D34] hover:border-zinc-400 transition-colors cursor-pointer"
+                      title="Sumar doble porción (2x)"
+                    >
+                      2x
+                    </button>
+                  </div>
+                </div>
               </div>
             )
           })}
@@ -395,7 +457,7 @@ export function NutritionView() {
                     </span>
                     {log.multiplier !== 1 && (
                       <span className="text-[9px] font-black text-zinc-400 bg-[#2C2D34] px-1.5 py-0.5 rounded">
-                        {log.multiplier}x
+                        {log.multiplier === 0.5 ? '½ porción' : `${log.multiplier}x`}
                       </span>
                     )}
                   </div>
@@ -418,7 +480,7 @@ export function NutritionView() {
         </div>
       )}
 
-      {/* MODAL: CREAR NUEVO BLOQUE DE COMIDA FRECUENTE */}
+      {/* MODAL: CREAR NUEVO BLOQUE DE COMIDA PERSONALIZADO */}
       {isNewPresetOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
           <div className="bg-[#212227] rounded-[28px] p-6 max-w-md w-full shadow-2xl border border-[#2C2D34] text-white space-y-4">
@@ -432,7 +494,7 @@ export function NutritionView() {
                     Nuevo Bloque de Comida
                   </h3>
                   <p className="text-xs text-zinc-400 font-medium">
-                    Guarda tus platos frecuentes para sumarlos en 1 toque
+                    Guarda tus platos para sumarlos en 1 toque
                   </p>
                 </div>
               </div>
@@ -447,11 +509,11 @@ export function NutritionView() {
             <form onSubmit={handleCreatePreset} className="space-y-3.5">
               <div>
                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
-                  Nombre del Plato / Comida *
+                  Nombre del Plato / Alimento *
                 </label>
                 <input
                   type="text"
-                  placeholder="ej. Pan con Palta y Huevo"
+                  placeholder="ej. Pan con Palta y Atún"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-bold text-white outline-none focus:ring-1 focus:ring-white border border-[#2C2D34]"
@@ -459,17 +521,34 @@ export function NutritionView() {
                 />
               </div>
 
-              <div>
-                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
-                  Descripción de la Porción
-                </label>
-                <input
-                  type="text"
-                  placeholder="ej. 1 Unidad, 1 Plato Hondo, 2 Rebanadas"
-                  value={newServing}
-                  onChange={(e) => setNewServing(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-sm font-bold text-white outline-none focus:ring-1 focus:ring-white border border-[#2C2D34]"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    Porción
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="ej. 1 Marraqueta, 1 Plato"
+                    value={newServing}
+                    onChange={(e) => setNewServing(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-bold text-white outline-none focus:ring-1 focus:ring-white border border-[#2C2D34]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    Categoría
+                  </label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-bold text-white outline-none focus:ring-1 focus:ring-white border border-[#2C2D34]"
+                  >
+                    <option value="almuerzo">Platos & Almuerzo</option>
+                    <option value="once">La Once & Desayuno</option>
+                    <option value="antojo">Antojos & Snacks</option>
+                  </select>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -557,7 +636,7 @@ export function NutritionView() {
                     Script SQL para Supabase
                   </h3>
                   <p className="text-xs text-zinc-400 font-medium">
-                    Copia y ejecuta en el SQL Editor de tu proyecto Supabase
+                    Base de comidas chilenas lista para ejecutar en tu Supabase
                   </p>
                 </div>
               </div>
@@ -571,7 +650,7 @@ export function NutritionView() {
 
             <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
               <p className="text-xs text-zinc-300 leading-relaxed">
-                Este script crea las tablas <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">meal_presets</code> y <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">daily_macros</code>, además de la función RPC <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">log_quick_meal()</code> para sincronización remota:
+                Este script crea las tablas <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">meal_presets</code> e inserta la base de comidas chilenas, además de la tabla <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">daily_macros</code> y la función RPC:
               </p>
 
               <div className="relative">
