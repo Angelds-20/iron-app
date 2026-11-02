@@ -271,8 +271,8 @@ export function HomeHub({
           {/* Header del Banner */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-              <span className="text-[10px] font-black tracking-widest uppercase text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] animate-pulse" />
+              <span className="text-[10px] font-black tracking-widest uppercase text-white/90">
                 HOY • DESCANSO ACTIVO & RECUPERACIÓN
               </span>
             </div>

@@ -37,8 +37,6 @@ export function NutritionView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [toastMessage, setToastMessage] = useState('')
   const [isNewPresetOpen, setIsNewPresetOpen] = useState(false)
-  const [isSqlModalOpen, setIsSqlModalOpen] = useState(false)
-  const [copiedSql, setCopiedSql] = useState(false)
 
   // Formulario de nuevo preset
   const [newName, setNewName] = useState('')
@@ -174,15 +172,6 @@ export function NutritionView() {
               <RotateCcw className="w-4 h-4" />
             </button>
           )}
-
-          <button
-            type="button"
-            onClick={() => setIsSqlModalOpen(true)}
-            className="p-2 rounded-2xl bg-[#212227] hover:bg-[#2C2D34] text-zinc-300 hover:text-white transition-colors cursor-pointer border border-[#2C2D34]"
-            title="Ver Script SQL para Supabase"
-          >
-            <Database className="w-4 h-4" />
-          </button>
 
           <button
             type="button"
@@ -618,67 +607,6 @@ export function NutritionView() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: SCRIPT SQL PARA SUPABASE */}
-      {isSqlModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="bg-[#212227] rounded-[28px] p-6 max-w-lg w-full max-h-[88vh] flex flex-col shadow-2xl border border-[#2C2D34] text-white space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#2C2D34]">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#2C2D34] flex items-center justify-center text-white">
-                  <Database className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-white leading-tight">
-                    Script SQL para Supabase
-                  </h3>
-                  <p className="text-xs text-zinc-400 font-medium">
-                    Base de comidas chilenas lista para ejecutar en tu Supabase
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsSqlModalOpen(false)}
-                className="p-2 rounded-full hover:bg-[#2C2D34] text-zinc-400 hover:text-white transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
-              <p className="text-xs text-zinc-300 leading-relaxed">
-                Este script crea las tablas <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">meal_presets</code> e inserta la base de comidas chilenas, además de la tabla <code className="text-white bg-[#1A1B20] px-1.5 py-0.5 rounded">daily_macros</code> y la función RPC:
-              </p>
-
-              <div className="relative">
-                <pre className="p-4 bg-[#141518] rounded-2xl text-[11px] font-mono text-zinc-300 overflow-x-auto border border-[#2C2D34] leading-relaxed">
-                  {SUPABASE_NUTRITION_SQL}
-                </pre>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={handleCopySql}
-                className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-black text-xs rounded-[20px] transition-all flex items-center justify-center gap-2 cursor-pointer touch-press shadow-xl shadow-white/20"
-              >
-                {copiedSql ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                    <span>¡SQL Copiado al Portapapeles!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 text-black" />
-                    <span>Copiar Script SQL</span>
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         </div>
       )}

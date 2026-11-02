@@ -187,16 +187,19 @@ export const MEAL_CATEGORIES = [
   { id: 'antojo', label: 'Antojos & Snacks' }
 ]
 
-// Cargar presets de comidas guardados (con migración a v2)
+// Cargar presets de comidas guardados (con migración forzada a base chilena v2)
 export function loadMealPresets() {
   const savedV2 = localStorage.getItem('iron_meal_presets_v2')
   if (savedV2) {
     try {
       const list = JSON.parse(savedV2)
-      if (Array.isArray(list) && list.length > 0) return list
+      // Si la lista guardada tiene al menos 12 comidas y no tiene el medio pan viejo, usarla
+      if (Array.isArray(list) && list.length >= 12 && !list.some((p) => p.id === 'preset-medio-pan-manjar')) {
+        return list
+      }
     } catch (e) {}
   }
-  // Limpiar clave obsoleta si existía
+  // Limpiar clave obsoleta si existía y sembrar las 16 comidas chilenas
   localStorage.removeItem('iron_meal_presets_v1')
   localStorage.setItem('iron_meal_presets_v2', JSON.stringify(DEFAULT_MEAL_PRESETS))
   return DEFAULT_MEAL_PRESETS

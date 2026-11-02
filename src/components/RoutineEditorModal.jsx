@@ -165,26 +165,26 @@ export function RoutineEditorModal({
   ]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/65 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-4xl p-5 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl border border-sand-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn text-white">
+      <div className="bg-[#212227] rounded-[28px] p-5 sm:p-6 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl border border-[#2C2D34]">
         {/* Cabecera */}
-        <div className="flex items-center justify-between pb-3 border-b border-sand-200">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-carbon-900 flex items-center justify-center text-coral-500 shadow-sm">
-              <Layers className="w-4 h-4" />
+        <div className="flex items-center justify-between pb-3 border-b border-[#2C2D34]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#1A1B20] border border-[#2C2D34] flex items-center justify-center text-white">
+              <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black text-carbon-900 leading-tight">
+              <h3 className="text-base font-black text-white leading-tight">
                 {routineToEdit ? 'Editar Rutina' : 'Nueva Rutina'}
               </h3>
-              <p className="text-[10px] text-neutral-400 font-semibold">
+              <p className="text-[10px] text-zinc-400 font-semibold">
                 Estructura tus ejercicios, series y cargas
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-sand-100 text-neutral-400 transition-colors cursor-pointer"
+            className="p-2 rounded-full hover:bg-[#2C2D34] text-zinc-400 hover:text-white transition-colors cursor-pointer"
             aria-label="Cerrar modal"
           >
             <X className="w-5 h-5" />
@@ -195,7 +195,7 @@ export function RoutineEditorModal({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto no-scrollbar py-3.5 space-y-4">
           {/* Título de la Rutina */}
           <div>
-            <label className="block text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-1">
+            <label className="block text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-1">
               Nombre de la Rutina
             </label>
             <input
@@ -203,7 +203,7 @@ export function RoutineEditorModal({
               placeholder="Ej: Empuje Pesado, Torso Fuerza, Brazos & Hombro..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none focus:border-coral-500"
+              className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-bold text-white border border-[#2C2D34] outline-none focus:border-white transition-colors"
               required
             />
           </div>
@@ -211,13 +211,13 @@ export function RoutineEditorModal({
           {/* División Muscular & Descripción */}
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-1">
+              <label className="block text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-1">
                 División / Split
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-sand-100 rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none cursor-pointer"
+                className="w-full px-3 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-bold text-white border border-[#2C2D34] outline-none cursor-pointer"
               >
                 <option value="torso">Torso</option>
                 <option value="pierna">Pierna</option>
@@ -227,7 +227,7 @@ export function RoutineEditorModal({
               </select>
             </div>
             <div>
-              <label className="block text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-1">
+              <label className="block text-[10px] font-black tracking-widest text-zinc-400 uppercase mb-1">
                 Objetivo / Nota
               </label>
               <input
@@ -235,7 +235,7 @@ export function RoutineEditorModal({
                 placeholder="Ej: Foco RIR 2, banco 60kg"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 bg-sand-100 rounded-xl text-xs font-medium text-carbon-900 border border-sand-200 outline-none"
+                className="w-full px-3 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-medium text-white border border-[#2C2D34] outline-none focus:border-white"
               />
             </div>
           </div>
@@ -243,24 +243,24 @@ export function RoutineEditorModal({
           {/* Lista de Ejercicios */}
           <div className="pt-1">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+              <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                 Ejercicios Planificados ({exercises.length})
               </span>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setShowCatalogPicker(true)}
-                  className="px-2.5 py-1 rounded-full bg-sand-100 hover:bg-sand-200 text-carbon-900 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-full bg-[#1A1B20] hover:bg-[#2C2D34] text-white text-[10px] font-bold flex items-center gap-1 border border-[#2C2D34] transition-colors cursor-pointer"
                 >
-                  <BookOpen className="w-3 h-3 text-coral-500" />
-                  <span>Catálogo Patio</span>
+                  <BookOpen className="w-3 h-3 text-white" />
+                  <span>Catálogo</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleAddCustomExercise}
-                  className="px-2.5 py-1 rounded-full bg-coral-50 hover:bg-coral-100 text-coral-600 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-full bg-white text-black hover:bg-zinc-200 text-[10px] font-black flex items-center gap-1 shadow-sm transition-all cursor-pointer"
                 >
-                  <Plus className="w-3 h-3 text-coral-500" />
+                  <Plus className="w-3 h-3 text-black stroke-[3]" />
                   <span>Manual</span>
                 </button>
               </div>
@@ -268,15 +268,15 @@ export function RoutineEditorModal({
 
             {/* Selector desplegable de catálogo */}
             {showCatalogPicker && (
-              <div className="mb-3.5 p-3.5 bg-sand-100/90 rounded-2xl border border-sand-200 space-y-2.5 animate-fadeIn">
+              <div className="mb-3.5 p-3.5 bg-[#141518] rounded-2xl border border-[#2C2D34] space-y-2.5 animate-fadeIn">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black tracking-widest text-carbon-900 uppercase">
+                  <span className="text-[10px] font-black tracking-widest text-white uppercase">
                     Elegir del Catálogo
                   </span>
                   <button
                     type="button"
                     onClick={() => setShowCatalogPicker(false)}
-                    className="text-neutral-400 hover:text-carbon-900 p-0.5"
+                    className="text-zinc-400 hover:text-white p-0.5"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -284,13 +284,13 @@ export function RoutineEditorModal({
 
                 {/* Búsqueda */}
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-neutral-400" />
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-zinc-400" />
                   <input
                     type="text"
                     placeholder="Buscar ejercicio o equipamiento..."
                     value={catalogSearch}
                     onChange={(e) => setCatalogSearch(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1.5 bg-white rounded-xl text-xs text-carbon-900 border border-sand-200 outline-none"
+                    className="w-full pl-8 pr-3 py-1.5 bg-[#1A1B20] rounded-xl text-xs text-white border border-[#2C2D34] outline-none focus:border-white"
                   />
                 </div>
 
@@ -303,8 +303,8 @@ export function RoutineEditorModal({
                       onClick={() => setCatalogMuscleFilter(cat.id)}
                       className={`px-2 py-1 rounded-full text-[9px] font-bold whitespace-nowrap transition-colors cursor-pointer ${
                         catalogMuscleFilter === cat.id
-                          ? 'bg-carbon-900 text-white'
-                          : 'bg-white text-neutral-500 hover:text-carbon-900'
+                          ? 'bg-white text-black font-black'
+                          : 'bg-[#1A1B20] text-zinc-400 hover:text-white border border-[#2C2D34]'
                       }`}
                     >
                       {cat.label}
@@ -319,21 +319,21 @@ export function RoutineEditorModal({
                       key={item.id}
                       type="button"
                       onClick={() => handleAddCatalogExercise(item)}
-                      className="w-full text-left p-2 bg-white hover:bg-coral-50/60 rounded-xl border border-sand-200/80 flex items-center justify-between transition-colors group cursor-pointer"
+                      className="w-full text-left p-2 bg-[#1A1B20] hover:bg-[#22242B] rounded-xl border border-[#2C2D34] flex items-center justify-between transition-colors group cursor-pointer"
                     >
                       <div>
-                        <div className="text-xs font-bold text-carbon-900 group-hover:text-coral-600">
+                        <div className="text-xs font-bold text-white group-hover:text-zinc-200">
                           {item.name}
                         </div>
-                        <div className="text-[9px] text-neutral-400 font-medium">
+                        <div className="text-[9px] text-zinc-400 font-medium">
                           {item.equipment} • {item.defaultWeight} kg base
                         </div>
                       </div>
-                      <Plus className="w-3.5 h-3.5 text-neutral-400 group-hover:text-coral-500" />
+                      <Plus className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white" />
                     </button>
                   ))}
                   {filteredCatalog.length === 0 && (
-                    <div className="text-center py-3 text-[10px] text-neutral-400 font-medium">
+                    <div className="text-center py-3 text-[10px] text-zinc-400 font-medium">
                       No se encontraron ejercicios con ese criterio.
                     </div>
                   )}
@@ -346,15 +346,15 @@ export function RoutineEditorModal({
               {exercises.map((ex, idx) => (
                 <div
                   key={ex.id || idx}
-                  className="p-3 bg-sand-50 rounded-2xl border border-sand-200/80 space-y-2 relative"
+                  className="p-3 bg-[#1A1B20] rounded-2xl border border-[#2C2D34] space-y-2 relative"
                 >
                   {/* Encabezado del Ejercicio: Número, Reordenar y Borrar */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-carbon-900 text-white text-[9px] font-black flex items-center justify-center">
+                      <span className="w-5 h-5 rounded-full bg-white text-black text-[9px] font-black flex items-center justify-center">
                         {idx + 1}
                       </span>
-                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider">
+                      <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">
                         ORDEN
                       </span>
                     </div>
@@ -365,7 +365,7 @@ export function RoutineEditorModal({
                         type="button"
                         onClick={() => handleMoveExercise(idx, -1)}
                         disabled={idx === 0}
-                        className="p-1 rounded-lg bg-white border border-sand-200 text-neutral-500 hover:text-carbon-900 disabled:opacity-30 disabled:hover:text-neutral-500 cursor-pointer"
+                        className="p-1 rounded-lg bg-[#2C2D34] text-zinc-400 hover:text-white disabled:opacity-20 cursor-pointer"
                         title="Subir de posición"
                       >
                         <ArrowUp className="w-3 h-3" />
@@ -375,7 +375,7 @@ export function RoutineEditorModal({
                         type="button"
                         onClick={() => handleMoveExercise(idx, 1)}
                         disabled={idx === exercises.length - 1}
-                        className="p-1 rounded-lg bg-white border border-sand-200 text-neutral-500 hover:text-carbon-900 disabled:opacity-30 disabled:hover:text-neutral-500 cursor-pointer"
+                        className="p-1 rounded-lg bg-[#2C2D34] text-zinc-400 hover:text-white disabled:opacity-20 cursor-pointer"
                         title="Bajar de posición"
                       >
                         <ArrowDown className="w-3 h-3" />
@@ -385,7 +385,7 @@ export function RoutineEditorModal({
                         <button
                           type="button"
                           onClick={() => handleRemoveExercise(idx)}
-                          className="p-1 rounded-lg bg-white border border-sand-200 text-neutral-400 hover:text-rose-500 ml-1 transition-colors cursor-pointer"
+                          className="p-1 rounded-lg bg-[#2C2D34] text-zinc-400 hover:text-rose-400 ml-1 transition-colors cursor-pointer"
                           title="Eliminar ejercicio"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -401,7 +401,7 @@ export function RoutineEditorModal({
                       placeholder="Nombre del ejercicio..."
                       value={ex.name}
                       onChange={(e) => handleUpdateExercise(idx, 'name', e.target.value)}
-                      className="w-full px-3 py-1.5 bg-white rounded-xl text-xs font-bold text-carbon-900 border border-sand-200 outline-none focus:border-carbon-900"
+                      className="w-full px-3 py-1.5 bg-[#141518] rounded-xl text-xs font-bold text-white border border-[#2C2D34] outline-none focus:border-white"
                       required
                     />
                   </div>
@@ -413,14 +413,14 @@ export function RoutineEditorModal({
                       placeholder="Equipamiento (ej: Barra 60kg, Barra chica...)"
                       value={ex.equipment || ''}
                       onChange={(e) => handleUpdateExercise(idx, 'equipment', e.target.value)}
-                      className="w-full px-2.5 py-1 bg-white/70 rounded-lg text-[10px] text-neutral-500 border border-sand-200/80 outline-none"
+                      className="w-full px-2.5 py-1 bg-[#141518] rounded-lg text-[10px] text-zinc-400 border border-[#2C2D34] outline-none"
                     />
                   </div>
 
                   {/* Métricas: Series, Reps, Peso Base, RIR */}
                   <div className="grid grid-cols-4 gap-1.5 text-center">
                     <div>
-                      <span className="text-[8px] font-black text-neutral-400 uppercase">Series</span>
+                      <span className="text-[8px] font-black text-zinc-400 uppercase">Series</span>
                       <input
                         type="number"
                         min="1"
@@ -429,20 +429,20 @@ export function RoutineEditorModal({
                         onChange={(e) =>
                           handleUpdateExercise(idx, 'targetSets', Number(e.target.value))
                         }
-                        className="w-full text-center py-1 bg-white rounded-lg text-xs font-black text-carbon-900 border border-sand-200 outline-none"
+                        className="w-full text-center py-1 bg-[#141518] rounded-lg text-xs font-black text-white border border-[#2C2D34] outline-none"
                       />
                     </div>
                     <div>
-                      <span className="text-[8px] font-black text-neutral-400 uppercase">Reps</span>
+                      <span className="text-[8px] font-black text-zinc-400 uppercase">Reps</span>
                       <input
                         type="text"
                         value={ex.targetReps || '10'}
                         onChange={(e) => handleUpdateExercise(idx, 'targetReps', e.target.value)}
-                        className="w-full text-center py-1 bg-white rounded-lg text-xs font-bold text-carbon-900 border border-sand-200 outline-none"
+                        className="w-full text-center py-1 bg-[#141518] rounded-lg text-xs font-bold text-white border border-[#2C2D34] outline-none"
                       />
                     </div>
                     <div>
-                      <span className="text-[8px] font-black text-neutral-400 uppercase">Peso (kg)</span>
+                      <span className="text-[8px] font-black text-zinc-400 uppercase">Peso (kg)</span>
                       <input
                         type="number"
                         step="0.5"
@@ -450,17 +450,17 @@ export function RoutineEditorModal({
                         onChange={(e) =>
                           handleUpdateExercise(idx, 'defaultWeight', Number(e.target.value))
                         }
-                        className="w-full text-center py-1 bg-white rounded-lg text-xs font-black text-carbon-900 border border-sand-200 outline-none"
+                        className="w-full text-center py-1 bg-[#141518] rounded-lg text-xs font-black text-white border border-[#2C2D34] outline-none"
                       />
                     </div>
                     <div>
-                      <span className="text-[8px] font-black text-neutral-400 uppercase">RIR Obj</span>
+                      <span className="text-[8px] font-black text-zinc-400 uppercase">RIR Obj</span>
                       <select
                         value={ex.defaultRir !== undefined ? ex.defaultRir : 2}
                         onChange={(e) =>
                           handleUpdateExercise(idx, 'defaultRir', Number(e.target.value))
                         }
-                        className="w-full text-center py-1 bg-white rounded-lg text-[11px] font-black text-carbon-900 border border-sand-200 outline-none cursor-pointer"
+                        className="w-full text-center py-1 bg-[#141518] rounded-lg text-[11px] font-black text-white border border-[#2C2D34] outline-none cursor-pointer"
                       >
                         <option value={3}>RIR 3</option>
                         <option value={2}>RIR 2</option>
@@ -478,9 +478,9 @@ export function RoutineEditorModal({
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3 bg-carbon-900 hover:bg-black text-white text-xs font-black rounded-full transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
+              className="w-full py-4 bg-white hover:bg-zinc-200 text-black font-black text-xs rounded-[20px] transition-all flex items-center justify-center gap-2 shadow-xl shadow-white/20 cursor-pointer touch-press"
             >
-              <Check className="w-4 h-4 text-coral-500" />
+              <Check className="w-4 h-4 text-black stroke-[3]" />
               <span>{routineToEdit ? 'Actualizar Rutina' : 'Guardar y Activar Rutina'}</span>
             </button>
           </div>
