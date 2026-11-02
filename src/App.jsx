@@ -575,7 +575,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0E0E11] text-white flex justify-center selection:bg-coral-500 selection:text-white">
+    <div className="min-h-screen bg-[#121316] text-white flex justify-center selection:bg-coral-500 selection:text-white">
       {/* Contenedor optimizado para iPhone con espacio seguro para el notch/Dynamic Island (44-48px) */}
       <div className="w-full max-w-md px-4 sm:px-5 pt-12 sm:pt-14 pb-28 relative min-h-screen">
         {/* Vistas según la pestaña activa */}

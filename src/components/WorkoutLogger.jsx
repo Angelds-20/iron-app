@@ -462,21 +462,21 @@ export function WorkoutLogger({
       <div className="flex items-center gap-2 mb-4">
         <button
           onClick={onCancel}
-          className="w-11 h-11 rounded-2xl bg-[#18181D] hover:bg-[#22222A] text-zinc-300 hover:text-white flex items-center justify-center shadow-lg shadow-black/20 touch-press flex-shrink-0 cursor-pointer"
-          title="Guardar y volver al inicio"
+          className="w-11 h-11 rounded-full bg-[#212227] hover:bg-[#2C2D34] text-white flex items-center justify-center shadow-md touch-press flex-shrink-0 cursor-pointer"
+          title="Guardar y volver a Workouts"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 bg-[#18181D] p-1.5 rounded-2xl shadow-lg shadow-black/20">
+        <div className="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 bg-[#212227] p-1.5 rounded-full shadow-md">
           {routines.map((rot, idx) => (
             <button
               key={rot.id || idx}
               onClick={() => handleSwitchRoutine(idx)}
-              className={`px-3.5 py-2 text-xs font-black rounded-xl transition-all whitespace-nowrap flex-shrink-0 cursor-pointer touch-press ${
+              className={`px-4 py-2 text-xs font-extrabold rounded-full transition-all whitespace-nowrap flex-shrink-0 cursor-pointer touch-press ${
                 selectedRoutineIndex === idx
-                  ? 'bg-[#272731] text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-[#8E909A] hover:text-white'
               }`}
             >
               {rot.title.split('—')[0].trim()}
@@ -487,13 +487,13 @@ export function WorkoutLogger({
 
       {/* Timer de descanso flotante dinámico con espacio para el notch */}
       {restSeconds > 0 && (
-        <div className="fixed top-12 sm:top-14 left-4 right-4 z-50 max-w-md mx-auto bg-[#18181D]/95 backdrop-blur-md text-white rounded-3xl p-4 flex items-center justify-between shadow-2xl shadow-black/70 animate-slideDown">
+        <div className="fixed top-12 sm:top-14 left-4 right-4 z-50 max-w-md mx-auto bg-[#212227]/95 backdrop-blur-md text-white rounded-[24px] p-4 flex items-center justify-between shadow-2xl shadow-black/80 animate-slideDown">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#272731] flex items-center justify-center text-coral-500">
+            <div className="w-10 h-10 rounded-2xl bg-[#2C2D34] flex items-center justify-center text-coral-500">
               <Clock className="w-5 h-5 animate-spin" />
             </div>
             <div>
-              <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-[#8E909A] uppercase tracking-wider">
                 DESCANSO EN VIVO
               </div>
               <div className="text-2xl font-black text-coral-500 font-mono tracking-tight leading-none">
@@ -505,7 +505,7 @@ export function WorkoutLogger({
             <button
               type="button"
               onClick={() => addRestTime(30)}
-              className="text-xs font-black px-3.5 py-2 rounded-xl bg-[#272731] hover:bg-[#343442] text-zinc-200 transition-colors touch-press cursor-pointer"
+              className="text-xs font-black px-3.5 py-2 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white transition-colors touch-press cursor-pointer"
             >
               +30s
             </button>
@@ -521,7 +521,7 @@ export function WorkoutLogger({
       )}
 
       {/* Encabezado con tiempo de entrenamiento real en vivo */}
-      <div className="bg-[#18181D] rounded-3xl p-6 shadow-xl shadow-black/30 mb-4 space-y-2">
+      <div className="bg-[#212227] rounded-[28px] p-6 shadow-lg mb-4 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -532,22 +532,22 @@ export function WorkoutLogger({
           <div className="flex items-center gap-2">
             <a
               href="meulify://"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#272731] hover:bg-[#343442] text-zinc-200 text-xs font-bold transition-colors touch-press"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#2C2D34] hover:bg-[#383A44] text-white text-xs font-bold transition-colors touch-press"
               title="Abrir reproductor Meulify en iPhone"
             >
               <Music className="w-3.5 h-3.5 text-coral-500" />
               <span>Meulify</span>
             </a>
-            <div className="text-xs font-black font-mono text-white bg-[#272731] px-3 py-1.5 rounded-full">
+            <div className="text-xs font-black font-mono text-white bg-[#2C2D34] px-3 py-1.5 rounded-full">
               {formatTime(elapsedSeconds)}
             </div>
           </div>
         </div>
 
-        <h2 className="text-2xl font-black text-white tracking-tight leading-tight">
+        <h2 className="text-2xl font-extrabold text-white tracking-tight leading-tight">
           {currentRoutine.title}
         </h2>
-        <p className="text-xs text-zinc-400 leading-relaxed">{currentRoutine.description}</p>
+        <p className="text-xs text-[#8E909A] leading-relaxed">{currentRoutine.description}</p>
       </div>
 
       {/* Lista de Ejercicios */}
@@ -565,16 +565,16 @@ export function WorkoutLogger({
           return (
             <div
               key={exercise.id}
-              className="bg-[#18181D] rounded-3xl p-5 sm:p-6 shadow-xl shadow-black/30 space-y-4"
+              className="bg-[#212227] rounded-[28px] p-5 sm:p-6 shadow-lg space-y-4"
             >
               {/* Encabezado del ejercicio con botón de Sustitución y Badge de Progresión */}
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="w-7 h-7 rounded-full bg-[#272731] text-white text-xs font-black flex items-center justify-center flex-shrink-0">
+                    <span className="w-7 h-7 rounded-full bg-[#2C2D34] text-white text-xs font-black flex items-center justify-center flex-shrink-0">
                       {exIndex + 1}
                     </span>
-                    <h3 className="text-lg font-black text-white leading-snug">{exercise.name}</h3>
+                    <h3 className="text-lg font-extrabold text-white leading-snug">{exercise.name}</h3>
                     {comparison?.isProgressing && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black tracking-wide uppercase">
                         <TrendingUp className="w-3 h-3 text-emerald-400" />
@@ -582,7 +582,7 @@ export function WorkoutLogger({
                       </span>
                     )}
                   </div>
-                  <div className="text-xs font-medium text-zinc-400 mt-1 ml-9">
+                  <div className="text-xs font-medium text-[#8E909A] mt-1 ml-9">
                     {exercise.equipment}
                   </div>
                 </div>
@@ -590,7 +590,7 @@ export function WorkoutLogger({
                 <button
                   type="button"
                   onClick={() => setSwapTargetExercise(exercise)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#272731] hover:bg-[#343442] text-zinc-200 text-xs font-bold transition-colors flex-shrink-0 touch-press cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#2C2D34] hover:bg-[#383A44] text-white text-xs font-bold transition-colors flex-shrink-0 touch-press cursor-pointer"
                   title="Cambiar ejercicio (ej: predicador por curl)"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-coral-500" />
@@ -600,11 +600,11 @@ export function WorkoutLogger({
 
               {/* Historial Contextual en Vivo & Sugerencia de Sobrecarga */}
               {lastPerformance && (
-                <div className="p-4 rounded-2xl bg-[#22222A] space-y-2">
+                <div className="p-4 rounded-2xl bg-[#1A1B20] space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold text-white">
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-coral-500 flex-shrink-0" />
-                      <span className="text-[10px] text-zinc-400 font-extrabold uppercase tracking-wider">Último entreno:</span>
+                      <span className="text-[10px] text-[#8E909A] font-extrabold uppercase tracking-wider">Último entreno:</span>
                       <span className="font-mono text-xs text-white font-black">
                         {formatPreviousSessionSummary(lastPerformance)}
                       </span>
@@ -624,12 +624,12 @@ export function WorkoutLogger({
               )}
 
               {/* Guía rápida de tempo / notas */}
-              <div className="text-xs text-zinc-400 flex items-center gap-2 font-medium px-1">
+              <div className="text-xs text-[#8E909A] flex items-center gap-2 font-medium px-1">
                 <TrendingUp className="w-3.5 h-3.5 text-coral-500 flex-shrink-0" />
                 <span>{exercise.notes}</span>
               </div>
 
-              {/* Series interactivas A PRUEBA DE GIMNASIO (Botones masivos de 44x44px, cero cajas de input) */}
+              {/* Series interactivas A PRUEBA DE GIMNASIO */}
               <div className="space-y-3">
                 {sets.map((set, setIdx) => (
                   <div
@@ -637,20 +637,20 @@ export function WorkoutLogger({
                     className={`rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-between gap-1.5 sm:gap-2 ${
                       set.completed
                         ? 'bg-emerald-950/30 ring-1 ring-emerald-500/40 text-white'
-                        : 'bg-[#22222A]'
+                        : 'bg-[#1A1B20]'
                     }`}
                   >
                     {/* Número de Serie */}
-                    <span className="text-xs font-black text-zinc-500 w-5 text-center flex-shrink-0">
+                    <span className="text-xs font-black text-[#565863] w-5 text-center flex-shrink-0">
                       #{set.setNumber}
                     </span>
 
-                    {/* Stepper de Peso (Kilos) - Botones masivos 44x44px a prueba de sudor */}
+                    {/* Stepper de Peso (Kilos) */}
                     <div className="flex items-center gap-1 sm:gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, -2.5)}
-                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
                         title="Restar 2.5 kg"
                       >
                         <Minus className="w-4 h-4 stroke-[2.5]" />
@@ -660,25 +660,25 @@ export function WorkoutLogger({
                         <span className="text-xl sm:text-2xl font-black font-mono text-white leading-none">
                           {set.weight}
                         </span>
-                        <span className="text-[10px] font-normal text-zinc-500 uppercase mt-0.5">kg</span>
+                        <span className="text-[10px] font-normal text-[#8E909A] uppercase mt-0.5">kg</span>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => handleQuickAdjustWeight(exercise.id, setIdx, 2.5)}
-                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
                         title="Sumar 2.5 kg"
                       >
                         <Plus className="w-4 h-4 stroke-[2.5]" />
                       </button>
                     </div>
 
-                    {/* Stepper de Repeticiones - Botones masivos 44x44px */}
+                    {/* Stepper de Repeticiones */}
                     <div className="flex items-center gap-1 sm:gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleQuickAdjustReps(exercise.id, setIdx, -1)}
-                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
                         title="Restar 1 rep"
                       >
                         <Minus className="w-4 h-4 stroke-[2.5]" />
@@ -688,13 +688,13 @@ export function WorkoutLogger({
                         <span className="text-xl sm:text-2xl font-black font-mono text-white leading-none">
                           {set.reps}
                         </span>
-                        <span className="text-[10px] font-normal text-zinc-500 uppercase mt-0.5">reps</span>
+                        <span className="text-[10px] font-normal text-[#8E909A] uppercase mt-0.5">reps</span>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => handleQuickAdjustReps(exercise.id, setIdx, 1)}
-                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2E2E3A] hover:bg-[#383848] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
+                        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#2C2D34] hover:bg-[#383A44] text-white flex items-center justify-center touch-press cursor-pointer flex-shrink-0 shadow-xs"
                         title="Sumar 1 rep"
                       >
                         <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -705,28 +705,28 @@ export function WorkoutLogger({
                     <button
                       type="button"
                       onClick={() => handleCycleRir(exercise.id, setIdx)}
-                      className={`h-10 sm:h-11 px-2 sm:px-3 rounded-xl text-xs font-black transition-all cursor-pointer touch-press flex items-center justify-center ${
+                      className={`h-10 sm:h-11 px-2.5 sm:px-3 rounded-xl text-xs font-black transition-all cursor-pointer touch-press flex items-center justify-center ${
                         set.rir === 0
                           ? 'bg-rose-500/20 text-rose-400'
                           : set.rir === 1
                           ? 'bg-amber-500/20 text-amber-400'
                           : set.rir === 2
                           ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-[#2E2E3A] text-zinc-300'
+                          : 'bg-[#2C2D34] text-zinc-300'
                       }`}
                       title="Repeticiones en reserva (toca para cambiar)"
                     >
                       {set.rir === 0 ? 'Fallo' : `RIR ${set.rir ?? 2}`}
                     </button>
 
-                    {/* Botón táctil grande de Check (48x48px hit target) */}
+                    {/* Botón táctil grande de Check */}
                     <button
                       type="button"
                       onClick={() => handleToggleComplete(exercise.id, setIdx)}
                       className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer touch-press flex-shrink-0 ${
                         set.completed
                           ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105'
-                          : 'bg-[#2E2E3A] hover:bg-[#383848] text-zinc-500 hover:text-white'
+                          : 'bg-[#2C2D34] hover:bg-[#383A44] text-[#565863] hover:text-white'
                       }`}
                       title={set.completed ? 'Serie completada' : 'Marcar serie como completada'}
                     >
@@ -748,8 +748,8 @@ export function WorkoutLogger({
                 </button>
 
                 {best1RM > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400">
-                    <span className="text-[10px] uppercase tracking-wider text-zinc-500">1RM Estimado:</span>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#8E909A]">
+                    <span className="text-[10px] uppercase tracking-wider text-[#565863]">1RM Estimado:</span>
                     <span className="font-mono font-black text-coral-500">{best1RM} kg</span>
                   </div>
                 )}
@@ -764,9 +764,9 @@ export function WorkoutLogger({
         <button
           type="button"
           onClick={handleAddNewExerciseToSession}
-          className="w-full py-4 rounded-3xl bg-[#18181D] hover:bg-[#22222A] text-zinc-300 hover:text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/20 touch-press cursor-pointer"
+          className="w-full py-4 rounded-[24px] bg-[#212227] hover:bg-[#2C2D34] text-white text-xs font-extrabold transition-all flex items-center justify-center gap-2 shadow-lg touch-press cursor-pointer"
         >
-          <Plus className="w-4 h-4 text-coral-500 stroke-[2.5]" />
+          <Plus className="w-4 h-4 text-white stroke-[2.5]" />
           <span>Añadir Otro Ejercicio a esta Sesión</span>
         </button>
       </div>
@@ -776,16 +776,16 @@ export function WorkoutLogger({
         <button
           type="button"
           onClick={handleFinish}
-          className="w-full py-4 bg-coral-500 hover:bg-coral-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-coral-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer touch-press"
+          className="w-full py-4 bg-white hover:bg-zinc-200 text-black font-extrabold text-sm rounded-[24px] shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer touch-press"
         >
-          <Sparkles className="w-4 h-4 text-white" />
+          <Sparkles className="w-4 h-4 text-black" />
           <span>Completar Entrenamiento de Hoy</span>
         </button>
 
         <button
           type="button"
           onClick={handleDiscardSession}
-          className="w-full py-3 text-zinc-500 hover:text-rose-400 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer touch-press"
+          className="w-full py-3 text-[#8E909A] hover:text-rose-400 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer touch-press"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Descartar progreso de esta sesión</span>

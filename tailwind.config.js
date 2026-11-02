@@ -8,12 +8,13 @@ export default {
     extend: {
       colors: {
         dark: {
-          950: '#0E0E11', // Canvas background ultra-profundo
-          900: '#17171C', // Card surface nivel 1
-          850: '#1E1E24', // Card surface nivel 2
-          800: '#272731', // Botones, steppers y chips elevados
-          700: '#343442', // Hover y bordes sutiles
-          600: '#464658'
+          950: '#121316', // Canvas background de la captura
+          900: '#212227', // Card surface exacta de la captura
+          850: '#27282F', // Card surface nivel 2
+          800: '#2C2D34', // Botones, steppers y círculos elevados de la captura
+          700: '#3A3C46', // Hover y bordes sutiles
+          600: '#565863', // Iconos mudos de la captura
+          muted: '#8E909A' // Texto secundario exacto de la captura
         },
         sand: {
           50: '#FAF9F6',
