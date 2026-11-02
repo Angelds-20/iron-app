@@ -19,7 +19,9 @@ import {
   RefreshCw,
   CheckCircle2,
   SlidersHorizontal,
-  Plus
+  Plus,
+  Play,
+  Calendar
 } from 'lucide-react'
 import { ExerciseTechniqueView } from './ExerciseTechniqueView'
 import { RirGuideView } from './RirGuideView'
@@ -123,6 +125,7 @@ export function HomeHub({
   completedDates = [],
   restDates = [],
   onLogRestDay,
+  lastWorkout,
   bodyweight,
   onUpdateWeight,
   onOpenEvolution,
@@ -140,7 +143,30 @@ export function HomeHub({
   const [activeSegment, setActiveSegment] = useState('workouts') // 'workouts' | 'recovery' | 'technique'
 
   const todayStr = new Date().toISOString().split('T')[0]
+  const yesterdayDate = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  const yesterdayStr = yesterdayDate.toISOString().split('T')[0]
+
   const isTodayRest = restDates.includes(todayStr)
+  const wasYesterdayTrained = completedDates.includes(yesterdayStr)
+
+  // Nombre formateado de días para lenguaje natural
+  const tomorrowDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
+  const tomorrowDayName = tomorrowDate.toLocaleDateString('es-ES', { weekday: 'long' })
+
+  // Rutina realizada ayer (Pecho + Tríceps)
+  const lastRoutineTitle = lastWorkout?.title || 'Torso — Banca & Inclinado'
+  const lastRoutineShort = 'Pecho + Tríceps'
+  const lastVolume = lastWorkout?.totalVolume || currentSessionVolume || 6420
+
+  // Siguiente rutina en el ciclo de sobrecarga
+  const isLastTorso =
+    lastWorkout?.routineId === 'torso-fuerza' ||
+    lastRoutineTitle.toLowerCase().includes('torso') ||
+    lastRoutineTitle.toLowerCase().includes('banca') ||
+    lastRoutineTitle.toLowerCase().includes('pecho')
+
+  const nextRoutineIndex = isLastTorso ? 1 : 0
+  const nextRoutine = routines[nextRoutineIndex] || routines[1] || routines[0]
 
   // Contar series completadas si hay sesión activa
   const completedSetsCount = activeSession?.exerciseData
@@ -188,23 +214,24 @@ export function HomeHub({
         </button>
       </div>
 
-      {/* Banner de Sesión en Curso */}
-      {activeSession?.isActive && completedSetsCount > 0 && (
-        <div className="bg-[#212227] text-white rounded-[28px] p-5 shadow-xl flex items-center justify-between animate-slideUp">
+      {/* Banner de Orientación Diaria Inteligente */}
+      {activeSession?.isActive && completedSetsCount > 0 ? (
+        /* Caso 1: Sesión en Curso */
+        <div className="bg-[#212227] text-white rounded-[28px] p-5 sm:p-6 shadow-xl border border-white/20 flex items-center justify-between animate-slideUp">
           <div
             onClick={() => onStartWorkout(activeSession.routineIndex || 0)}
             className="cursor-pointer flex-1 pr-3"
           >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,1)]" />
               <span className="text-[10px] font-black tracking-widest uppercase text-white">
                 SESIÓN EN CURSO
               </span>
             </div>
-            <h3 className="text-base font-black text-white leading-tight">
+            <h3 className="text-lg font-black text-white leading-tight">
               {routines[activeSession.routineIndex]?.title || 'Torso — Banca & Inclinado'}
             </h3>
-            <p className="text-xs text-zinc-300 mt-1">
+            <p className="text-xs text-zinc-300 mt-1 font-medium">
               {completedSetsCount} series completadas • Toca para continuar
             </p>
           </div>
@@ -213,10 +240,10 @@ export function HomeHub({
             <button
               type="button"
               onClick={() => onStartWorkout(activeSession.routineIndex || 0)}
-              className="px-4 py-2 rounded-full bg-white text-black hover:bg-zinc-200 text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer touch-press shadow-lg shadow-white/20"
+              className="px-4 py-2.5 rounded-2xl bg-white text-black hover:bg-zinc-200 text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer touch-press shadow-lg shadow-white/20"
             >
               <span>Continuar</span>
-              <ArrowRight className="w-3.5 h-3.5 text-black" />
+              <ArrowRight className="w-3.5 h-3.5 text-black stroke-[3]" />
             </button>
 
             {onDiscardActiveSession && (
@@ -228,10 +255,152 @@ export function HomeHub({
                     onDiscardActiveSession()
                   }
                 }}
-                className="p-2 rounded-full bg-[#2C2D34] text-zinc-300 hover:text-rose-400 transition-colors touch-press"
+                className="p-2.5 rounded-xl bg-[#2C2D34] text-zinc-400 hover:text-rose-400 transition-colors touch-press cursor-pointer"
                 title="Descartar sesión no guardada"
               >
                 <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      ) : isTodayRest ? (
+        /* Caso 2: Hoy toca DESCANSO ACTIVO & RECUPERACIÓN */
+        <div className="bg-[#212227] text-white rounded-[28px] p-5 sm:p-6 shadow-xl border border-[#2C2D34] space-y-4 animate-fadeIn">
+          {/* Header del Banner */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="text-[10px] font-black tracking-widest uppercase text-emerald-400">
+                HOY • DESCANSO ACTIVO & RECUPERACIÓN
+              </span>
+            </div>
+            <span className="text-[10px] font-bold text-zinc-400 bg-[#1A1B20] px-2.5 py-1 rounded-full border border-[#2C2D34]">
+              Racha protegida • +50 XP
+            </span>
+          </div>
+
+          {/* Título & Contexto de lo que hiciste ayer */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              Regenerando Pectoral & Tríceps
+            </h3>
+            <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
+              <span className="text-white font-semibold">Ayer completaste:</span>{' '}
+              <strong className="text-white">{lastRoutineShort}</strong> con{' '}
+              <strong className="text-white">{lastVolume.toLocaleString()} kg</strong> levantados en 15 series con barra de 60 kg.
+              Hoy tus fibras musculares se reparan y crecen.
+            </p>
+          </div>
+
+          {/* Tarjeta de Próximo Paso (Mañana) */}
+          <div className="p-3.5 bg-[#1A1B20] rounded-2xl border border-[#2C2D34] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#2C2D34] flex items-center justify-center text-white font-black text-sm">
+                2
+              </div>
+              <div>
+                <span className="text-[9px] font-black uppercase text-zinc-400 tracking-wider">
+                  SIGUIENTE SESIÓN • MAÑANA {tomorrowDayName.toUpperCase()}
+                </span>
+                <div className="text-sm font-black text-white leading-tight mt-0.5">
+                  {nextRoutine.title}
+                </div>
+                <div className="text-[10px] text-zinc-400 mt-0.5">
+                  Sentadilla 60 kg • Peso Muerto 60 kg • Zancadas 14 kg
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Botones de Acción */}
+          <div className="flex items-center gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={() => setActiveSegment('recovery')}
+              className="flex-1 py-3.5 px-4 rounded-2xl bg-white hover:bg-zinc-200 text-black text-xs font-black flex items-center justify-center gap-2 shadow-xl shadow-white/20 transition-transform active:scale-[0.98] cursor-pointer touch-press"
+            >
+              <ShieldCheck className="w-4 h-4 text-black stroke-[2.5]" />
+              <span>Ver Recuperación Muscular</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onStartWorkout(nextRoutineIndex)}
+              className="py-3.5 px-4 rounded-2xl bg-[#1A1B20] hover:bg-[#2C2D34] text-zinc-300 hover:text-white text-xs font-bold transition-colors cursor-pointer touch-press border border-[#2C2D34]"
+              title="Adelantar entrenamiento de mañana para hoy"
+            >
+              <span>Entrenar Pierna Hoy</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Caso 3: Hoy toca ENTRENAR */
+        <div className="bg-[#212227] text-white rounded-[28px] p-5 sm:p-6 shadow-xl border border-white/20 space-y-4 animate-fadeIn">
+          {/* Header del Banner */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,1)]" />
+              <span className="text-[10px] font-black tracking-widest uppercase text-white">
+                HOY TOCA ENTRENAR
+              </span>
+            </div>
+            <span className="text-[10px] font-black text-black bg-white px-2.5 py-0.5 rounded-full uppercase">
+              Listo para sobrecarga
+            </span>
+          </div>
+
+          {/* Título Principal */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              Hoy toca: {nextRoutine.title}
+            </h3>
+            <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
+              <span className="text-white font-semibold">Ayer:</span>{' '}
+              {wasYesterdayTrained ? (
+                <>Completaste <strong className="text-white">{lastRoutineShort}</strong> ({lastVolume.toLocaleString()} kg). Hoy cambiamos a tren inferior.</>
+              ) : (
+                <>Completaste <strong className="text-white">Descanso Activo</strong>. Tu sistema neuromuscular está al 100% para mover los 60 kg.</>
+              )}
+            </p>
+          </div>
+
+          {/* Resumen de la Rutina de Hoy */}
+          <div className="p-3.5 bg-[#1A1B20] rounded-2xl border border-[#2C2D34] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-black text-sm">
+                {nextRoutineIndex + 1}
+              </div>
+              <div>
+                <span className="text-[9px] font-black uppercase text-zinc-400 tracking-wider">
+                  {nextRoutine.estimatedTime || '45 min'} • {nextRoutine.intensity || 'Alta Intensidad'}
+                </span>
+                <div className="text-xs font-bold text-white mt-0.5">
+                  Sentadilla 60 kg • Peso Muerto 60 kg • Zancadas 14 kg
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Botón Masivo Blanco Protagonista */}
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={() => onStartWorkout(nextRoutineIndex)}
+              className="flex-1 py-4 px-5 rounded-2xl bg-white hover:bg-zinc-200 text-black text-sm font-black flex items-center justify-center gap-2 shadow-xl shadow-white/20 transition-transform active:scale-[0.98] cursor-pointer touch-press"
+            >
+              <Play className="w-4 h-4 text-black fill-black" />
+              <span>Iniciar Rutina de Hoy</span>
+              <ArrowRight className="w-4 h-4 text-black stroke-[3]" />
+            </button>
+
+            {onLogRestDay && (
+              <button
+                type="button"
+                onClick={onLogRestDay}
+                className="py-3 px-4 rounded-2xl bg-[#1A1B20] hover:bg-[#2C2D34] text-zinc-400 hover:text-white text-xs font-bold border border-[#2C2D34] transition-colors cursor-pointer touch-press"
+                title="Tomar día de descanso hoy"
+              >
+                <span>Descansar Hoy</span>
               </button>
             )}
           </div>

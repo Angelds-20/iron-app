@@ -633,6 +633,7 @@ export default function App() {
               completedDates={completedDates}
               restDates={restDates}
               onLogRestDay={handleLogRestDay}
+              lastWorkout={lastWorkout}
               bodyweight={bodyweight}
               onUpdateWeight={setBodyweight}
               onOpenEvolution={() => {
