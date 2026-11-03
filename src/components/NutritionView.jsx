@@ -534,8 +534,9 @@ export function NutritionView() {
                     className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-bold text-white outline-none focus:ring-1 focus:ring-white border border-[#2C2D34]"
                   >
                     <option value="almuerzo">Platos & Almuerzo</option>
+                    <option value="ensaladas">Ensaladas & Frutas</option>
                     <option value="once">La Once & Desayuno</option>
-                    <option value="antojo">Antojos & Snacks</option>
+                    <option value="antojo">Antojos & Calle</option>
                   </select>
                 </div>
               </div>

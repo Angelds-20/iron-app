@@ -7,13 +7,23 @@ import { supabase, isSupabaseConfigured } from './supabaseClient'
 export const DEFAULT_MEAL_PRESETS = [
   // --- 1. ALMUERZOS Y PLATOS CASEROS CHILENOS ---
   {
-    id: 'preset-porotos-riendas',
-    name: 'Porotos con Riendas',
-    serving_label: '1 Plato Hondo',
-    calories: 580,
-    protein: 26,
-    carbs: 90,
-    fats: 12,
+    id: 'preset-carbonada-vacuno',
+    name: 'Carbonada Criolla de Vacuno',
+    serving_label: '1 Plato Hondo con carne, zapallo y verduras',
+    calories: 440,
+    protein: 28,
+    carbs: 48,
+    fats: 14,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-pollo-apanado-arroz',
+    name: 'Pollo Apanado con Arroz',
+    serving_label: '1 Filete apanado con 1 taza de arroz',
+    calories: 620,
+    protein: 32,
+    carbs: 65,
+    fats: 18,
     category: 'almuerzo'
   },
   {
@@ -37,16 +47,6 @@ export const DEFAULT_MEAL_PRESETS = [
     category: 'almuerzo'
   },
   {
-    id: 'preset-fideos-salsa',
-    name: 'Fideos con Salsa / Tuco',
-    serving_label: '1 Plato de tallarines',
-    calories: 520,
-    protein: 24,
-    carbs: 78,
-    fats: 12,
-    category: 'almuerzo'
-  },
-  {
     id: 'preset-charquican',
     name: 'Charquicán con Huevo Frito',
     serving_label: '1 Plato con huevo montado',
@@ -57,13 +57,13 @@ export const DEFAULT_MEAL_PRESETS = [
     category: 'almuerzo'
   },
   {
-    id: 'preset-pastel-choclo',
-    name: 'Pastel de Choclo / Papa',
-    serving_label: '1 Paila o porción generosa',
-    calories: 680,
-    protein: 32,
-    carbs: 68,
-    fats: 28,
+    id: 'preset-porotos-riendas',
+    name: 'Porotos con Riendas',
+    serving_label: '1 Plato Hondo',
+    calories: 580,
+    protein: 26,
+    carbs: 90,
+    fats: 12,
     category: 'almuerzo'
   },
   {
@@ -79,15 +79,207 @@ export const DEFAULT_MEAL_PRESETS = [
   {
     id: 'preset-pure-bistec',
     name: 'Puré con Bistec o Vienesas',
-    serving_label: '1 Plato',
+    serving_label: '1 Plato de puré casero con carne',
     calories: 640,
     protein: 30,
     carbs: 62,
     fats: 28,
     category: 'almuerzo'
   },
+  {
+    id: 'preset-fideos-salsa',
+    name: 'Fideos con Salsa / Tuco de Carne',
+    serving_label: '1 Plato de tallarines con tuco',
+    calories: 520,
+    protein: 26,
+    carbs: 76,
+    fats: 13,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-pastel-choclo',
+    name: 'Pastel de Choclo / Papa',
+    serving_label: '1 Paila o porción generosa',
+    calories: 680,
+    protein: 32,
+    carbs: 68,
+    fats: 28,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-guiso-zapallo-italiano',
+    name: 'Guiso de Zapallo Italiano',
+    serving_label: '1 Plato con carne molida o huevo',
+    calories: 390,
+    protein: 26,
+    carbs: 24,
+    fats: 18,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-tomatican-arroz',
+    name: 'Tomaticán de Vacuno con Arroz',
+    serving_label: '1 Plato con carne picada y choclo',
+    calories: 490,
+    protein: 32,
+    carbs: 54,
+    fats: 15,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-pollo-al-jugo',
+    name: 'Pollo al Jugo con Arroz o Puré',
+    serving_label: '1 Presa con salsa y acompañamiento',
+    calories: 580,
+    protein: 38,
+    carbs: 52,
+    fats: 18,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-pescado-frito',
+    name: 'Pescado Frito con Ensalada',
+    serving_label: '1 Filete de merluza frita',
+    calories: 520,
+    protein: 32,
+    carbs: 28,
+    fats: 24,
+    category: 'almuerzo'
+  },
+  {
+    id: 'preset-atun-lata',
+    name: 'Lata de Atún al Agua con Limón',
+    serving_label: '1 Lata entera escurrida (120g)',
+    calories: 130,
+    protein: 28,
+    carbs: 0,
+    fats: 1.5,
+    category: 'almuerzo'
+  },
 
-  // --- 2. LA ONCE Y DESAYUNO CHILENO ---
+  // --- 2. ENSALADAS, VERDURAS & FRUTAS ---
+  {
+    id: 'preset-platano',
+    name: '1 Plátano Maduro',
+    serving_label: '1 Unidad mediana (~120g)',
+    calories: 105,
+    protein: 1.3,
+    carbs: 27,
+    fats: 0.3,
+    category: 'ensaladas'
+  },
+  {
+    id: 'preset-esparragos-plato',
+    name: 'Plato de Espárragos Cocidos',
+    serving_label: '1 Plato con limón y chorrito de aceite',
+    calories: 90,
+    protein: 4,
+    carbs: 7,
+    fats: 6,
+    category: 'ensaladas'
+  },
+  {
+    id: 'preset-lechuga-ensalada',
+    name: 'Ensalada de Lechuga',
+    serving_label: '1 Porción aliñada con limón y aceite',
+    calories: 60,
+    protein: 1,
+    carbs: 2,
+    fats: 5,
+    category: 'ensaladas'
+  },
+  {
+    id: 'preset-tomate-cilantro',
+    name: 'Tomate con Cilantro Chileno',
+    serving_label: '1 Plato de tomate picado aliñado',
+    calories: 95,
+    protein: 1.2,
+    carbs: 7,
+    fats: 8,
+    category: 'ensaladas'
+  },
+  {
+    id: 'preset-ensalada-chilena',
+    name: 'Ensalada Chilena (Tomate & Cebolla)',
+    serving_label: '1 Plato tradicional amortiguado',
+    calories: 85,
+    protein: 1.5,
+    carbs: 9,
+    fats: 6,
+    category: 'ensaladas'
+  },
+  {
+    id: 'preset-papas-porcion',
+    name: 'Porción de Papas Cocidas / Doradas',
+    serving_label: '1 Porción (~200g)',
+    calories: 220,
+    protein: 4,
+    carbs: 46,
+    fats: 4,
+    category: 'ensaladas'
+  },
+  {
+    id: 'preset-mandarina-manzana',
+    name: '1 Mandarina o Manzana',
+    serving_label: '1 Unidad de fruta fresca',
+    calories: 45,
+    protein: 0.8,
+    carbs: 11,
+    fats: 0.2,
+    category: 'ensaladas'
+  },
+
+  // --- 3. LA ONCE Y DESAYUNO CHILENO ---
+  {
+    id: 'preset-pan-manjar',
+    name: 'Pan con Manjar',
+    serving_label: '1 Pan entero con manjar',
+    calories: 350,
+    protein: 8,
+    carbs: 68,
+    fats: 5,
+    category: 'once'
+  },
+  {
+    id: 'preset-pan-queso-crema',
+    name: 'Pan con Queso Crema',
+    serving_label: '1 Pan untado con queso crema',
+    calories: 340,
+    protein: 8,
+    carbs: 52,
+    fats: 11,
+    category: 'once'
+  },
+  {
+    id: 'preset-pan-queso-sucedaneo',
+    name: 'Pan con Queso Sucedáneo Acuenta',
+    serving_label: '1 Pan con 2 láminas de queso',
+    calories: 390,
+    protein: 14,
+    carbs: 54,
+    fats: 14,
+    category: 'once'
+  },
+  {
+    id: 'preset-marraqueta-huevo',
+    name: 'Marraqueta con Huevos',
+    serving_label: '1 Pan con 2 huevos revueltos',
+    calories: 410,
+    protein: 20,
+    carbs: 54,
+    fats: 14,
+    category: 'once'
+  },
+  {
+    id: 'preset-huevos-solos',
+    name: '2 a 3 Huevos Solos (Duros / Revueltos)',
+    serving_label: 'Porción de huevos sin pan',
+    calories: 180,
+    protein: 16,
+    carbs: 1,
+    fats: 13,
+    category: 'once'
+  },
   {
     id: 'preset-marraqueta-palta',
     name: 'Marraqueta con Palta',
@@ -108,28 +300,8 @@ export const DEFAULT_MEAL_PRESETS = [
     fats: 16,
     category: 'once'
   },
-  {
-    id: 'preset-marraqueta-huevo',
-    name: 'Marraqueta con Huevos',
-    serving_label: '1 Pan con 2 huevos revueltos',
-    calories: 410,
-    protein: 20,
-    carbs: 54,
-    fats: 14,
-    category: 'once'
-  },
-  {
-    id: 'preset-pan-manjar',
-    name: 'Pan con Manjar o Mermelada',
-    serving_label: '1 Pan con manjar Colún',
-    calories: 350,
-    protein: 8,
-    carbs: 68,
-    fats: 5,
-    category: 'once'
-  },
 
-  // --- 3. ANTOJOS, CALLE Y SNACKS ---
+  // --- 4. ANTOJOS, CALLE Y SNACKS ---
   {
     id: 'preset-completo-italiano',
     name: 'Completo Italiano',
@@ -141,6 +313,26 @@ export const DEFAULT_MEAL_PRESETS = [
     category: 'antojo'
   },
   {
+    id: 'preset-churrasco-italiano',
+    name: 'Churrasco Italiano en Marraqueta',
+    serving_label: 'Posta, palta, tomate y mayo',
+    calories: 680,
+    protein: 38,
+    carbs: 55,
+    fats: 34,
+    category: 'antojo'
+  },
+  {
+    id: 'preset-as-italiano',
+    name: 'As Italiano',
+    serving_label: 'Carne picada, palta, tomate y mayo',
+    calories: 590,
+    protein: 24,
+    carbs: 48,
+    fats: 32,
+    category: 'antojo'
+  },
+  {
     id: 'preset-empanada-pino',
     name: 'Empanada de Pino al Horno',
     serving_label: '1 Empanada tradicional',
@@ -148,6 +340,16 @@ export const DEFAULT_MEAL_PRESETS = [
     protein: 22,
     carbs: 56,
     fats: 22,
+    category: 'antojo'
+  },
+  {
+    id: 'preset-sopaipilla-pebre',
+    name: 'Sopaipillas con Pebre (1-2 unidades)',
+    serving_label: 'Sopaipillas fritas tradicionales',
+    calories: 240,
+    protein: 4,
+    carbs: 32,
+    fats: 12,
     category: 'antojo'
   },
   {
@@ -162,12 +364,12 @@ export const DEFAULT_MEAL_PRESETS = [
   },
   {
     id: 'preset-yogur-avena',
-    name: 'Yogur con Avena o Plátano',
-    serving_label: '1 Tazón de yogur con avena',
-    calories: 290,
-    protein: 15,
-    carbs: 48,
-    fats: 5,
+    name: 'Yogur Protein o con Avena',
+    serving_label: '1 Tazón o pote con fruta/avena',
+    calories: 220,
+    protein: 16,
+    carbs: 32,
+    fats: 4,
     category: 'antojo'
   }
 ]
@@ -183,31 +385,45 @@ export const DEFAULT_TARGET_MACROS = {
 export const MEAL_CATEGORIES = [
   { id: 'todos', label: 'Todos' },
   { id: 'almuerzo', label: 'Platos & Almuerzo' },
+  { id: 'ensaladas', label: 'Ensaladas & Frutas' },
   { id: 'once', label: 'La Once & Desayuno' },
-  { id: 'antojo', label: 'Antojos & Snacks' }
+  { id: 'antojo', label: 'Antojos & Calle' }
 ]
 
-// Cargar presets de comidas guardados (con migración forzada a base chilena v2)
+// Cargar presets de comidas guardados (con migración forzada a base chilena v3 expandida)
 export function loadMealPresets() {
-  const savedV2 = localStorage.getItem('iron_meal_presets_v2')
-  if (savedV2) {
+  const savedV3 = localStorage.getItem('iron_meal_presets_v3')
+  if (savedV3) {
     try {
-      const list = JSON.parse(savedV2)
-      // Si la lista guardada tiene al menos 12 comidas y no tiene el medio pan viejo, usarla
-      if (Array.isArray(list) && list.length >= 12 && !list.some((p) => p.id === 'preset-medio-pan-manjar')) {
+      const list = JSON.parse(savedV3)
+      if (Array.isArray(list) && list.length >= 25) {
         return list
       }
     } catch (e) {}
   }
-  // Limpiar clave obsoleta si existía y sembrar las 16 comidas chilenas
-  localStorage.removeItem('iron_meal_presets_v1')
-  localStorage.setItem('iron_meal_presets_v2', JSON.stringify(DEFAULT_MEAL_PRESETS))
-  return DEFAULT_MEAL_PRESETS
+
+  // Si el usuario tenía custom presets creados por él en v2, recuperarlos y fusionarlos
+  let customPresets = []
+  const savedV2 = localStorage.getItem('iron_meal_presets_v2')
+  if (savedV2) {
+    try {
+      const oldList = JSON.parse(savedV2)
+      if (Array.isArray(oldList)) {
+        customPresets = oldList.filter(
+          (item) => !item.id.startsWith('preset-') || item.id.startsWith('preset-custom-') || /preset-\d+/.test(item.id)
+        )
+      }
+    } catch (e) {}
+  }
+
+  const merged = [...DEFAULT_MEAL_PRESETS, ...customPresets]
+  localStorage.setItem('iron_meal_presets_v3', JSON.stringify(merged))
+  return merged
 }
 
 // Guardar lista de presets
 export function saveMealPresets(presets) {
-  localStorage.setItem('iron_meal_presets_v2', JSON.stringify(presets))
+  localStorage.setItem('iron_meal_presets_v3', JSON.stringify(presets))
 }
 
 // Cargar objetivos de macros
