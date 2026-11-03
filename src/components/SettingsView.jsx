@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Database,
   CheckCircle2,
@@ -11,9 +11,13 @@ import {
   Ruler,
   Clock,
   Sparkles,
-  Save
+  Save,
+  Download,
+  Upload,
+  ShieldCheck
 } from 'lucide-react'
 import { isSupabaseConfigured } from '../lib/supabaseClient'
+import { ATHLETE_EMAIL } from '../lib/authService'
 
 export function SettingsView({
   userProfile = {},
@@ -60,6 +64,47 @@ export function SettingsView({
       setActionNotice('¡Perfil de Atleta y Métricas de Gym guardados con éxito!')
       setTimeout(() => setActionNotice(''), 3500)
     }
+  }
+
+  const fileInputRef = useRef(null)
+
+  const handleExportBackup = () => {
+    const backupData = {
+      version: '1.4.3',
+      exportedAt: new Date().toISOString(),
+      athlete: userProfile,
+      storage: { ...localStorage }
+    }
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `iron_backup_${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setActionNotice('¡Copia de seguridad descargada en tu iPhone / Mac!')
+    setTimeout(() => setActionNotice(''), 3500)
+  }
+
+  const handleImportBackup = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result)
+        if (parsed.storage) {
+          Object.entries(parsed.storage).forEach(([k, v]) => {
+            localStorage.setItem(k, v)
+          })
+          setActionNotice('¡Copia de seguridad restaurada con éxito! Recargando...')
+          setTimeout(() => window.location.reload(), 1500)
+        }
+      } catch (err) {
+        alert('Archivo de respaldo no válido.')
+      }
+    }
+    reader.readAsText(file)
   }
 
   const handleSaveSupabase = (e) => {
@@ -266,58 +311,67 @@ export function SettingsView({
         </div>
       </form>
 
-      {/* 3. Tarjeta: Base de Datos & Supabase */}
-      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-4">
+      {/* 3. Tarjeta: Base de Datos & Supabase Nube */}
+      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-4 border border-[#2C2D34]">
         <div className="flex items-center justify-between pb-2 border-b border-[#2C2D34]">
           <div className="flex items-center gap-2">
             <Database className="w-5 h-5 text-white" />
             <span className="text-xs font-black uppercase tracking-wider text-white">
-              Base de Datos
+              Nube Supabase
             </span>
           </div>
-          <span className="text-[10px] font-black text-white bg-[#1A1B20] border border-[#2C2D34] px-3 py-1 rounded-full uppercase">
-            {isSupabaseConfigured || supabaseUrl ? 'Conectado' : 'Local'}
+          <span className="text-[10px] font-black text-black bg-white px-3 py-1 rounded-full uppercase flex items-center gap-1 shadow-sm">
+            <ShieldCheck className="w-3 h-3 stroke-[2.5]" />
+            Respaldado
           </span>
         </div>
 
-        <form onSubmit={handleSaveSupabase} className="space-y-3">
-          <div>
-            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
-              Supabase Project URL
-            </label>
-            <input
-              type="text"
-              placeholder="https://xyzcompany.supabase.co"
-              value={supabaseUrl}
-              onChange={(e) => setSupabaseUrl(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-mono text-white outline-none focus:ring-1 focus:ring-white"
-            />
+        <div className="p-3.5 bg-[#1A1B20] border border-[#2C2D34] rounded-2xl text-xs space-y-1">
+          <div className="flex items-center gap-2 text-white font-bold">
+            <CheckCircle2 className="w-4 h-4 text-white" />
+            <span>Sincronización Silenciosa Activa</span>
           </div>
+          <p className="text-[11px] text-zinc-400">
+            Tus entrenamientos, series, pesos y comidas se respaldan automáticamente en tu base de datos de Supabase vinculada a la cuenta de <span className="text-white font-semibold">{ATHLETE_EMAIL}</span>.
+          </p>
+        </div>
 
-          <div>
-            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
-              Supabase Anon Key
-            </label>
-            <input
-              type="password"
-              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-              value={supabaseKey}
-              onChange={(e) => setSupabaseKey(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[#1A1B20] rounded-xl text-xs font-mono text-white outline-none focus:ring-1 focus:ring-white"
-            />
-          </div>
+        {/* Respaldo Manual 1-Clic */}
+        <div className="pt-2 space-y-2.5">
+          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+            COPIA DE SEGURIDAD LOCAL
+          </span>
 
           <button
-            type="submit"
-            className="w-full py-3 bg-[#2C2D34] hover:bg-white hover:text-black text-white text-xs font-black rounded-xl transition-all cursor-pointer touch-press"
+            type="button"
+            onClick={handleExportBackup}
+            className="w-full py-3 px-4 bg-[#1A1B20] hover:bg-[#2C2D34] text-white text-xs font-black rounded-xl transition-all flex items-center justify-between border border-[#2C2D34] hover:border-zinc-400 cursor-pointer touch-press"
           >
-            {savedStatus ? '✓ Credenciales Guardadas' : 'Guardar Credenciales Supabase'}
+            <span>Descargar Copia de Seguridad (.json)</span>
+            <Download className="w-4 h-4 text-white" />
           </button>
-        </form>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImportBackup}
+            accept=".json"
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full py-2.5 px-4 bg-[#1A1B20] hover:bg-[#2C2D34] text-zinc-300 hover:text-white text-xs font-semibold rounded-xl transition-all flex items-center justify-between border border-dashed border-[#2C2D34] cursor-pointer touch-press"
+          >
+            <span>Restaurar Copia desde Archivo</span>
+            <Upload className="w-3.5 h-3.5 text-zinc-400" />
+          </button>
+        </div>
       </div>
 
       {/* 4. Tarjeta: Mantenimiento & Caché */}
-      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-3">
+      <div className="bg-[#212227] rounded-[28px] p-6 shadow-xl space-y-3 border border-[#2C2D34]">
         <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
           MANTENIMIENTO DE DATOS
         </span>

@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabaseClient'
+import { ATHLETE_EMAIL, ATHLETE_PASS, ATHLETE_USER_ID } from './authService'
 
 /**
  * Servicio de sincronización silenciosa con Supabase
@@ -9,30 +10,27 @@ export async function syncWorkoutToCloud(workoutData, userProfile = {}) {
   }
 
   try {
-    // 1. Obtener sesión de usuario o crear sesión anónima/persistente
+    // 1. Obtener sesión de usuario o auto-autenticar como Ángel
     let { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
-      // Intentar iniciar sesión anónima si está habilitada en el proyecto
-      const { data: anonAuth, error: anonErr } = await supabase.auth.signInAnonymously()
-      if (!anonErr && anonAuth?.session) {
-        session = anonAuth.session
+      const { data: authData } = await supabase.auth.signInWithPassword({
+        email: ATHLETE_EMAIL,
+        password: ATHLETE_PASS
+      })
+      if (authData?.session) {
+        session = authData.session
       }
     }
 
-    const userId = session?.user?.id
-
-    if (!userId) {
-      // Si RLS requiere auth y no hay sesión activa, los datos siguen 100% seguros en localStorage
-      return { success: true, localOnly: true }
-    }
+    const userId = session?.user?.id || ATHLETE_USER_ID
 
     // 2. Insertar en tabla workouts
     const { data: workoutRecord, error: workoutErr } = await supabase
       .from('workouts')
       .insert({
         user_id: userId,
-        title: workoutData.title,
+        title: workoutData.title || 'Entrenamiento de Patio / Gym',
         category: workoutData.category || 'torso',
         duration_minutes: workoutData.durationMinutes || 45,
         avg_bpm: workoutData.watchMetrics?.avgBpm || null,
@@ -56,7 +54,7 @@ export async function syncWorkoutToCloud(workoutData, userProfile = {}) {
         .insert({
           workout_id: workoutId,
           name: ex.name,
-          order_index: 0
+          order_index: ex.orderIndex || 0
         })
         .select('id')
         .single()
