@@ -310,11 +310,11 @@ export const DEFAULT_ROUTINES = [
     id: 'pierna-fuerza',
     title: 'Pierna — Sentadilla & Peso Muerto',
     category: 'pierna',
-    estimatedTime: '45 min',
+    estimatedTime: '40 min',
     intensity: 'Alta',
     restSeconds: 90,
     image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=800&q=80',
-    description: 'Sentadilla (60 kg) sacada del banco, Peso muerto (60 kg), Zancadas (14 kg) y Gemelos (60 kg). 1:30 min de descanso.',
+    description: 'Sentadilla pesada (60 kg), Peso muerto (60 kg) y Gemelos (60 kg). Puro hierro pesado, sin zancadas.',
     exercises: [
       {
         id: 'back-squat',
@@ -337,17 +337,6 @@ export const DEFAULT_ROUTINES = [
         defaultRir: 2,
         restSeconds: 90,
         notes: 'Barra a 2-3 cm de tibias. Empuje de piernas contra el suelo. Bloqueo con glúteos sin arquear lumbares.'
-      },
-      {
-        id: 'lunges',
-        name: 'Zancadas con barra chica',
-        equipment: 'Barra chica (14 kg)',
-        targetSets: 3,
-        targetReps: '10 - 12',
-        defaultWeight: 14,
-        defaultRir: 2,
-        restSeconds: 90,
-        notes: 'Paso largo, rodilla trasera a 2 cm del suelo. Foco en glúteo mayor y estabilidad unilateral.'
       },
       {
         id: 'calf-raises',
