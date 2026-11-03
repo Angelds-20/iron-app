@@ -347,7 +347,7 @@ export function NutritionView() {
 
                   {eatenCount > 0 ? (
                     <span className="text-[10px] font-black bg-white text-black px-2 py-0.5 rounded-full shadow-sm">
-                      x{eatenCount} hoy
+                      x{eatenCount % 1 === 0 ? eatenCount : eatenCount.toFixed(1)} hoy
                     </span>
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-[#1A1B20] border border-[#2C2D34] flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors">
@@ -367,16 +367,17 @@ export function NutritionView() {
                 </div>
 
                 {/* Macros pills & Botones de Porción rápida */}
-                <div className="mt-3 pt-2 border-t border-[#2C2D34]/60 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-[9px] font-bold text-zinc-300">
+                <div
+                  className="mt-3 pt-2.5 border-t border-[#2C2D34]/70 flex items-center justify-between gap-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center gap-1 text-[9px] font-bold text-zinc-300">
                     <span className="text-white font-extrabold">{preset.protein}g P</span>
                     <span className="text-zinc-600">•</span>
                     <span>{preset.carbs}g C</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="text-zinc-400">{preset.fats}g G</span>
                   </div>
 
-                  {/* Acceso a media porción o doble ración */}
+                  {/* Acceso táctil a media porción (½), 1 ración (1x) o doble (2x) */}
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -384,7 +385,7 @@ export function NutritionView() {
                         e.stopPropagation()
                         handleQuickAdd(preset, 0.5)
                       }}
-                      className="px-1.5 py-0.5 rounded-md bg-[#1A1B20] text-zinc-400 hover:text-white text-[8px] font-bold border border-[#2C2D34] hover:border-zinc-400 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-[#1A1B20] hover:bg-[#2C2D34] active:bg-white active:text-black text-zinc-300 hover:text-white text-[11px] font-black border border-[#2C2D34] hover:border-zinc-400 transition-all cursor-pointer touch-press"
                       title="Sumar media porción (½)"
                     >
                       ½
@@ -393,9 +394,20 @@ export function NutritionView() {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation()
+                        handleQuickAdd(preset, 1)
+                      }}
+                      className="px-2 py-1 rounded-lg bg-[#2C2D34] hover:bg-zinc-600 text-white text-[10px] font-black border border-zinc-600 hover:border-white transition-all cursor-pointer touch-press"
+                      title="Sumar 1 porción entera"
+                    >
+                      1x
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
                         handleQuickAdd(preset, 2)
                       }}
-                      className="px-1.5 py-0.5 rounded-md bg-[#1A1B20] text-zinc-400 hover:text-white text-[8px] font-bold border border-[#2C2D34] hover:border-zinc-400 transition-colors cursor-pointer"
+                      className="px-1.5 py-1 rounded-lg bg-[#1A1B20] hover:bg-[#2C2D34] text-zinc-500 hover:text-zinc-300 text-[10px] font-bold border border-[#2C2D34] transition-all cursor-pointer touch-press"
                       title="Sumar doble porción (2x)"
                     >
                       2x

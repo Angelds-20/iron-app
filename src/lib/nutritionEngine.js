@@ -231,8 +231,58 @@ export const DEFAULT_MEAL_PRESETS = [
 
   // --- 3. LA ONCE Y DESAYUNO CHILENO ---
   {
+    id: 'preset-medio-pan-manjar',
+    name: 'Medio Pan con Manjar',
+    serving_label: '½ Pan (1 batida) con manjar',
+    calories: 175,
+    protein: 4,
+    carbs: 34,
+    fats: 2.5,
+    category: 'once'
+  },
+  {
+    id: 'preset-medio-pan-queso-crema',
+    name: 'Medio Pan Queso Crema',
+    serving_label: '½ Pan untado con queso crema',
+    calories: 170,
+    protein: 4,
+    carbs: 26,
+    fats: 5.5,
+    category: 'once'
+  },
+  {
+    id: 'preset-medio-pan-queso-sucedaneo',
+    name: 'Medio Pan Queso Sucedáneo',
+    serving_label: '½ Pan con 1 lámina queso Acuenta',
+    calories: 195,
+    protein: 7,
+    carbs: 27,
+    fats: 7,
+    category: 'once'
+  },
+  {
+    id: 'preset-medio-pan-palta',
+    name: 'Medio Pan con Palta',
+    serving_label: '½ Pan con palta molida',
+    calories: 190,
+    protein: 4.5,
+    carbs: 28,
+    fats: 7,
+    category: 'once'
+  },
+  {
+    id: 'preset-medio-pan-huevo',
+    name: 'Medio Pan con Huevo',
+    serving_label: '½ Pan con 1 huevo revuelto',
+    calories: 205,
+    protein: 10,
+    carbs: 27,
+    fats: 7,
+    category: 'once'
+  },
+  {
     id: 'preset-pan-manjar',
-    name: 'Pan con Manjar',
+    name: 'Pan con Manjar Entero',
     serving_label: '1 Pan entero con manjar',
     calories: 350,
     protein: 8,
@@ -242,7 +292,7 @@ export const DEFAULT_MEAL_PRESETS = [
   },
   {
     id: 'preset-pan-queso-crema',
-    name: 'Pan con Queso Crema',
+    name: 'Pan con Queso Crema Entero',
     serving_label: '1 Pan untado con queso crema',
     calories: 340,
     protein: 8,
@@ -252,7 +302,7 @@ export const DEFAULT_MEAL_PRESETS = [
   },
   {
     id: 'preset-pan-queso-sucedaneo',
-    name: 'Pan con Queso Sucedáneo Acuenta',
+    name: 'Pan con Queso Sucedáneo Entero',
     serving_label: '1 Pan con 2 láminas de queso',
     calories: 390,
     protein: 14,
@@ -390,24 +440,24 @@ export const MEAL_CATEGORIES = [
   { id: 'antojo', label: 'Antojos & Calle' }
 ]
 
-// Cargar presets de comidas guardados (con migración forzada a base chilena v3 expandida)
+// Cargar presets de comidas guardados (con migración forzada a base chilena v4 con medias porciones)
 export function loadMealPresets() {
-  const savedV3 = localStorage.getItem('iron_meal_presets_v3')
-  if (savedV3) {
+  const savedV4 = localStorage.getItem('iron_meal_presets_v4')
+  if (savedV4) {
     try {
-      const list = JSON.parse(savedV3)
-      if (Array.isArray(list) && list.length >= 25) {
+      const list = JSON.parse(savedV4)
+      if (Array.isArray(list) && list.length >= 30) {
         return list
       }
     } catch (e) {}
   }
 
-  // Si el usuario tenía custom presets creados por él en v2, recuperarlos y fusionarlos
+  // Si el usuario tenía custom presets creados por él en versiones anteriores, recuperarlos y fusionarlos
   let customPresets = []
-  const savedV2 = localStorage.getItem('iron_meal_presets_v2')
-  if (savedV2) {
+  const oldSaved = localStorage.getItem('iron_meal_presets_v3') || localStorage.getItem('iron_meal_presets_v2')
+  if (oldSaved) {
     try {
-      const oldList = JSON.parse(savedV2)
+      const oldList = JSON.parse(oldSaved)
       if (Array.isArray(oldList)) {
         customPresets = oldList.filter(
           (item) => !item.id.startsWith('preset-') || item.id.startsWith('preset-custom-') || /preset-\d+/.test(item.id)
@@ -417,13 +467,13 @@ export function loadMealPresets() {
   }
 
   const merged = [...DEFAULT_MEAL_PRESETS, ...customPresets]
-  localStorage.setItem('iron_meal_presets_v3', JSON.stringify(merged))
+  localStorage.setItem('iron_meal_presets_v4', JSON.stringify(merged))
   return merged
 }
 
 // Guardar lista de presets
 export function saveMealPresets(presets) {
-  localStorage.setItem('iron_meal_presets_v3', JSON.stringify(presets))
+  localStorage.setItem('iron_meal_presets_v4', JSON.stringify(presets))
 }
 
 // Cargar objetivos de macros
