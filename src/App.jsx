@@ -22,6 +22,7 @@ import { getRealisticProgressionSeed } from './lib/statsEngine'
 import { getRealisticBodyMeasurementsSeed } from './lib/bodyMetricsEngine'
 import { syncWorkoutToCloud } from './lib/syncService'
 import { getInitialSession, signOutUser } from './lib/authService'
+import { triggerCloudAutoSync } from './lib/cloudAutoSync'
 import {
   getActiveSession,
   saveActiveSession,
@@ -184,18 +185,37 @@ export default function App() {
     return list
   })
 
-  // Días de descanso planificados (Garantiza HOY automáticamente como descanso activo tras la sesión de ayer)
+  // Días de descanso planificados
   const [restDates, setRestDates] = useState(() => {
-    const todayStr = new Date().toISOString().split('T')[0]
     const saved = localStorage.getItem('iron_rest_dates_v2')
-    const list = saved ? JSON.parse(saved) : []
-    // Hoy es descanso automático
-    if (!list.includes(todayStr)) {
-      list.push(todayStr)
-      localStorage.setItem('iron_rest_dates_v2', JSON.stringify(list))
-    }
-    return list
+    return saved ? JSON.parse(saved) : []
   })
+
+  // Sincronización automática silenciosa con la nube en segundo plano
+  useEffect(() => {
+    // Sincronizar al iniciar la app
+    triggerCloudAutoSync()
+
+    // Sincronizar al volver a la pestaña en el iPhone
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        triggerCloudAutoSync()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('focus', handleVisibility)
+
+    // Intervalo cada 60 segundos
+    const timer = setInterval(() => {
+      triggerCloudAutoSync()
+    }, 60000)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('focus', handleVisibility)
+      clearInterval(timer)
+    }
+  }, [])
 
   // Entrenamientos completados (Historial con sesión de ayer: 6.420 kg, 15 series efectivas)
   const [workoutsHistory, setWorkoutsHistory] = useState(() => {

@@ -28,6 +28,7 @@ import {
   MEAL_CATEGORIES,
   SUPABASE_NUTRITION_SQL
 } from '../lib/nutritionEngine'
+import { triggerCloudAutoSync } from '../lib/cloudAutoSync'
 
 export function NutritionView() {
   const [presets, setPresets] = useState(() => loadMealPresets())
@@ -59,6 +60,7 @@ export function NutritionView() {
     setTodayMacros(updated)
     const portionText = multiplier === 1 ? '1 porción' : multiplier === 0.5 ? '½ porción' : `${multiplier}x`
     showToast(`+${Math.round(preset.calories * multiplier)} kcal • ${preset.name} (${portionText})`)
+    triggerCloudAutoSync()
   }
 
   // Deshacer último registro
@@ -68,6 +70,7 @@ export function NutritionView() {
     const updated = removeMealLog(lastLog.id)
     setTodayMacros(updated)
     showToast(`Deshecho: -${lastLog.calories} kcal de ${lastLog.name}`)
+    triggerCloudAutoSync()
   }
 
   // Eliminar un registro específico del día
@@ -75,6 +78,7 @@ export function NutritionView() {
     const updated = removeMealLog(logId)
     setTodayMacros(updated)
     showToast(`Eliminado: -${cal} kcal de ${name}`)
+    triggerCloudAutoSync()
   }
 
   // Guardar nuevo preset
