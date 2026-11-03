@@ -19,8 +19,9 @@ export function WatchView({ onSaveWatchData, currentData = {} }) {
   const [copiedLink, setCopiedLink] = useState(false)
   const [savedSuccess, setSavedSuccess] = useState(false)
 
-  // Genera el URL Scheme para Atajos de iOS
-  const sampleUrl = `iron://watch-sync?avgBpm=138&maxBpm=168&calories=285`
+  // Genera la URL real de sincronización para Atajos de iOS
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://10.76.19.43:3000'
+  const sampleUrl = `${baseUrl}/?avgBpm=138&maxBpm=168&calories=285`
 
   const copyShortcutUrl = () => {
     navigator.clipboard.writeText(sampleUrl)
