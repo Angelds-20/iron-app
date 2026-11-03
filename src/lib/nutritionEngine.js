@@ -231,59 +231,9 @@ export const DEFAULT_MEAL_PRESETS = [
 
   // --- 3. LA ONCE Y DESAYUNO CHILENO ---
   {
-    id: 'preset-medio-pan-manjar',
-    name: 'Medio Pan con Manjar',
-    serving_label: '½ Pan (1 batida) con manjar',
-    calories: 175,
-    protein: 4,
-    carbs: 34,
-    fats: 2.5,
-    category: 'once'
-  },
-  {
-    id: 'preset-medio-pan-queso-crema',
-    name: 'Medio Pan Queso Crema',
-    serving_label: '½ Pan untado con queso crema',
-    calories: 170,
-    protein: 4,
-    carbs: 26,
-    fats: 5.5,
-    category: 'once'
-  },
-  {
-    id: 'preset-medio-pan-queso-sucedaneo',
-    name: 'Medio Pan Queso Sucedáneo',
-    serving_label: '½ Pan con 1 lámina queso Acuenta',
-    calories: 195,
-    protein: 7,
-    carbs: 27,
-    fats: 7,
-    category: 'once'
-  },
-  {
-    id: 'preset-medio-pan-palta',
-    name: 'Medio Pan con Palta',
-    serving_label: '½ Pan con palta molida',
-    calories: 190,
-    protein: 4.5,
-    carbs: 28,
-    fats: 7,
-    category: 'once'
-  },
-  {
-    id: 'preset-medio-pan-huevo',
-    name: 'Medio Pan con Huevo',
-    serving_label: '½ Pan con 1 huevo revuelto',
-    calories: 205,
-    protein: 10,
-    carbs: 27,
-    fats: 7,
-    category: 'once'
-  },
-  {
     id: 'preset-pan-manjar',
-    name: 'Pan con Manjar Entero',
-    serving_label: '1 Pan entero con manjar',
+    name: 'Pan con Manjar',
+    serving_label: '1 Pan entero (o usa ½)',
     calories: 350,
     protein: 8,
     carbs: 68,
@@ -292,8 +242,8 @@ export const DEFAULT_MEAL_PRESETS = [
   },
   {
     id: 'preset-pan-queso-crema',
-    name: 'Pan con Queso Crema Entero',
-    serving_label: '1 Pan untado con queso crema',
+    name: 'Pan con Queso Crema',
+    serving_label: '1 Pan untado (o usa ½)',
     calories: 340,
     protein: 8,
     carbs: 52,
@@ -302,12 +252,52 @@ export const DEFAULT_MEAL_PRESETS = [
   },
   {
     id: 'preset-pan-queso-sucedaneo',
-    name: 'Pan con Queso Sucedáneo Entero',
-    serving_label: '1 Pan con 2 láminas de queso',
+    name: 'Pan con Queso Sucedáneo Acuenta',
+    serving_label: '1 Pan con 2 láminas (o usa ½)',
     calories: 390,
     protein: 14,
     carbs: 54,
     fats: 14,
+    category: 'once'
+  },
+  {
+    id: 'preset-marraqueta-huevo',
+    name: 'Marraqueta con Huevos',
+    serving_label: '1 Pan con 2 huevos (o usa ½)',
+    calories: 410,
+    protein: 20,
+    carbs: 54,
+    fats: 14,
+    category: 'once'
+  },
+  {
+    id: 'preset-huevos-solos',
+    name: '2 a 3 Huevos Solos (Duros / Revueltos)',
+    serving_label: 'Porción de huevos sin pan',
+    calories: 180,
+    protein: 16,
+    carbs: 1,
+    fats: 13,
+    category: 'once'
+  },
+  {
+    id: 'preset-marraqueta-palta',
+    name: 'Marraqueta con Palta',
+    serving_label: '1 Pan entero (o usa ½)',
+    calories: 380,
+    protein: 9,
+    carbs: 56,
+    fats: 14,
+    category: 'once'
+  },
+  {
+    id: 'preset-marraqueta-queso-jamon',
+    name: 'Marraqueta Queso & Jamón',
+    serving_label: '1 Pan con gauda y jamón',
+    calories: 450,
+    protein: 24,
+    carbs: 54,
+    fats: 16,
     category: 'once'
   },
   {
@@ -440,13 +430,13 @@ export const MEAL_CATEGORIES = [
   { id: 'antojo', label: 'Antojos & Calle' }
 ]
 
-// Cargar presets de comidas guardados (con migración forzada a base chilena v4 con medias porciones)
+// Cargar presets de comidas guardados (con migración forzada a base chilena v5 limpia)
 export function loadMealPresets() {
-  const savedV4 = localStorage.getItem('iron_meal_presets_v4')
-  if (savedV4) {
+  const savedV5 = localStorage.getItem('iron_meal_presets_v5')
+  if (savedV5) {
     try {
-      const list = JSON.parse(savedV4)
-      if (Array.isArray(list) && list.length >= 30) {
+      const list = JSON.parse(savedV5)
+      if (Array.isArray(list) && list.length >= 25 && !list.some((p) => p.name.startsWith('Medio Pan '))) {
         return list
       }
     } catch (e) {}
@@ -454,7 +444,10 @@ export function loadMealPresets() {
 
   // Si el usuario tenía custom presets creados por él en versiones anteriores, recuperarlos y fusionarlos
   let customPresets = []
-  const oldSaved = localStorage.getItem('iron_meal_presets_v3') || localStorage.getItem('iron_meal_presets_v2')
+  const oldSaved =
+    localStorage.getItem('iron_meal_presets_v4') ||
+    localStorage.getItem('iron_meal_presets_v3') ||
+    localStorage.getItem('iron_meal_presets_v2')
   if (oldSaved) {
     try {
       const oldList = JSON.parse(oldSaved)
@@ -467,13 +460,13 @@ export function loadMealPresets() {
   }
 
   const merged = [...DEFAULT_MEAL_PRESETS, ...customPresets]
-  localStorage.setItem('iron_meal_presets_v4', JSON.stringify(merged))
+  localStorage.setItem('iron_meal_presets_v5', JSON.stringify(merged))
   return merged
 }
 
 // Guardar lista de presets
 export function saveMealPresets(presets) {
-  localStorage.setItem('iron_meal_presets_v4', JSON.stringify(presets))
+  localStorage.setItem('iron_meal_presets_v5', JSON.stringify(presets))
 }
 
 // Cargar objetivos de macros
