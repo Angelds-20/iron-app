@@ -3,9 +3,6 @@ import confetti from 'canvas-confetti'
 import { Trophy } from 'lucide-react'
 import { Header } from './components/Header'
 import { WeekStrip } from './components/WeekStrip'
-import { BodyweightCard } from './components/BodyweightCard'
-import { SessionMetricsCard } from './components/SessionMetricsCard'
-import { ActionCards } from './components/ActionCards'
 import { HomeHub } from './components/HomeHub'
 import { Navbar } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
@@ -790,26 +787,27 @@ export default function App() {
 
         {/* Modal de Insignia Desbloqueada */}
         {newBadgeModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-white rounded-4xl p-6 max-w-xs w-full text-center shadow-2xl border border-sand-200">
-              <div className="w-16 h-16 rounded-3xl bg-carbon-900 text-coral-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-carbon-900/20">
-                <Trophy className="w-8 h-8" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn text-white">
+            <div className="bg-[#212227] border border-[#2C2D34] rounded-[28px] p-6 max-w-xs w-full text-center shadow-2xl space-y-3">
+              <div className="w-16 h-16 rounded-3xl bg-[#1A1B20] border border-[#2C2D34] text-white flex items-center justify-center mx-auto mb-2 shadow-lg">
+                <Trophy className="w-8 h-8 text-white" />
               </div>
-              <div className="text-[10px] font-bold tracking-widest text-coral-500 uppercase">
+              <div className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                 ¡LOGRO DESBLOQUEADO!
               </div>
-              <h3 className="text-xl font-black text-carbon-900 mt-1 mb-1">
+              <h3 className="text-xl font-black text-white leading-tight">
                 {newBadgeModal.title}
               </h3>
-              <p className="text-xs text-neutral-500 leading-relaxed mb-4">
+              <p className="text-xs text-zinc-300 leading-relaxed">
                 {newBadgeModal.description}
               </p>
-              <div className="inline-block px-3 py-1 rounded-full bg-sand-100 text-xs font-black text-carbon-900 mb-5">
+              <div className="inline-block px-3 py-1 rounded-full bg-[#1A1B20] border border-[#2C2D34] text-xs font-black text-white">
                 +{newBadgeModal.xpReward} XP GANADOS
               </div>
               <button
+                type="button"
                 onClick={() => setNewBadgeModal(null)}
-                className="w-full py-3 bg-carbon-900 hover:bg-black text-white text-xs font-bold rounded-full transition-colors"
+                className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black text-xs font-black rounded-2xl shadow-xl shadow-white/20 transition-all cursor-pointer touch-press"
               >
                 Continuar
               </button>

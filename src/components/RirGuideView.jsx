@@ -31,8 +31,8 @@ export function RirGuideView() {
       level: 2,
       badge: 'RIR 2',
       name: 'Zona Dorada de Hipertrofia & Fuerza',
-      color: 'text-emerald-700',
-      tagColor: 'bg-emerald-600 text-white',
+      color: 'text-white',
+      tagColor: 'bg-white text-black',
       isRecommended: true,
       description: 'Te quedaban exactamente 2 repeticiones antes del fallo técnico.',
       barSpeed: 'La barra desacelera en las 2 últimas repeticiones pero no se traba',
@@ -157,7 +157,7 @@ export function RirGuideView() {
             </div>
 
             <div className="flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-white flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="font-extrabold text-white">Para tus entrenos en patio: </strong>
                 <span className="text-zinc-200">{activeLevel.angelAdvice}</span>
@@ -169,14 +169,14 @@ export function RirGuideView() {
         {/* Semáforo de Decisión para 60 kg */}
         <div className="p-5 rounded-2xl bg-[#1A1B20] space-y-3">
           <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase block">
-            SEMÁFORO DE SOBRECARGA (60 KG)
+            CRITERIO DE SOBRECARGA (60 KG)
           </span>
 
           <div className="space-y-2.5 text-xs">
             <div className="flex items-start gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1 shadow-xs shadow-emerald-400/50" />
+              <span className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)] flex-shrink-0 mt-1" />
               <div>
-                <strong className="font-bold text-white">Verde (RIR 2 o 3 en las 10 reps): </strong>
+                <strong className="font-bold text-white">Óptimo (RIR 2 o 3 en las 10 reps): </strong>
                 <span className="text-zinc-300">Tienes margen sobrante. En tu siguiente entreno intenta sacar 11-12 reps o sumar 2.5 kg a la barra.</span>
               </div>
             </div>
@@ -213,7 +213,7 @@ export function RirGuideView() {
                   <button
                     type="button"
                     onClick={() => setExpandedFaq(isOpen ? null : index)}
-                    className="w-full text-left text-xs font-bold text-white flex items-center justify-between gap-2 cursor-pointer hover:text-coral-400 transition-colors"
+                    className="w-full text-left text-xs font-bold text-white flex items-center justify-between gap-2 cursor-pointer hover:text-white/80 transition-colors"
                   >
                     <span>{faq.q}</span>
                     {isOpen ? (

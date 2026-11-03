@@ -468,8 +468,8 @@ export function ExerciseTechniqueView({ onStartExerciseRoutine = null }) {
                     </span>
 
                     {/* Píldora RIR */}
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1A1B20] text-emerald-400 text-xs font-black">
-                      <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1A1B20] text-white text-xs font-black border border-[#2C2D34]">
+                      <Shield className="w-3.5 h-3.5 text-white" />
                       <span>{ex.rir}</span>
                     </span>
                   </div>

@@ -6,13 +6,13 @@ export function WeeklyVolumeChart({ volumeData }) {
   const maxVol = Math.max(...weeks.map((w) => w.volume), 1)
 
   return (
-    <div className="bg-white rounded-3xl p-5 shadow-xs border border-sand-200/80 space-y-3.5">
+    <div className="bg-[#212227] rounded-[28px] p-5 sm:p-6 shadow-xl border border-[#2C2D34] space-y-3.5 text-white">
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-[10px] font-black tracking-widest text-neutral-400 uppercase">
+          <span className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
             TONELAJE ACUMULADO
           </span>
-          <h3 className="text-base font-black text-carbon-900 leading-tight mt-0.5">
+          <h3 className="text-base font-black text-white leading-tight mt-0.5">
             Volumen Semanal
           </h3>
         </div>
@@ -21,14 +21,14 @@ export function WeeklyVolumeChart({ volumeData }) {
           <div
             className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black ${
               volumeData?.weekDiff >= 0
-                ? 'bg-emerald-50 text-emerald-700'
-                : 'bg-sand-100 text-neutral-600'
+                ? 'bg-white/15 text-white border border-white/20'
+                : 'bg-[#1A1B20] text-zinc-400 border border-[#2C2D34]'
             }`}
           >
             {volumeData?.weekDiff >= 0 ? (
-              <TrendingUp className="w-3.5 h-3.5" />
+              <TrendingUp className="w-3.5 h-3.5 text-white" />
             ) : (
-              <TrendingDown className="w-3.5 h-3.5" />
+              <TrendingDown className="w-3.5 h-3.5 text-zinc-400" />
             )}
             <span>
               {volumeData?.weekDiff >= 0 ? '+' : ''}
@@ -40,10 +40,10 @@ export function WeeklyVolumeChart({ volumeData }) {
 
       {/* Título de Volumen Actual */}
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-black text-carbon-900 font-mono tracking-tight">
+        <span className="text-3xl font-black text-white font-mono tracking-tight">
           {(volumeData?.currentWeekVolume || 0).toLocaleString()}
         </span>
-        <span className="text-xs font-bold text-neutral-400 uppercase">kg movidos esta semana</span>
+        <span className="text-xs font-bold text-zinc-400 uppercase">kg movidos esta semana</span>
       </div>
 
       {/* Gráfico de Barras Semanales */}
@@ -55,17 +55,17 @@ export function WeeklyVolumeChart({ volumeData }) {
 
             return (
               <div key={week.label} className="flex flex-col items-center gap-1.5 h-full justify-end group">
-                <span className="text-[9px] font-mono font-bold text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-[9px] font-mono font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">
                   {Math.round(week.volume / 1000)}t
                 </span>
 
-                <div className="w-full bg-sand-100 rounded-xl overflow-hidden flex flex-col justify-end p-1 h-24">
+                <div className="w-full bg-[#1A1B20] rounded-xl overflow-hidden flex flex-col justify-end p-1 h-24 border border-[#2C2D34]">
                   <div
                     style={{ height: `${heightPercent}%` }}
                     className={`w-full rounded-lg transition-all duration-500 ${
                       isCurrentWeek
-                        ? 'bg-coral-500 shadow-sm shadow-coral-500/20'
-                        : 'bg-carbon-900'
+                        ? 'bg-white shadow-[0_0_12px_rgba(255,255,255,0.7)]'
+                        : 'bg-[#2C2D34]'
                     }`}
                   />
                 </div>
@@ -73,12 +73,12 @@ export function WeeklyVolumeChart({ volumeData }) {
                 <div className="text-center">
                   <span
                     className={`text-[10px] font-bold block ${
-                      isCurrentWeek ? 'text-coral-500 font-black' : 'text-neutral-500'
+                      isCurrentWeek ? 'text-white font-black' : 'text-zinc-500'
                     }`}
                   >
                     {week.label}
                   </span>
-                  <span className="text-[8px] text-neutral-400 block font-medium">
+                  <span className="text-[8px] text-zinc-400 block font-medium">
                     {week.sessionsCount} ent.
                   </span>
                 </div>
@@ -89,12 +89,12 @@ export function WeeklyVolumeChart({ volumeData }) {
       </div>
 
       {/* Promedio Semanal */}
-      <div className="p-3 bg-sand-50 rounded-2xl border border-sand-200/60 flex items-center justify-between text-xs">
+      <div className="p-3.5 bg-[#1A1B20] rounded-2xl border border-[#2C2D34] flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-coral-500" />
-          <span className="font-bold text-carbon-900">Promedio por semana:</span>
+          <Calendar className="w-4 h-4 text-white" />
+          <span className="font-bold text-zinc-300">Promedio por semana:</span>
         </div>
-        <span className="font-mono font-black text-carbon-900">
+        <span className="font-mono font-black text-white">
           {(volumeData?.averageWeeklyVolume || 0).toLocaleString()} kg
         </span>
       </div>

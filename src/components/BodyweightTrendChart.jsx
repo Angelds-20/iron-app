@@ -88,7 +88,7 @@ export function BodyweightTrendChart({
         <div
           className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black ${
             totalDelta >= 0
-              ? 'bg-emerald-950/50 text-emerald-400 border border-emerald-800/40'
+              ? 'bg-white/15 text-white border border-white/20'
               : 'bg-[#2C2D34] text-white'
           }`}
         >

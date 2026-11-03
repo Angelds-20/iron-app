@@ -95,7 +95,7 @@ export function BodyEvolutionView({
           <div className="text-2xl font-black text-white mt-1">
             {currentWeight} <span className="text-xs font-bold text-zinc-400">kg</span>
           </div>
-          <span className="text-[9px] font-black text-emerald-400 block mt-0.5">
+          <span className="text-[9px] font-black text-white/90 block mt-0.5">
             Ayunas
           </span>
         </div>
@@ -151,7 +151,7 @@ export function BodyEvolutionView({
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-zinc-400 uppercase">Pecho</span>
               {chestDelta !== null && (
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+                <span className="text-[10px] font-black text-white bg-[#2C2D34] px-1.5 py-0.5 rounded-md">
                   +{chestDelta} cm
                 </span>
               )}
@@ -169,7 +169,7 @@ export function BodyEvolutionView({
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-zinc-400 uppercase">Brazo</span>
               {armDelta !== null && (
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+                <span className="text-[10px] font-black text-white bg-[#2C2D34] px-1.5 py-0.5 rounded-md">
                   +{armDelta} cm
                 </span>
               )}
@@ -187,7 +187,7 @@ export function BodyEvolutionView({
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-zinc-400 uppercase">Cintura</span>
               {waistDelta !== null && (
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+                <span className="text-[10px] font-black text-white bg-[#2C2D34] px-1.5 py-0.5 rounded-md">
                   {waistDelta <= 0 ? `${waistDelta} cm` : `+${waistDelta} cm`}
                 </span>
               )}
@@ -205,7 +205,7 @@ export function BodyEvolutionView({
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-zinc-400 uppercase">Muslo</span>
               {thighDelta !== null && (
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+                <span className="text-[10px] font-black text-white bg-[#2C2D34] px-1.5 py-0.5 rounded-md">
                   +{thighDelta} cm
                 </span>
               )}
