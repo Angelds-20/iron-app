@@ -23,6 +23,7 @@ import { getRealisticBodyMeasurementsSeed } from './lib/bodyMetricsEngine'
 import { syncWorkoutToCloud } from './lib/syncService'
 import { getInitialSession, signOutUser } from './lib/authService'
 import { triggerCloudAutoSync } from './lib/cloudAutoSync'
+import { getLocalDateString, getYesterdayLocalDateString } from './lib/dateUtils'
 import {
   getActiveSession,
   saveActiveSession,
@@ -172,8 +173,8 @@ export default function App() {
 
   // Días completados (Registra SOLO ayer como sesión completada de 60 kg)
   const [completedDates, setCompletedDates] = useState(() => {
-    const todayStr = new Date().toISOString().split('T')[0]
-    const yesterdayStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const todayStr = getLocalDateString()
+    const yesterdayStr = getYesterdayLocalDateString()
     const saved = localStorage.getItem('completed_workout_dates')
     let list = saved ? JSON.parse(saved) : []
     // Asegurar que hoy NUNCA esté marcado como entrenado automáticamente
@@ -187,7 +188,7 @@ export default function App() {
 
   // Días de descanso planificados
   const [restDates, setRestDates] = useState(() => {
-    const todayStr = new Date().toISOString().split('T')[0]
+    const todayStr = getLocalDateString()
     const saved = localStorage.getItem('iron_rest_dates_v2')
     let list = saved ? JSON.parse(saved) : []
     // Asegurar que hoy NUNCA esté marcado como descanso por defecto si Ángel quiere entrenar
@@ -422,7 +423,7 @@ export default function App() {
 
   // Alternar día de descanso / entreno (+50 XP y racha protegida)
   const handleLogRestDay = () => {
-    const todayStr = new Date().toISOString().split('T')[0]
+    const todayStr = getLocalDateString()
     setRestDates((prev) => {
       const isRest = prev.includes(todayStr)
       let nextRest
@@ -592,7 +593,7 @@ export default function App() {
 
   // Finalizar entrenamiento
   const handleCompleteWorkout = (workoutData) => {
-    const todayStr = new Date().toISOString().split('T')[0]
+    const todayStr = getLocalDateString()
 
     if (!completedDates.includes(todayStr)) {
       setCompletedDates((prev) => [...prev, todayStr])
@@ -672,7 +673,7 @@ export default function App() {
               onDiscardActiveSession={handleClearActiveSession}
               routines={allRoutines}
               onStartWorkout={(idx = 0) => {
-                const todayStr = new Date().toISOString().split('T')[0]
+                const todayStr = getLocalDateString()
                 setRestDates((prev) => {
                   const cleaned = prev.filter((d) => d !== todayStr)
                   localStorage.setItem('iron_rest_dates_v2', JSON.stringify(cleaned))

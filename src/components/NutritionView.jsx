@@ -44,6 +44,15 @@ export function NutritionView() {
 
   // Escuchar eventos de actualización reactiva desde la nube o sincronización
   useEffect(() => {
+    // Si arranca en 0 calorías, auto-descargar de Supabase inmediatamente
+    if (todayMacros.total_calories === 0) {
+      forceCloudPull().then((res) => {
+        if (res?.success && res.data) {
+          setTodayMacros(res.data)
+        }
+      })
+    }
+
     const handleUpdate = (e) => {
       if (e?.detail) {
         setTodayMacros(e.detail)

@@ -4,6 +4,7 @@
 
 import { supabase, isSupabaseConfigured } from './supabaseClient'
 import { ATHLETE_EMAIL, ATHLETE_PASS, ATHLETE_USER_ID } from './authService'
+import { getLocalDateString } from './dateUtils'
 
 export const DEFAULT_MEAL_PRESETS = [
   // --- 1. ALMUERZOS Y PLATOS CASEROS CHILENOS ---
@@ -485,12 +486,30 @@ export function saveTargetMacros(targets) {
   localStorage.setItem('iron_target_macros_v1', JSON.stringify(targets))
 }
 
-// Cargar registro de macros de hoy
-export function loadTodayMacros(dateStr = new Date().toISOString().split('T')[0]) {
-  const saved = localStorage.getItem(`iron_macros_${dateStr}`)
+// Cargar registro de macros de hoy (Con blindaje de zona horaria local chilena)
+export function loadTodayMacros(dateStr = getLocalDateString()) {
+  let saved = localStorage.getItem(`iron_macros_${dateStr}`)
+  // Si no hay datos en dateStr, buscar en fechas adyacentes por diferencia UTC vs local
+  if (!saved) {
+    const fallbackDates = ['2026-11-03', '2026-11-04']
+    for (const fb of fallbackDates) {
+      const fbData = localStorage.getItem(`iron_macros_${fb}`)
+      if (fbData) {
+        try {
+          const parsed = JSON.parse(fbData)
+          if (parsed && parsed.total_calories > 0) {
+            saved = fbData
+            localStorage.setItem(`iron_macros_${dateStr}`, fbData)
+            break
+          }
+        } catch (e) {}
+      }
+    }
+  }
   if (saved) {
     try {
-      return JSON.parse(saved)
+      const parsed = JSON.parse(saved)
+      if (parsed) return parsed
     } catch (e) {}
   }
   return {
@@ -510,13 +529,18 @@ export function saveTodayMacros(macrosData) {
     macrosData.updatedAt = Date.now()
   }
   localStorage.setItem(`iron_macros_${macrosData.date}`, JSON.stringify(macrosData))
+  // También guardar con la fecha local de Chile para evitar discrepancias
+  const localDate = getLocalDateString()
+  if (macrosData.date !== localDate) {
+    localStorage.setItem(`iron_macros_${localDate}`, JSON.stringify({ ...macrosData, date: localDate }))
+  }
   try {
     window.dispatchEvent(new CustomEvent('iron_macros_updated', { detail: macrosData }))
   } catch (e) {}
 }
 
 // Registrar comida rápida (Quick Add)
-export async function logQuickMealLocalAndRemote(preset, multiplier = 1, dateStr = new Date().toISOString().split('T')[0]) {
+export async function logQuickMealLocalAndRemote(preset, multiplier = 1, dateStr = getLocalDateString()) {
   const current = loadTodayMacros(dateStr)
 
   const addedCal = Math.round(preset.calories * multiplier)
@@ -579,7 +603,7 @@ export async function logQuickMealLocalAndRemote(preset, multiplier = 1, dateStr
 }
 
 // Deshacer el último registro o eliminar un registro específico
-export function removeMealLog(logId, dateStr = new Date().toISOString().split('T')[0]) {
+export function removeMealLog(logId, dateStr = getLocalDateString()) {
   const current = loadTodayMacros(dateStr)
   const entryToRemove = current.logs?.find((l) => l.id === logId)
   if (!entryToRemove) return current

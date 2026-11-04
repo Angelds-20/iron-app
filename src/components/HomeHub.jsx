@@ -24,6 +24,7 @@ import {
   Calendar,
   Utensils
 } from 'lucide-react'
+import { getLocalDateString, getYesterdayLocalDateString } from '../lib/dateUtils'
 import { ExerciseTechniqueView } from './ExerciseTechniqueView'
 import { RirGuideView } from './RirGuideView'
 
@@ -144,9 +145,8 @@ export function HomeHub({
 }) {
   const [activeSegment, setActiveSegment] = useState('workouts') // 'workouts' | 'recovery' | 'technique'
 
-  const todayStr = new Date().toISOString().split('T')[0]
-  const yesterdayDate = new Date(Date.now() - 24 * 60 * 60 * 1000)
-  const yesterdayStr = yesterdayDate.toISOString().split('T')[0]
+  const todayStr = getLocalDateString()
+  const yesterdayStr = getYesterdayLocalDateString()
 
   const isTodayRest = restDates.includes(todayStr)
   const wasYesterdayTrained = completedDates.includes(yesterdayStr)
