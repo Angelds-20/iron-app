@@ -308,7 +308,7 @@ export function HomeHub({
                   {nextRoutine.title}
                 </div>
                 <div className="text-[10px] text-zinc-400 mt-0.5">
-                  Sentadilla 60 kg • Peso Muerto 60 kg • Zancadas 14 kg
+                  Sentadilla 60 kg • Peso Muerto 60 kg • Gemelos con Barra
                 </div>
               </div>
             </div>
@@ -377,7 +377,7 @@ export function HomeHub({
                   {nextRoutine.estimatedTime || '45 min'} • {nextRoutine.intensity || 'Alta Intensidad'}
                 </span>
                 <div className="text-xs font-bold text-white mt-0.5">
-                  Sentadilla 60 kg • Peso Muerto 60 kg • Zancadas 14 kg
+                  Sentadilla 60 kg • Peso Muerto 60 kg • Gemelos con Barra
                 </div>
               </div>
             </div>

@@ -15,7 +15,9 @@ import {
   ChevronRight,
   Info,
   Search,
-  Sparkles
+  Sparkles,
+  Cloud,
+  RefreshCw
 } from 'lucide-react'
 import {
   loadMealPresets,
@@ -28,7 +30,7 @@ import {
   MEAL_CATEGORIES,
   SUPABASE_NUTRITION_SQL
 } from '../lib/nutritionEngine'
-import { triggerCloudAutoSync } from '../lib/cloudAutoSync'
+import { triggerCloudAutoSync, forceCloudPull } from '../lib/cloudAutoSync'
 
 export function NutritionView() {
   const [presets, setPresets] = useState(() => loadMealPresets())
@@ -38,6 +40,38 @@ export function NutritionView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [toastMessage, setToastMessage] = useState('')
   const [isNewPresetOpen, setIsNewPresetOpen] = useState(false)
+  const [isPulling, setIsPulling] = useState(false)
+
+  // Escuchar eventos de actualización reactiva desde la nube o sincronización
+  useEffect(() => {
+    const handleUpdate = (e) => {
+      if (e?.detail) {
+        setTodayMacros(e.detail)
+      } else {
+        setTodayMacros(loadTodayMacros())
+      }
+    }
+    window.addEventListener('iron_macros_updated', handleUpdate)
+    window.addEventListener('focus', () => setTodayMacros(loadTodayMacros()))
+    return () => {
+      window.removeEventListener('iron_macros_updated', handleUpdate)
+      window.removeEventListener('focus', () => setTodayMacros(loadTodayMacros()))
+    }
+  }, [])
+
+  // Forzar sincronización desde la nube
+  const handleForcePull = async () => {
+    setIsPulling(true)
+    showToast('Sincronizando con Supabase...')
+    const res = await forceCloudPull()
+    setIsPulling(false)
+    if (res.success && res.data) {
+      setTodayMacros(res.data)
+      showToast(`¡Nube sincronizada! (${res.data.total_calories} kcal)`)
+    } else {
+      showToast('Registro al día con la nube')
+    }
+  }
 
   // Formulario de nuevo preset
   const [newName, setNewName] = useState('')
@@ -166,6 +200,16 @@ export function NutritionView() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleForcePull}
+            disabled={isPulling}
+            className="p-2 rounded-2xl bg-[#212227] hover:bg-[#2C2D34] text-zinc-300 hover:text-white transition-colors cursor-pointer border border-[#2C2D34] disabled:opacity-50"
+            title="Sincronizar comidas con la nube Supabase"
+          >
+            <Cloud className={`w-4 h-4 text-white ${isPulling ? 'animate-pulse text-zinc-400' : ''}`} />
+          </button>
+
           {todayMacros.logs?.length > 0 && (
             <button
               type="button"

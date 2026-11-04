@@ -187,8 +187,13 @@ export default function App() {
 
   // Días de descanso planificados
   const [restDates, setRestDates] = useState(() => {
+    const todayStr = new Date().toISOString().split('T')[0]
     const saved = localStorage.getItem('iron_rest_dates_v2')
-    return saved ? JSON.parse(saved) : []
+    let list = saved ? JSON.parse(saved) : []
+    // Asegurar que hoy NUNCA esté marcado como descanso por defecto si Ángel quiere entrenar
+    list = list.filter((d) => d !== todayStr)
+    localStorage.setItem('iron_rest_dates_v2', JSON.stringify(list))
+    return list
   })
 
   // Sincronización automática silenciosa con la nube en segundo plano
@@ -667,6 +672,12 @@ export default function App() {
               onDiscardActiveSession={handleClearActiveSession}
               routines={allRoutines}
               onStartWorkout={(idx = 0) => {
+                const todayStr = new Date().toISOString().split('T')[0]
+                setRestDates((prev) => {
+                  const cleaned = prev.filter((d) => d !== todayStr)
+                  localStorage.setItem('iron_rest_dates_v2', JSON.stringify(cleaned))
+                  return cleaned
+                })
                 setActiveRoutineIndex(idx)
                 setActiveTab('workout')
               }}

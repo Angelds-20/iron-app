@@ -506,7 +506,13 @@ export function loadTodayMacros(dateStr = new Date().toISOString().split('T')[0]
 // Guardar macros del día
 export function saveTodayMacros(macrosData) {
   if (!macrosData?.date) return
+  if (!macrosData.updatedAt) {
+    macrosData.updatedAt = Date.now()
+  }
   localStorage.setItem(`iron_macros_${macrosData.date}`, JSON.stringify(macrosData))
+  try {
+    window.dispatchEvent(new CustomEvent('iron_macros_updated', { detail: macrosData }))
+  } catch (e) {}
 }
 
 // Registrar comida rápida (Quick Add)
